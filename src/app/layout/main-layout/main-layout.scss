@@ -36,7 +36,7 @@
 }
 
 .brand-subtitle {
-  color: var(--mat-sys-on-surface-variant);
+  color: var(--mat-sys-on-surface);
   font-size: 0.75rem;
   letter-spacing: 0.05em;
   text-transform: uppercase;
@@ -105,6 +105,7 @@
     opacity: 0;
     transform: translateY(-8px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -114,4 +115,3 @@
 .animate-fade-in {
   animation: fadeIn 0.2s ease-out forwards;
 }
-
