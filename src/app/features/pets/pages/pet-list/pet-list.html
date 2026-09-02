@@ -1,0 +1,369 @@
+<div class="container-fluid px-3 px-md-4">
+  <!-- Cabeçalho da Página -->
+  <div class="row align-items-center mb-4 g-3">
+    <div class="col-12 col-md-7">
+      <div class="d-flex align-items-center gap-3">
+        <div class="header-icon-box d-flex align-items-center justify-content-center">
+          <mat-icon>pets</mat-icon>
+        </div>
+        <div>
+          <h1 class="h3 fw-bold mb-1">Gestão de Pets</h1>
+          <p class="text-surface-muted small mb-0">Consulte, filtre e gerencie todos os animais cadastrados no sistema.</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-12 col-md-5 d-flex justify-content-md-end gap-2">
+      <button mat-flat-button color="primary" routerLink="/pets/novo"
+        class="btn-create d-flex align-items-center gap-2 py-2 px-3 rounded-3 shadow-sm">
+        <mat-icon>add</mat-icon>
+        <span class="fw-semibold">Cadastrar Novo Pet</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Cards de Estatísticas Rápidas -->
+  <div class="row g-3 mb-4">
+    <div class="col-6 col-md-3">
+      <div class="stat-card p-3 rounded-3 shadow-xs">
+        <div class="d-flex align-items-center justify-content-between">
+          <div>
+            <span class="text-surface-muted small d-block mb-1">Total de Animais</span>
+            <span class="fs-4 fw-bold">{{ totalPets() }}</span>
+          </div>
+          <div class="stat-icon-wrapper bg-light-primary">
+            <mat-icon>pets</mat-icon>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="stat-card p-3 rounded-3 shadow-xs">
+        <div class="d-flex align-items-center justify-content-between">
+          <div>
+            <span class="text-surface-muted small d-block mb-1">Disponíveis</span>
+            <span class="fs-4 fw-bold text-success">{{ totalDisponiveis() }}</span>
+          </div>
+          <div class="stat-icon-wrapper bg-light-success">
+            <mat-icon>check_circle</mat-icon>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="stat-card p-3 rounded-3 shadow-xs">
+        <div class="d-flex align-items-center justify-content-between">
+          <div>
+            <span class="text-surface-muted small d-block mb-1">Em Tratamento</span>
+            <span class="fs-4 fw-bold text-warning">{{ totalTratamento() }}</span>
+          </div>
+          <div class="stat-icon-wrapper bg-light-warning">
+            <mat-icon>medical_services</mat-icon>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="stat-card p-3 rounded-3 shadow-xs">
+        <div class="d-flex align-items-center justify-content-between">
+          <div>
+            <span class="text-surface-muted small d-block mb-1">Adotados</span>
+            <span class="fs-4 fw-bold text-info">{{ totalAdotados() }}</span>
+          </div>
+          <div class="stat-icon-wrapper bg-light-info">
+            <mat-icon>favorite</mat-icon>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Painel de Filtros e Busca -->
+  <div class="filter-panel p-3 p-md-4 rounded-3 shadow-xs mb-4">
+    <div class="row g-3">
+      <!-- Busca Textual -->
+      <div class="col-12 col-lg-4">
+        <label class="form-label small fw-semibold text-surface-muted mb-1">Buscar por Nome, Chip, RGA ou Cód. Moura</label>
+        <div class="input-group">
+          <span class="input-group-text bg-surface-subtle border-end-0 border-surface">
+            <i class="bi bi-search text-muted"></i>
+          </span>
+          <input type="text" class="form-control border-start-0 border-surface bg-surface-card text-surface-main"
+            placeholder="Ex: Rex, 9810..., RGA123, MOURA-01"
+            [ngModel]="search()" (ngModelChange)="search.set($event)" (keyup.enter)="applyFilters()" />
+        </div>
+      </div>
+
+      <!-- Filtro Tipo de Pet -->
+      <div class="col-6 col-md-3 col-lg-2">
+        <label class="form-label small fw-semibold text-surface-muted mb-1">Espécie</label>
+        <select class="form-select bg-surface-card text-surface-main border-surface" [ngModel]="tipoFilter()" (ngModelChange)="tipoFilter.set($event); applyFilters()">
+          <option value="">Todas</option>
+          @for (tipo of tipoOptions; track tipo.value) {
+            <option [value]="tipo.value">{{ tipo.label }}</option>
+          }
+        </select>
+      </div>
+
+      <!-- Filtro Sexo -->
+      <div class="col-6 col-md-3 col-lg-2">
+        <label class="form-label small fw-semibold text-surface-muted mb-1">Sexo</label>
+        <select class="form-select bg-surface-card text-surface-main border-surface" [ngModel]="sexoFilter()" (ngModelChange)="sexoFilter.set($event); applyFilters()">
+          <option value="">Todos</option>
+          @for (sex of sexoOptions; track sex.value) {
+            <option [value]="sex.value">{{ sex.label }}</option>
+          }
+        </select>
+      </div>
+
+      <!-- Filtro Status -->
+      <div class="col-6 col-md-3 col-lg-2">
+        <label class="form-label small fw-semibold text-surface-muted mb-1">Status</label>
+        <select class="form-select bg-surface-card text-surface-main border-surface" [ngModel]="statusFilter()" (ngModelChange)="statusFilter.set($event); applyFilters()">
+          <option value="">Todos</option>
+          @for (st of statusOptions; track st.value) {
+            <option [value]="st.value">{{ st.label }}</option>
+          }
+        </select>
+      </div>
+
+      <!-- Filtro Porte -->
+      <div class="col-6 col-md-3 col-lg-2">
+        <label class="form-label small fw-semibold text-surface-muted mb-1">Porte</label>
+        <select class="form-select bg-surface-card text-surface-main border-surface" [ngModel]="porteFilter()" (ngModelChange)="porteFilter.set($event); applyFilters()">
+          <option value="">Todos</option>
+          @for (porte of porteOptions; track porte.value) {
+            <option [value]="porte.value">{{ porte.label }}</option>
+          }
+        </select>
+      </div>
+
+      <!-- Botões de Ação de Filtro -->
+      <div class="col-12 d-flex justify-content-end gap-2 mt-2">
+        <button mat-stroked-button (click)="clearFilters()" class="btn-clear">
+          <mat-icon>filter_alt_off</mat-icon>
+          <span>Limpar Filtros</span>
+        </button>
+        <button mat-flat-button color="primary" (click)="applyFilters()">
+          <mat-icon>search</mat-icon>
+          <span>Filtrar</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  @if (petsService.loading()) {
+    <div class="d-flex flex-column align-items-center justify-content-center py-5">
+      <mat-spinner diameter="44"></mat-spinner>
+      <span class="text-surface-muted mt-3 small">Carregando pets...</span>
+    </div>
+  } @else {
+    <!-- Empty State -->
+    @if (petsService.pets().length === 0) {
+      <div class="empty-state rounded-3 p-5 text-center my-4">
+        <div class="empty-icon-circle mx-auto mb-3">
+          <mat-icon>pets</mat-icon>
+        </div>
+        <h4 class="fw-semibold mb-1">Nenhum pet encontrado</h4>
+        <p class="text-surface-muted small mb-4" style="max-width: 400px; margin: 0 auto;">
+          Nenhum animal corresponde aos filtros atuais ou nenhum registro foi cadastrado ainda.
+        </p>
+        <button mat-flat-button color="primary" routerLink="/pets/novo" class="rounded-pill px-4">
+          <mat-icon>add</mat-icon>
+          <span>Cadastrar Primeiro Pet</span>
+        </button>
+      </div>
+    } @else {
+      <!-- VISÃO DESKTOP: TABELA ELEGANTE (Escondida em telas < 992px) -->
+      <div class="table-responsive-desktop d-none d-lg-block rounded-3 shadow-xs overflow-hidden">
+        <table class="table table-hover align-middle mb-0 custom-pet-table">
+          <thead class="small fw-semibold">
+            <tr>
+              <th scope="col" class="ps-4">Pet</th>
+              <th scope="col">Espécie / Sexo</th>
+              <th scope="col">Porte / Pelagem</th>
+              <th scope="col">Status</th>
+              <th scope="col">Origem / Entrada</th>
+              <th scope="col">Identificação</th>
+              <th scope="col" class="text-end pe-4">Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (pet of petsService.pets(); track pet.id) {
+              <tr>
+                <!-- Nome e ID -->
+                <td class="ps-4">
+                  <div class="d-flex align-items-center gap-3">
+                    <div class="pet-avatar rounded-circle d-flex align-items-center justify-content-center"
+                      [ngClass]="pet.tipo_pet === 'Gato' ? 'bg-cat' : 'bg-dog'">
+                      <mat-icon>{{ getTipoIcon(pet.tipo_pet) }}</mat-icon>
+                    </div>
+                    <div>
+                      <div class="fw-bold">{{ pet.nome }}</div>
+                      <span class="text-surface-muted" style="font-size: 0.75rem;">ID: #{{ pet.id }}</span>
+                    </div>
+                  </div>
+                </td>
+
+                <!-- Espécie & Sexo -->
+                <td>
+                  <div class="d-flex flex-column gap-1">
+                    <span class="d-flex align-items-center gap-1 small fw-medium">
+                      <i class="bi bi-tag text-muted"></i> {{ pet.tipo_pet }}
+                    </span>
+                    <span class="d-flex align-items-center gap-1 text-surface-muted small">
+                      <mat-icon style="font-size: 18px; width: 18px; height: 18px;">{{ getSexoIcon(pet.sexo) }}</mat-icon>
+                      {{ pet.sexo }}
+                    </span>
+                  </div>
+                </td>
+
+                <!-- Porte & Cor -->
+                <td>
+                  <div class="small">
+                    <div><span class="text-surface-muted">Porte:</span> <strong>{{ pet.porte || 'N/I' }}</strong></div>
+                    <div><span class="text-surface-muted">Cor:</span> {{ pet.cor_majoritaria || 'N/I' }}</div>
+                  </div>
+                </td>
+
+                <!-- Status Badge -->
+                <td>
+                  <span class="badge-status {{ getStatusBadgeClass(pet.status) }}">
+                    {{ pet.status }}
+                  </span>
+                </td>
+
+                <!-- Origem e Entrada -->
+                <td>
+                  <div class="small">
+                    @if (pet.entradas && pet.entradas.length > 0) {
+                      <div class="text-truncate fw-medium" style="max-width: 170px;" [title]="pet.entradas[0].local_origem">
+                        <i class="bi bi-geo-alt text-danger me-1"></i>{{ pet.entradas[0].local_origem }}
+                      </div>
+                      <div class="text-surface-muted" style="font-size: 0.75rem;">
+                        <i class="bi bi-calendar3 me-1"></i>{{ pet.entradas[0].data_entrada | date:'dd/MM/yyyy' }}
+                      </div>
+                    } @else {
+                      <span class="text-surface-muted fst-italic">Sem entrada registrada</span>
+                    }
+                  </div>
+                </td>
+
+                <!-- Identificação (Chip / RGA / Moura) -->
+                <td>
+                  <div class="small d-flex flex-column gap-1">
+                    @if (pet.chip) {
+                      <div><span class="badge bg-surface-subtle text-surface-main border border-surface">Chip: {{ pet.chip }}</span></div>
+                    }
+                    @if (pet.rga) {
+                      <div><span class="badge bg-surface-subtle text-surface-muted border border-surface">RGA: {{ pet.rga }}</span></div>
+                    }
+                    @if (pet.moura) {
+                      <div><span class="badge bg-light-primary border">Moura: {{ pet.moura }}</span></div>
+                    }
+                    @if (!pet.chip && !pet.rga && !pet.moura) {
+                      <span class="text-surface-muted small">-</span>
+                    }
+                  </div>
+                </td>
+
+                <!-- Ações (Apenas Leitura/Docs e Edição) -->
+                <td class="text-end pe-4">
+                  <div class="d-flex align-items-center justify-content-end gap-1">
+                    @if (pet.link_documentos) {
+                      <a [href]="pet.link_documentos" target="_blank" rel="noopener noreferrer" mat-icon-button color="primary"
+                        matTooltip="Abrir Prontuário / Drive">
+                        <mat-icon>description</mat-icon>
+                      </a>
+                    }
+                    <button mat-icon-button color="accent" (click)="goToEdit(pet.id)" matTooltip="Editar dados do Pet">
+                      <mat-icon>edit</mat-icon>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <!-- VISÃO MOBILE & TABLET: CARDS RESPONSIVOS (Visível em telas < 992px) -->
+      <div class="row g-3 d-lg-none">
+        @for (pet of petsService.pets(); track pet.id) {
+          <div class="col-12 col-sm-6">
+            <div class="card pet-mobile-card shadow-sm h-100 rounded-3 overflow-hidden">
+              <div class="card-body p-3 d-flex flex-column">
+                <!-- Cabeçalho do Card -->
+                <div class="d-flex align-items-center justify-content-between mb-2">
+                  <div class="d-flex align-items-center gap-2">
+                    <div class="pet-avatar rounded-circle d-flex align-items-center justify-content-center"
+                      [ngClass]="pet.tipo_pet === 'Gato' ? 'bg-cat' : 'bg-dog'">
+                      <mat-icon>{{ getTipoIcon(pet.tipo_pet) }}</mat-icon>
+                    </div>
+                    <div>
+                      <h5 class="fw-bold mb-0">{{ pet.nome }}</h5>
+                      <span class="text-surface-muted" style="font-size: 0.75rem;">#{{ pet.id }} &bull; {{ pet.tipo_pet }} ({{
+                        pet.sexo }})</span>
+                    </div>
+                  </div>
+                  <span class="badge-status {{ getStatusBadgeClass(pet.status) }}">
+                    {{ pet.status }}
+                  </span>
+                </div>
+
+                <!-- Detalhes Físicos e Origem -->
+                <div class="pet-card-details rounded-2 p-2 my-2 small">
+                  <div class="row g-1">
+                    <div class="col-6">
+                      <span class="text-surface-muted d-block">Porte:</span>
+                      <strong>{{ pet.porte || 'N/I' }}</strong>
+                    </div>
+                    <div class="col-6">
+                      <span class="text-surface-muted d-block">Cor:</span>
+                      <strong>{{ pet.cor_majoritaria || 'N/I' }}</strong>
+                    </div>
+                    @if (pet.entradas && pet.entradas.length > 0) {
+                      <div class="col-12 mt-1 border-top border-surface pt-1">
+                        <span class="text-surface-muted d-block">Origem / Entrada:</span>
+                        <span>{{ pet.entradas[0].local_origem }} ({{ pet.entradas[0].data_entrada | date:'dd/MM/yyyy' }})</span>
+                      </div>
+                    }
+                    @if (pet.chip || pet.rga || pet.moura) {
+                      <div class="col-12 mt-1">
+                        <span class="text-surface-muted d-block">Identificação:</span>
+                        <span class="small">
+                          {{ pet.chip ? 'Chip: ' + pet.chip : '' }}
+                          {{ pet.rga ? ' | RGA: ' + pet.rga : '' }}
+                          {{ pet.moura ? ' | Moura: ' + pet.moura : '' }}
+                        </span>
+                      </div>
+                    }
+                  </div>
+                </div>
+
+                <!-- Ações Mobile (Apenas Leitura/Docs e Edição) -->
+                <div class="mt-auto pt-2 border-top border-surface d-flex align-items-center justify-content-between">
+                  @if (pet.link_documentos) {
+                    <a [href]="pet.link_documentos" target="_blank" rel="noopener noreferrer"
+                      class="btn btn-sm btn-outline-secondary d-flex align-items-center gap-1">
+                      <mat-icon style="font-size: 16px; width: 16px; height: 16px;">open_in_new</mat-icon>
+                      <span>Docs</span>
+                    </a>
+                  } @else {
+                    <div></div>
+                  }
+                  <div>
+                    <button mat-stroked-button color="primary" class="btn-sm" (click)="goToEdit(pet.id)">
+                      <mat-icon style="font-size: 16px; width: 16px; height: 16px;">edit</mat-icon>
+                      <span>Editar</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+    }
+  }
+</div>

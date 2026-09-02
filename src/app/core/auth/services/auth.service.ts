@@ -31,6 +31,18 @@ export class AuthService {
     return this.currentUser()?.access_token || null;
   }
 
+  public getUserId(): string | null {
+    return this.currentUser()?.user?.id || null;
+  }
+
+  public getUser(): LoginResponse['user'] | null {
+    return this.currentUser()?.user || null;
+  }
+
+  public getUserSignal() {
+    return this.currentUser.asReadonly();
+  }
+
   private loadUserFromStorage(): LoginResponse | null {
     const storedUser = localStorage.getItem('currentUser');
     return storedUser ? JSON.parse(storedUser) : null;

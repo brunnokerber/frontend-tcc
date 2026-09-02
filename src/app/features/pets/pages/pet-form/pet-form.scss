@@ -1,0 +1,37 @@
+.pet-form-wrapper {
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.form-card {
+  background-color: var(--mat-sys-surface-container-lowest);
+  border: 1px solid var(--mat-sys-outline-variant);
+  color: var(--mat-sys-on-surface);
+  transition: all 0.2s ease-in-out;
+
+  &.bg-light-blue {
+    background-color: var(--mat-sys-surface-container-low);
+    border-color: var(--mat-sys-primary) !important;
+  }
+}
+
+.shadow-2xs {
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.shadow-xs {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.02);
+}
+
+.form-control-lg {
+  height: 56px;
+  border-radius: 4px;
+  background-color: var(--mat-sys-surface-container-lowest);
+  color: var(--mat-sys-on-surface);
+  border-color: var(--mat-sys-outline-variant);
+
+  &:focus {
+    border-color: var(--mat-sys-primary);
+    box-shadow: 0 0 0 0.25rem var(--mat-sys-primary-container);
+  }
+}

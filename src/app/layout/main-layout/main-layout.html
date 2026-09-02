@@ -1,0 +1,104 @@
+<div class="layout-container d-flex flex-column min-vh-100">
+  <!-- Navbar Superior -->
+  <header class="main-navbar shadow-sm sticky-top">
+    <div class="container-fluid px-3 px-md-4">
+      <div class="d-flex align-items-center justify-content-between py-2">
+        <!-- Logo / Marca -->
+        <a routerLink="/pets" class="brand-link d-flex align-items-center gap-2 text-decoration-none"
+          (click)="closeMobileMenu()">
+          <div class="brand-icon-wrapper">
+            <mat-icon class="brand-icon">pets</mat-icon>
+          </div>
+          <div class="d-flex flex-column">
+            <span class="brand-title fw-bold">Peludinhos do Vale</span>
+            <span class="brand-subtitle text-muted small d-none d-sm-inline">Gestão Animal</span>
+          </div>
+        </a>
+
+        <!-- Navegação Desktop -->
+        <nav class="d-none d-md-flex align-items-center gap-1 nav-links-desktop">
+          <a routerLink="/pets" routerLinkActive="active"
+            class="nav-btn d-flex align-items-center gap-2 text-decoration-none px-3 py-2 rounded-3">
+            <mat-icon class="fs-5">pets</mat-icon>
+            <span>Pets</span>
+          </a>
+          <a routerLink="/pets/novo" routerLinkActive="active"
+            class="nav-btn d-flex align-items-center gap-2 text-decoration-none px-3 py-2 rounded-3">
+            <mat-icon class="fs-5">add_circle_outline</mat-icon>
+            <span>Novo Pet</span>
+          </a>
+        </nav>
+
+        <!-- Ações do Usuário Desktop & Botão Mobile -->
+        <div class="d-flex align-items-center gap-2">
+          <!-- Usuário Logado -->
+          <div class="user-profile d-none d-sm-flex align-items-center gap-2 pe-2 border-end">
+            <div class="user-avatar text-white rounded-circle d-flex align-items-center justify-content-center">
+              <mat-icon>person</mat-icon>
+            </div>
+            <div class="user-info d-flex flex-column text-end">
+              <span class="user-email small fw-semibold text-truncate" style="max-width: 160px;">{{ user?.email ||
+                'Usuário' }}</span>
+              <span class="user-role text-muted" style="font-size: 0.72rem;">Operador</span>
+            </div>
+          </div>
+
+          <button mat-icon-button color="warn" (click)="logout()" title="Sair do sistema"
+            class="d-none d-sm-inline-flex">
+            <mat-icon>logout</mat-icon>
+          </button>
+
+          <!-- Botão Hamburger Mobile -->
+          <button mat-icon-button class="d-md-none" (click)="toggleMobileMenu()" aria-label="Abrir menu">
+            <mat-icon>{{ mobileMenuOpen() ? 'close' : 'menu' }}</mat-icon>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Menu Mobile Dropdown / Collapse -->
+    @if (mobileMenuOpen()) {
+    <div class="mobile-menu d-md-none border-top px-3 py-3 animate-fade-in">
+      <div class="d-flex flex-column gap-2 mb-3">
+        <a routerLink="/pets" routerLinkActive="active"
+          class="mobile-nav-link d-flex align-items-center gap-3 p-2 rounded-3 text-decoration-none"
+          (click)="closeMobileMenu()">
+          <mat-icon>pets</mat-icon>
+          <span class="fw-medium">Lista de Pets</span>
+        </a>
+        <a routerLink="/pets/novo" routerLinkActive="active"
+          class="mobile-nav-link d-flex align-items-center gap-3 p-2 rounded-3 text-decoration-none"
+          (click)="closeMobileMenu()">
+          <mat-icon>add_circle_outline</mat-icon>
+          <span class="fw-medium">Cadastrar Novo Pet</span>
+        </a>
+      </div>
+
+      <div class="border-top pt-3 d-flex align-items-center justify-content-between">
+        <div class="d-flex align-items-center gap-2">
+          <div class="user-avatar text-white rounded-circle d-flex align-items-center justify-content-center">
+            <mat-icon>person</mat-icon>
+          </div>
+          <span class="small fw-semibold text-truncate" style="max-width: 180px;">{{ user?.email || 'Usuário' }}</span>
+        </div>
+        <button mat-stroked-button color="warn" (click)="logout()" class="d-flex align-items-center gap-1">
+          <mat-icon>logout</mat-icon>
+          <span>Sair</span>
+        </button>
+      </div>
+    </div>
+    }
+  </header>
+
+  <!-- Conteúdo Principal -->
+  <main class="main-content flex-grow-1 py-3 py-md-4">
+    <router-outlet></router-outlet>
+  </main>
+
+  <!-- Rodapé -->
+  <footer class="main-footer py-3 text-center text-muted small border-top mt-auto">
+    <div class="container">
+      <span>Peludinhos do Vale &bull; Sistema de Gestão de Animais e Resgates</span>
+    </div>
+  </footer>
+</div>

@@ -1,0 +1,117 @@
+.layout-container {
+  background-color: var(--mat-sys-surface);
+  color: var(--mat-sys-on-surface);
+  min-height: 100vh;
+}
+
+.main-navbar {
+  background-color: var(--mat-sys-surface-container-lowest);
+  border-bottom: 1px solid var(--mat-sys-outline-variant);
+  z-index: 1030;
+}
+
+.brand-icon-wrapper {
+  background-color: var(--mat-sys-primary);
+  color: var(--mat-sys-on-primary);
+  width: 38px;
+  height: 38px;
+  min-width: 38px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  mat-icon {
+    font-size: 22px !important;
+    width: 22px !important;
+    height: 22px !important;
+    line-height: 22px !important;
+  }
+}
+
+.brand-title {
+  color: var(--mat-sys-on-surface);
+  font-size: 1.15rem;
+  line-height: 1.2;
+}
+
+.brand-subtitle {
+  color: var(--mat-sys-on-surface-variant);
+  font-size: 0.75rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.nav-btn {
+  color: var(--mat-sys-on-surface-variant);
+  font-weight: 500;
+  font-size: 0.925rem;
+  transition: all 0.2s ease;
+
+  &:hover {
+    color: var(--mat-sys-primary);
+    background-color: var(--mat-sys-surface-container);
+  }
+
+  &.active {
+    color: var(--mat-sys-on-primary-container);
+    background-color: var(--mat-sys-primary-container);
+    font-weight: 600;
+  }
+}
+
+.user-avatar {
+  width: 34px;
+  height: 34px;
+  min-width: 34px;
+  border-radius: 50%;
+  background-color: var(--mat-sys-primary);
+  color: var(--mat-sys-on-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  mat-icon {
+    font-size: 20px !important;
+    width: 20px !important;
+    height: 20px !important;
+    line-height: 20px !important;
+  }
+}
+
+.mobile-menu {
+  background-color: var(--mat-sys-surface-container-lowest);
+}
+
+.mobile-nav-link {
+  color: var(--mat-sys-on-surface);
+  transition: all 0.2s;
+
+  &:hover,
+  &.active {
+    background-color: var(--mat-sys-primary-container);
+    color: var(--mat-sys-on-primary-container);
+  }
+}
+
+.main-footer {
+  background-color: var(--mat-sys-surface-container-lowest);
+  border-color: var(--mat-sys-outline-variant) !important;
+  color: var(--mat-sys-on-surface-variant) !important;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.2s ease-out forwards;
+}
+

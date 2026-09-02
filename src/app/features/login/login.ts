@@ -50,7 +50,7 @@ export default class Login {
     this.authService.login(formValue).subscribe({
       next: () => {
         this.toast.success('Login realizado com sucesso!');
-        this.router.navigate(['/hello-world']);
+        this.router.navigate(['/pets']);
       },
       error: (err) => {
         this.isLoading.set(false);

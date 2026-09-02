@@ -1,4 +1,6 @@
 @use '@angular/material' as mat;
+@import 'bootstrap/dist/css/bootstrap.min.css';
+@import 'bootstrap-icons/font/bootstrap-icons.css';
 
 /* Reset e estilos globais */
 * {
@@ -23,19 +25,205 @@ html {
 
 body {
   margin: 0;
-  overflow: hidden;
+  overflow-x: hidden;
   color-scheme: light;
   background-color: var(--mat-sys-surface);
   color: var(--mat-sys-on-surface);
-  font: var(--mat-sys-body-medium);
+  font-family: 'Roboto', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  -webkit-font-smoothing: antialiased;
 }
 
 @media (prefers-color-scheme: dark) {
   body {
+    background-color: var(--mat-sys-surface);
+    color: var(--mat-sys-on-surface);
     color-scheme: dark;
   }
 }
 
+/* Button Alignment Harmonization */
+.mat-mdc-button,
+.mat-mdc-raised-button,
+.mat-mdc-flat-button,
+.mat-mdc-stroked-button,
+.mat-mdc-icon-button {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  vertical-align: middle;
+
+  .mdc-button__label {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 0.35rem;
+    line-height: normal !important;
+  }
+
+  mat-icon {
+    margin: 0 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+}
+
+.mat-mdc-icon-button {
+  width: 40px !important;
+  height: 40px !important;
+  padding: 0 !important;
+  box-sizing: border-box;
+
+  mat-icon {
+    font-size: 24px !important;
+    width: 24px !important;
+    height: 24px !important;
+    line-height: 24px !important;
+  }
+}
+
+/* Global Material Icon flexible sizing */
+.mat-icon {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  vertical-align: middle;
+  overflow: visible;
+
+  &.fs-1 { font-size: 2.5rem !important; width: 2.5rem !important; height: 2.5rem !important; }
+  &.fs-2 { font-size: 2rem !important; width: 2rem !important; height: 2rem !important; }
+  &.fs-3 { font-size: 1.75rem !important; width: 1.75rem !important; height: 1.75rem !important; }
+  &.fs-4 { font-size: 1.5rem !important; width: 1.5rem !important; height: 1.5rem !important; }
+  &.fs-5 { font-size: 1.25rem !important; width: 1.25rem !important; height: 1.25rem !important; }
+  &.fs-6 { font-size: 1rem !important; width: 1rem !important; height: 1rem !important; }
+}
+
+/* Tokenized Surface and Utility Classes */
+.bg-surface-card {
+  background-color: var(--mat-sys-surface-container-lowest) !important;
+  color: var(--mat-sys-on-surface) !important;
+  border-color: var(--mat-sys-outline-variant) !important;
+}
+
+.bg-surface-container {
+  background-color: var(--mat-sys-surface-container-low) !important;
+  color: var(--mat-sys-on-surface) !important;
+}
+
+.bg-surface-subtle {
+  background-color: var(--mat-sys-surface-container) !important;
+  color: var(--mat-sys-on-surface) !important;
+}
+
+/* Contrast & Typography Harmonization */
+.text-muted,
+.text-secondary,
+.text-surface-muted {
+  color: var(--mat-sys-on-surface-variant) !important;
+}
+
+.text-surface-main,
+.text-dark {
+  color: var(--mat-sys-on-surface) !important;
+}
+
+.border-surface {
+  border-color: var(--mat-sys-outline-variant) !important;
+}
+
+/* Form Controls Theme Harmonization & Cursor */
+select,
+.form-select,
+mat-select,
+.mat-mdc-select,
+.mat-mdc-select-trigger,
+.mat-mdc-select-value,
+.mat-mdc-option {
+  cursor: pointer !important;
+}
+
+.form-control,
+.form-select {
+  background-color: var(--mat-sys-surface-container-lowest) !important;
+  color: var(--mat-sys-on-surface) !important;
+  border-color: var(--mat-sys-outline-variant) !important;
+
+  &:focus {
+    background-color: var(--mat-sys-surface-container-lowest) !important;
+    color: var(--mat-sys-on-surface) !important;
+    border-color: var(--mat-sys-primary) !important;
+    box-shadow: 0 0 0 0.25rem var(--mat-sys-primary-container) !important;
+  }
+
+  &::placeholder {
+    color: var(--mat-sys-on-surface-variant) !important;
+    opacity: 0.7;
+  }
+}
+
+.input-group-text {
+  background-color: var(--mat-sys-surface-container) !important;
+  color: var(--mat-sys-on-surface-variant) !important;
+  border-color: var(--mat-sys-outline-variant) !important;
+}
+
+/* Badges Contrast in Dark/Light Modes */
+.badge.bg-light {
+  background-color: var(--mat-sys-surface-container) !important;
+  color: var(--mat-sys-on-surface) !important;
+  border-color: var(--mat-sys-outline-variant) !important;
+}
+
+/* Status Badges */
+.badge-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.3rem 0.65rem;
+  font-size: 0.775rem;
+  font-weight: 600;
+  border-radius: 9999px;
+  line-height: 1;
+  text-transform: capitalize;
+}
+
+.badge-status-disponivel {
+  background-color: #dcfce7;
+  color: #15803d;
+  border: 1px solid #bbf7d0;
+}
+
+.badge-status-tratamento {
+  background-color: #fef3c7;
+  color: #b45309;
+  border: 1px solid #fde68a;
+}
+
+.badge-status-lar {
+  background-color: #e0e7ff;
+  color: #4338ca;
+  border: 1px solid #c7d2fe;
+}
+
+.badge-status-quarentena {
+  background-color: #ffedd5;
+  color: #c2410c;
+  border: 1px solid #fed7aa;
+}
+
+.badge-status-adotado {
+  background-color: #dbeafe;
+  color: #1d4ed8;
+  border: 1px solid #bfdbfe;
+}
+
+.badge-status-obito {
+  background-color: var(--mat-sys-surface-container-high);
+  color: var(--mat-sys-on-surface-variant);
+  border: 1px solid var(--mat-sys-outline-variant);
+}
+
+/* Toasts */
 .toast-success {
   --mat-snack-bar-container-color: #2e7d32;
   --mat-snack-bar-supporting-text-color: #ffffff;
