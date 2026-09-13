@@ -45,6 +45,9 @@ export class PetsService {
         if (filter.status) {
           query = query.eq('status', filter.status);
         }
+        if (filter.senioridade) {
+          query = query.eq('senioridade', filter.senioridade);
+        }
         if (filter.porte) {
           query = query.eq('porte', filter.porte);
         }
@@ -98,22 +101,9 @@ export class PetsService {
         throw new Error('Usuário autenticado não encontrado para registrar a entrada.');
       }
 
-      // 1. Inserir na tabela pets
-      const petPayload = {
-        tipo_pet: dto.tipo_pet,
-        sexo: dto.sexo,
-        status: dto.status,
-        nome: dto.nome,
-        data_nascimento: dto.data_nascimento || null,
-        data_castracao: dto.data_castracao || null,
-        link_documentos: dto.link_documentos || null,
-        cor_majoritaria: dto.cor_majoritaria || null,
-        porte: dto.porte || null,
-        moura: dto.moura || null,
-        chip: dto.chip || null,
-        rga: dto.rga || null
-      };
+      const { local_origem, data_entrada, resgatante, observacoes, ...petPayload } = dto;
 
+      // 1. Inserir na tabela pets
       const { data: petData, error: petError } = await this.supabase.client
         .from('pets')
         .insert([petPayload])
@@ -130,8 +120,10 @@ export class PetsService {
       const entradaPayload: Omit<Entrada, 'id' | 'created_at' | 'updated_at'> = {
         id_pet: createdPet.id,
         id_usuario: userId,
-        local_origem: dto.local_origem || 'Não informado',
-        data_entrada: dto.data_entrada || new Date().toISOString().split('T')[0]
+        local_origem,
+        data_entrada,
+        resgatante,
+        observacoes,
       };
 
       const { data: entradaData, error: entradaError } = await this.supabase.client

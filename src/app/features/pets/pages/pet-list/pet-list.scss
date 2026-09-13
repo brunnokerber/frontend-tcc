@@ -21,7 +21,9 @@
   background-color: var(--mat-sys-surface-container-lowest);
   border: 1px solid var(--mat-sys-outline-variant);
   color: var(--mat-sys-on-surface);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
 
   &:hover {
     transform: translateY(-2px);
@@ -62,12 +64,19 @@
 }
 
 .bg-light-info {
-  background-color: #e0e7ff;
-  color: #4338ca;
+  background-color: var(--mat-sys-secondary-container);
+  color: var(--mat-sys-on-secondary-container);
+}
+
+.bg-light-danger {
+  background-color: var(--mat-sys-error-container);
+  color: var(--mat-sys-on-error-container);
 }
 
 .shadow-xs {
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.02);
+  box-shadow:
+    0 1px 3px rgba(0, 0, 0, 0.04),
+    0 1px 2px rgba(0, 0, 0, 0.02);
 }
 
 .filter-panel {
@@ -99,8 +108,8 @@
   }
 
   &.bg-cat {
-    background-color: #fce7f3;
-    color: #be185d;
+    background-color: var(--mat-sys-tertiary-container);
+    color: var(--mat-sys-on-tertiary-container);
   }
 }
 
@@ -110,6 +119,9 @@
 }
 
 .custom-pet-table {
+  --bs-table-bg: var(--mat-sys-surface-container-lowest);
+  --bs-table-hover-bg: var(--mat-sys-surface-container);
+  --bs-table-color: var(--mat-sys-on-surface);
   background-color: var(--mat-sys-surface-container-lowest);
   color: var(--mat-sys-on-surface);
 
@@ -121,6 +133,7 @@
   }
 
   td {
+    background-color: var(--mat-sys-surface-container-lowest);
     padding: 0.85rem 0.75rem;
     vertical-align: middle;
     border-bottom: 1px solid var(--mat-sys-outline-variant);

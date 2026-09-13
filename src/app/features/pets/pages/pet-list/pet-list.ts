@@ -13,10 +13,10 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { Router, RouterLink } from '@angular/router';
 import {
   PORTE_OPTIONS,
-  Pet,
+  SENIORIDADE_OPTIONS,
   SEXO_OPTIONS,
   STATUS_OPTIONS,
-  TIPO_PET_OPTIONS
+  TIPO_PET_OPTIONS,
 } from '../../models/pet.model';
 import { PetsService } from '../../services/pets.service';
 
@@ -35,10 +35,10 @@ import { PetsService } from '../../services/pets.service';
     MatSelectModule,
     MatChipsModule,
     MatProgressSpinnerModule,
-    MatTooltipModule
+    MatTooltipModule,
   ],
   templateUrl: './pet-list.html',
-  styleUrls: ['./pet-list.scss']
+  styleUrls: ['./pet-list.scss'],
 })
 export default class PetListComponent implements OnInit {
   public petsService = inject(PetsService);
@@ -50,23 +50,28 @@ export default class PetListComponent implements OnInit {
   public sexoFilter = signal<string>('');
   public statusFilter = signal<string>('');
   public porteFilter = signal<string>('');
+  public senioridadeFilter = signal<string>('');
 
   // Opções para os selects
   public tipoOptions = TIPO_PET_OPTIONS;
   public sexoOptions = SEXO_OPTIONS;
   public statusOptions = STATUS_OPTIONS;
   public porteOptions = PORTE_OPTIONS;
+  public senioridadeOptions = SENIORIDADE_OPTIONS;
 
   // Estatísticas computadas
   public totalPets = computed(() => this.petsService.pets().length);
-  public totalDisponiveis = computed(() =>
-    this.petsService.pets().filter(p => p.status === 'Disponível').length
+  public totalDisponiveis = computed(
+    () => this.petsService.pets().filter((p) => p.status === 'Disponível').length,
   );
-  public totalTratamento = computed(() =>
-    this.petsService.pets().filter(p => p.status === 'Em Tratamento').length
+  public totalTratamento = computed(
+    () => this.petsService.pets().filter((p) => p.status === 'Em Tratamento').length,
   );
-  public totalAdotados = computed(() =>
-    this.petsService.pets().filter(p => p.status === 'Adotado').length
+  public totalAdotados = computed(
+    () => this.petsService.pets().filter((p) => p.status === 'Adotado').length,
+  );
+  public totalObitos = computed(
+    () => this.petsService.pets().filter((p) => p.status === 'Óbito').length,
   );
 
   ngOnInit() {
@@ -79,7 +84,8 @@ export default class PetListComponent implements OnInit {
       tipo_pet: this.tipoFilter() || undefined,
       sexo: this.sexoFilter() || undefined,
       status: this.statusFilter() || undefined,
-      porte: this.porteFilter() || undefined
+      senioridade: this.senioridadeFilter() || undefined,
+      porte: this.porteFilter() || undefined,
     });
   }
 
@@ -89,6 +95,7 @@ export default class PetListComponent implements OnInit {
     this.sexoFilter.set('');
     this.statusFilter.set('');
     this.porteFilter.set('');
+    this.senioridadeFilter.set('');
     this.applyFilters();
   }
 
@@ -98,8 +105,6 @@ export default class PetListComponent implements OnInit {
         return 'badge-status-disponivel';
       case 'Em Tratamento':
         return 'badge-status-tratamento';
-      case 'Lar Temporário':
-        return 'badge-status-lar';
       case 'Quarentena':
         return 'badge-status-quarentena';
       case 'Adotado':

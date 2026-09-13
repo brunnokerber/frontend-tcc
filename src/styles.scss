@@ -95,7 +95,11 @@ mat-select,
   border: 1px solid var(--mat-sys-outline-variant);
 }
 
-/* Toasts */
+/* Overlay & Toasts */
+.cdk-overlay-container {
+  z-index: 2000;
+}
+
 .toast-success {
   --mat-snack-bar-container-color: #2e7d32;
   --mat-snack-bar-supporting-text-color: #ffffff;

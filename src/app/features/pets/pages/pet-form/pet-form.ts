@@ -12,14 +12,17 @@ import { MatSelectModule } from '@angular/material/select';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { ToastService } from '@core/services/toast.service';
 import { FormErrorPipe } from '@shared/pipes/form-error.pipe';
+import { dateToIsoString, parseIsoToDate, sanitize } from '@shared/utils/string-utils';
 import {
+  calculateSenioridade,
   PORTE_OPTIONS,
   Pet,
   PetCreateDto,
   PetUpdateDto,
+  SENIORIDADE_OPTIONS,
   SEXO_OPTIONS,
   STATUS_OPTIONS,
-  TIPO_PET_OPTIONS
+  TIPO_PET_OPTIONS,
 } from '../../models/pet.model';
 import { PetsService } from '../../services/pets.service';
 
@@ -38,10 +41,10 @@ import { PetsService } from '../../services/pets.service';
     MatSelectModule,
     MatDatepickerModule,
     MatProgressSpinnerModule,
-    FormErrorPipe
+    FormErrorPipe,
   ],
   templateUrl: './pet-form.html',
-  styleUrls: ['./pet-form.scss']
+  styleUrls: ['./pet-form.scss'],
 })
 export default class PetFormComponent implements OnInit {
   private fb = inject(FormBuilder);
@@ -62,6 +65,7 @@ export default class PetFormComponent implements OnInit {
   public sexoOptions = SEXO_OPTIONS;
   public statusOptions = STATUS_OPTIONS;
   public porteOptions = PORTE_OPTIONS;
+  public senioridadeOptions = SENIORIDADE_OPTIONS;
 
   // Formulário Reativo
   public petForm = this.fb.group({
@@ -69,6 +73,8 @@ export default class PetFormComponent implements OnInit {
     tipo_pet: ['Cachorro', [Validators.required, Validators.maxLength(10)]],
     sexo: ['Macho', [Validators.required, Validators.maxLength(10)]],
     status: ['Disponível', [Validators.required, Validators.maxLength(30)]],
+    senioridade: ['Filhote', [Validators.required, Validators.maxLength(30)]],
+    raca: ['', [Validators.required, Validators.maxLength(30)]],
     porte: ['Médio', [Validators.maxLength(30)]],
     cor_majoritaria: ['', [Validators.maxLength(30)]],
     moura: ['', [Validators.maxLength(30)]],
@@ -79,10 +85,20 @@ export default class PetFormComponent implements OnInit {
     link_documentos: ['', [Validators.maxLength(200)]],
     // Campos da tabela 'entradas' (obrigatórios na criação)
     local_origem: ['', [Validators.required, Validators.maxLength(50)]],
-    data_entrada: [new Date(), [Validators.required]]
+    data_entrada: [new Date(), [Validators.required]],
+    resgatante: ['', [Validators.required, Validators.maxLength(50)]],
+    observacoes: ['', [Validators.maxLength(200)]],
   });
 
   ngOnInit() {
+    // Atualização dinâmica da fase da vida / senioridade ao alterar data de nascimento
+    this.petForm.controls.data_nascimento.valueChanges.subscribe((birthDate) => {
+      const calculatedSenioridade = calculateSenioridade(birthDate);
+      if (calculatedSenioridade) {
+        this.petForm.controls.senioridade.setValue(calculatedSenioridade);
+      }
+    });
+
     const idParam = this.route.snapshot.paramMap.get('id');
     if (idParam) {
       const id = parseInt(idParam, 10);
@@ -92,27 +108,6 @@ export default class PetFormComponent implements OnInit {
         this.loadPetData(id);
       }
     }
-  }
-
-  private parseIsoToDate(dateStr?: string | null): Date | null {
-    if (!dateStr) return null;
-    const [year, month, day] = dateStr.split('-').map(Number);
-    if (!year || !month || !day) return null;
-    return new Date(year, month - 1, day);
-  }
-
-  private formatDateToIso(val: any): string | null {
-    if (!val) return null;
-    if (val instanceof Date && !isNaN(val.getTime())) {
-      const year = val.getFullYear();
-      const month = String(val.getMonth() + 1).padStart(2, '0');
-      const day = String(val.getDate()).padStart(2, '0');
-      return `${year}-${month}-${day}`;
-    }
-    if (typeof val === 'string' && val.trim()) {
-      return val.split('T')[0];
-    }
-    return null;
   }
 
   async loadPetData(id: number) {
@@ -131,8 +126,10 @@ export default class PetFormComponent implements OnInit {
     // Desabilitar validação de entrada na edição se não for necessária
     this.petForm.controls.local_origem.clearValidators();
     this.petForm.controls.data_entrada.clearValidators();
+    this.petForm.controls.resgatante.clearValidators();
     this.petForm.controls.local_origem.updateValueAndValidity();
     this.petForm.controls.data_entrada.updateValueAndValidity();
+    this.petForm.controls.resgatante.updateValueAndValidity();
 
     // Preencher dados do formulário
     const firstEntrada = pet.entradas && pet.entradas.length > 0 ? pet.entradas[0] : null;
@@ -142,16 +139,22 @@ export default class PetFormComponent implements OnInit {
       tipo_pet: pet.tipo_pet || 'Cachorro',
       sexo: pet.sexo || 'Macho',
       status: pet.status || 'Disponível',
+      senioridade: pet.senioridade || 'Filhote',
+      raca: pet.raca || '',
       porte: pet.porte || 'Médio',
       cor_majoritaria: pet.cor_majoritaria || '',
       moura: pet.moura || '',
       chip: pet.chip || '',
       rga: pet.rga || '',
-      data_nascimento: this.parseIsoToDate(pet.data_nascimento),
-      data_castracao: this.parseIsoToDate(pet.data_castracao),
+      data_nascimento: parseIsoToDate(pet.data_nascimento),
+      data_castracao: parseIsoToDate(pet.data_castracao),
       link_documentos: pet.link_documentos || '',
       local_origem: firstEntrada ? firstEntrada.local_origem : '',
-      data_entrada: firstEntrada ? (this.parseIsoToDate(firstEntrada.data_entrada) || new Date()) : new Date()
+      data_entrada: firstEntrada
+        ? parseIsoToDate(firstEntrada.data_entrada) || new Date()
+        : new Date(),
+      resgatante: firstEntrada ? firstEntrada.resgatante : '',
+      observacoes: firstEntrada ? firstEntrada.observacoes || '' : '',
     });
   }
 
@@ -168,18 +171,20 @@ export default class PetFormComponent implements OnInit {
     try {
       if (this.isEditing() && this.petId()) {
         const updateDto: PetUpdateDto = {
-          nome: formValues.nome || '',
+          nome: formValues.nome?.trim() || '',
           tipo_pet: formValues.tipo_pet || 'Cachorro',
           sexo: formValues.sexo || 'Macho',
           status: formValues.status || 'Disponível',
-          porte: formValues.porte || 'Médio',
-          cor_majoritaria: formValues.cor_majoritaria || null,
-          moura: formValues.moura || null,
-          chip: formValues.chip || null,
-          rga: formValues.rga || null,
-          data_nascimento: this.formatDateToIso(formValues.data_nascimento),
-          data_castracao: this.formatDateToIso(formValues.data_castracao),
-          link_documentos: formValues.link_documentos || null
+          senioridade: formValues.senioridade?.trim() || 'Filhote',
+          raca: formValues.raca?.trim() || 'Não informado',
+          porte: sanitize(formValues.porte) || 'Médio',
+          cor_majoritaria: formValues.cor_majoritaria?.trim() || 'Não informado',
+          moura: sanitize(formValues.moura),
+          chip: sanitize(formValues.chip),
+          rga: sanitize(formValues.rga),
+          data_nascimento: dateToIsoString(formValues.data_nascimento),
+          data_castracao: dateToIsoString(formValues.data_castracao),
+          link_documentos: sanitize(formValues.link_documentos),
         };
 
         const updated = await this.petsService.updatePet(this.petId()!, updateDto);
@@ -188,20 +193,25 @@ export default class PetFormComponent implements OnInit {
         }
       } else {
         const createDto: PetCreateDto = {
-          nome: formValues.nome || '',
+          nome: formValues.nome?.trim() || '',
           tipo_pet: formValues.tipo_pet || 'Cachorro',
           sexo: formValues.sexo || 'Macho',
           status: formValues.status || 'Disponível',
-          porte: formValues.porte || 'Médio',
-          cor_majoritaria: formValues.cor_majoritaria || null,
-          moura: formValues.moura || null,
-          chip: formValues.chip || null,
-          rga: formValues.rga || null,
-          data_nascimento: this.formatDateToIso(formValues.data_nascimento),
-          data_castracao: this.formatDateToIso(formValues.data_castracao),
-          link_documentos: formValues.link_documentos || null,
-          local_origem: formValues.local_origem || 'Não informado',
-          data_entrada: this.formatDateToIso(formValues.data_entrada) || new Date().toISOString().split('T')[0]
+          senioridade: formValues.senioridade?.trim() || 'Filhote',
+          raca: formValues.raca?.trim() || 'Não informado',
+          porte: sanitize(formValues.porte) || 'Médio',
+          cor_majoritaria: formValues.cor_majoritaria?.trim() || 'Não informado',
+          moura: sanitize(formValues.moura),
+          chip: sanitize(formValues.chip),
+          rga: sanitize(formValues.rga),
+          data_nascimento: dateToIsoString(formValues.data_nascimento),
+          data_castracao: dateToIsoString(formValues.data_castracao),
+          link_documentos: sanitize(formValues.link_documentos),
+          local_origem: formValues.local_origem?.trim() || 'Não informado',
+          data_entrada:
+            dateToIsoString(formValues.data_entrada) || new Date().toISOString().split('T')[0],
+          resgatante: formValues.resgatante?.trim() || 'Não informado',
+          observacoes: sanitize(formValues.observacoes),
         };
 
         const created = await this.petsService.createPet(createDto);

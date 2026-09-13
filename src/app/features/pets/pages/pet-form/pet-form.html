@@ -3,7 +3,12 @@
   <div class="row align-items-center mb-4 g-3">
     <div class="col-12 col-md-8">
       <div class="d-flex align-items-center gap-3">
-        <a routerLink="/pets" mat-icon-button class="btn-back border border-surface shadow-2xs me-1" title="Voltar para a lista">
+        <a
+          routerLink="/pets"
+          mat-icon-button
+          class="btn-back border border-surface shadow-2xs me-1"
+          title="Voltar para a lista"
+        >
           <mat-icon>arrow_back</mat-icon>
         </a>
         <div>
@@ -11,7 +16,11 @@
             {{ isEditing() ? 'Editar Pet: ' + (existingPet()?.nome || '') : 'Cadastrar Novo Pet' }}
           </h1>
           <p class="text-surface-muted small mb-0">
-            {{ isEditing() ? 'Atualize as informações cadastrais do animal.' : 'Preencha os dados do animal e o registro de entrada inicial no abrigo.' }}
+            {{
+              isEditing()
+                ? 'Atualize as informações cadastrais do animal.'
+                : 'Preencha os dados do animal e o registro de entrada inicial no abrigo.'
+            }}
           </p>
         </div>
       </div>
@@ -37,7 +46,12 @@
           <div class="col-12 col-md-6">
             <mat-form-field appearance="outline" class="w-100">
               <mat-label>Nome do Pet *</mat-label>
-              <input matInput formControlName="nome" placeholder="Ex: Bob, Pipoca, Thor" maxlength="30" />
+              <input
+                matInput
+                formControlName="nome"
+                placeholder="Ex: Bob, Pipoca, Thor"
+                maxlength="30"
+              />
               <mat-icon matPrefix class="me-2 text-muted">pets</mat-icon>
               @if (petForm.controls.nome.touched && petForm.controls.nome.errors) {
                 <mat-error>{{ petForm.controls.nome | formError }}</mat-error>
@@ -92,14 +106,66 @@
         </div>
       </div>
 
-      <!-- CARD 2: Características Físicas -->
+      <!-- CARD 2: Idade & Características Físicas -->
       <div class="form-card p-3 p-md-4 rounded-3 shadow-xs mb-4">
         <div class="d-flex align-items-center gap-2 mb-3 pb-2 border-bottom border-surface">
           <mat-icon class="text-primary">straighten</mat-icon>
-          <h2 class="h6 fw-bold mb-0">2. Características Físicas</h2>
+          <h2 class="h6 fw-bold mb-0">2. Idade & Características Físicas</h2>
         </div>
 
         <div class="row g-3">
+          <!-- Data Nascimento -->
+          <div class="col-12 col-md-6">
+            <mat-form-field appearance="outline" class="w-100">
+              <mat-label>Data de Nascimento (Estimada)</mat-label>
+              <input
+                matInput
+                [matDatepicker]="pickerNascimento"
+                formControlName="data_nascimento"
+                placeholder="dd/mm/aaaa"
+              />
+              <mat-datepicker-toggle matIconSuffix [for]="pickerNascimento"></mat-datepicker-toggle>
+              <mat-datepicker #pickerNascimento></mat-datepicker>
+              @if (
+                petForm.controls.data_nascimento.touched && petForm.controls.data_nascimento.errors
+              ) {
+                <mat-error>{{ petForm.controls.data_nascimento | formError }}</mat-error>
+              }
+            </mat-form-field>
+          </div>
+
+          <!-- Senioridade / Fase da Vida -->
+          <div class="col-12 col-md-6">
+            <mat-form-field appearance="outline" class="w-100">
+              <mat-label>Fase da Vida / Senioridade *</mat-label>
+              <mat-select formControlName="senioridade">
+                @for (opt of senioridadeOptions; track opt.value) {
+                  <mat-option [value]="opt.value">{{ opt.label }}</mat-option>
+                }
+              </mat-select>
+              @if (petForm.controls.senioridade.touched && petForm.controls.senioridade.errors) {
+                <mat-error>{{ petForm.controls.senioridade | formError }}</mat-error>
+              }
+            </mat-form-field>
+          </div>
+
+          <!-- Raça -->
+          <div class="col-12 col-md-6">
+            <mat-form-field appearance="outline" class="w-100">
+              <mat-label>Raça *</mat-label>
+              <input
+                matInput
+                formControlName="raca"
+                placeholder="Ex: SRD (Sem Raça Definida), Siamês, Labrador"
+                maxlength="30"
+              />
+              <mat-icon matPrefix class="me-2 text-muted">category</mat-icon>
+              @if (petForm.controls.raca.touched && petForm.controls.raca.errors) {
+                <mat-error>{{ petForm.controls.raca | formError }}</mat-error>
+              }
+            </mat-form-field>
+          </div>
+
           <!-- Porte -->
           <div class="col-12 col-md-6">
             <mat-form-field appearance="outline" class="w-100">
@@ -116,8 +182,33 @@
           <div class="col-12 col-md-6">
             <mat-form-field appearance="outline" class="w-100">
               <mat-label>Cor Majoritária</mat-label>
-              <input matInput formControlName="cor_majoritaria" placeholder="Ex: Marrom, Branco com manchas" maxlength="30" />
+              <input
+                matInput
+                formControlName="cor_majoritaria"
+                placeholder="Ex: Marrom, Branco com manchas"
+                maxlength="30"
+              />
               <mat-icon matPrefix class="me-2 text-muted">palette</mat-icon>
+            </mat-form-field>
+          </div>
+
+          <!-- Data Castração -->
+          <div class="col-12 col-md-6">
+            <mat-form-field appearance="outline" class="w-100">
+              <mat-label>Data da Castração</mat-label>
+              <input
+                matInput
+                [matDatepicker]="pickerCastracao"
+                formControlName="data_castracao"
+                placeholder="dd/mm/aaaa"
+              />
+              <mat-datepicker-toggle matIconSuffix [for]="pickerCastracao"></mat-datepicker-toggle>
+              <mat-datepicker #pickerCastracao></mat-datepicker>
+              @if (
+                petForm.controls.data_castracao.touched && petForm.controls.data_castracao.errors
+              ) {
+                <mat-error>{{ petForm.controls.data_castracao | formError }}</mat-error>
+              }
             </mat-form-field>
           </div>
         </div>
@@ -135,7 +226,12 @@
           <div class="col-12 col-md-6">
             <mat-form-field appearance="outline" class="w-100">
               <mat-label>Número do Chip</mat-label>
-              <input matInput formControlName="chip" placeholder="Ex: 981098108102938" maxlength="30" />
+              <input
+                matInput
+                formControlName="chip"
+                placeholder="Ex: 981098108102938"
+                maxlength="30"
+              />
               <mat-icon matPrefix class="me-2 text-muted">memory</mat-icon>
             </mat-form-field>
           </div>
@@ -144,7 +240,12 @@
           <div class="col-12 col-md-6">
             <mat-form-field appearance="outline" class="w-100">
               <mat-label>RGA (Registro Geral Animal)</mat-label>
-              <input matInput formControlName="rga" placeholder="Ex: RGA-2024-0012" maxlength="30" />
+              <input
+                matInput
+                formControlName="rga"
+                placeholder="Ex: RGA-2024-0012"
+                maxlength="30"
+              />
               <mat-icon matPrefix class="me-2 text-muted">tag</mat-icon>
             </mat-form-field>
           </div>
@@ -153,7 +254,12 @@
           <div class="col-12 col-md-6">
             <mat-form-field appearance="outline" class="w-100">
               <mat-label>Cód. Moura / Terceirizada</mat-label>
-              <input matInput formControlName="moura" placeholder="Ex: MOURA-12345" maxlength="30" />
+              <input
+                matInput
+                formControlName="moura"
+                placeholder="Ex: MOURA-12345"
+                maxlength="30"
+              />
               <mat-icon matPrefix class="me-2 text-muted">badge</mat-icon>
             </mat-form-field>
           </div>
@@ -162,56 +268,30 @@
           <div class="col-12 col-md-6">
             <mat-form-field appearance="outline" class="w-100">
               <mat-label>Link Prontuário / Drive</mat-label>
-              <input matInput formControlName="link_documentos" placeholder="https://drive.google.com/..." maxlength="200" />
+              <input
+                matInput
+                formControlName="link_documentos"
+                placeholder="https://drive.google.com/..."
+                maxlength="200"
+              />
               <mat-icon matPrefix class="me-2 text-muted">link</mat-icon>
             </mat-form-field>
           </div>
         </div>
       </div>
 
-      <!-- CARD 4: Datas Clínicas -->
-      <div class="form-card p-3 p-md-4 rounded-3 shadow-xs mb-4">
-        <div class="d-flex align-items-center gap-2 mb-3 pb-2 border-bottom border-surface">
-          <mat-icon class="text-primary">calendar_today</mat-icon>
-          <h2 class="h6 fw-bold mb-0">4. Datas Clínicas</h2>
-        </div>
-
-        <div class="row g-3">
-          <!-- Data Nascimento -->
-          <div class="col-12 col-md-6">
-            <mat-form-field appearance="outline" class="w-100">
-              <mat-label>Data de Nascimento (Estimada)</mat-label>
-              <input matInput [matDatepicker]="pickerNascimento" formControlName="data_nascimento" placeholder="dd/mm/aaaa" />
-              <mat-datepicker-toggle matIconSuffix [for]="pickerNascimento"></mat-datepicker-toggle>
-              <mat-datepicker #pickerNascimento></mat-datepicker>
-              @if (petForm.controls.data_nascimento.touched && petForm.controls.data_nascimento.errors) {
-                <mat-error>{{ petForm.controls.data_nascimento | formError }}</mat-error>
-              }
-            </mat-form-field>
-          </div>
-
-          <!-- Data Castração -->
-          <div class="col-12 col-md-6">
-            <mat-form-field appearance="outline" class="w-100">
-              <mat-label>Data da Castração</mat-label>
-              <input matInput [matDatepicker]="pickerCastracao" formControlName="data_castracao" placeholder="dd/mm/aaaa" />
-              <mat-datepicker-toggle matIconSuffix [for]="pickerCastracao"></mat-datepicker-toggle>
-              <mat-datepicker #pickerCastracao></mat-datepicker>
-              @if (petForm.controls.data_castracao.touched && petForm.controls.data_castracao.errors) {
-                <mat-error>{{ petForm.controls.data_castracao | formError }}</mat-error>
-              }
-            </mat-form-field>
-          </div>
-        </div>
-      </div>
-
-      <!-- CARD 5: Registro de Entrada / Origem -->
-      <div class="form-card p-3 p-md-4 rounded-3 shadow-xs mb-4" [ngClass]="{'bg-light-blue': !isEditing()}">
-        <div class="d-flex align-items-center justify-content-between mb-3 pb-2 border-bottom border-surface">
+      <!-- CARD 4: Registro de Entrada / Origem -->
+      <div
+        class="form-card p-3 p-md-4 rounded-3 shadow-xs mb-4"
+        [ngClass]="{ 'bg-light-blue': !isEditing() }"
+      >
+        <div
+          class="d-flex align-items-center justify-content-between mb-3 pb-2 border-bottom border-surface"
+        >
           <div class="d-flex align-items-center gap-2">
             <mat-icon class="text-primary">move_to_inbox</mat-icon>
             <h2 class="h6 fw-bold mb-0">
-              5. Dados de Entrada / Resgate
+              4. Dados de Entrada / Resgate
               @if (!isEditing()) {
                 <span class="badge bg-primary ms-2 small fw-normal">Novo Registro</span>
               }
@@ -224,10 +304,16 @@
 
         <div class="row g-3">
           <!-- Local de Origem -->
-          <div class="col-12 col-md-7">
+          <div class="col-12 col-md-6">
             <mat-form-field appearance="outline" class="w-100">
               <mat-label>Local de Origem / Resgate {{ !isEditing() ? '*' : '' }}</mat-label>
-              <input matInput formControlName="local_origem" placeholder="Ex: Resgate Bairro Centro, Entrega Voluntária, Av. Principal" maxlength="50" [readonly]="isEditing()" />
+              <input
+                matInput
+                formControlName="local_origem"
+                placeholder="Ex: Resgate Bairro Centro, Entrega Voluntária, Av. Principal"
+                maxlength="50"
+                [readonly]="isEditing()"
+              />
               <mat-icon matPrefix class="me-2 text-muted">location_on</mat-icon>
               @if (petForm.controls.local_origem.touched && petForm.controls.local_origem.errors) {
                 <mat-error>{{ petForm.controls.local_origem | formError }}</mat-error>
@@ -235,16 +321,60 @@
             </mat-form-field>
           </div>
 
+          <!-- Resgatante -->
+          <div class="col-12 col-md-6">
+            <mat-form-field appearance="outline" class="w-100">
+              <mat-label>Resgatante / Responsável {{ !isEditing() ? '*' : '' }}</mat-label>
+              <input
+                matInput
+                formControlName="resgatante"
+                placeholder="Ex: Nome da pessoa ou entidade"
+                maxlength="50"
+                [readonly]="isEditing()"
+              />
+              <mat-icon matPrefix class="me-2 text-muted">person</mat-icon>
+              @if (petForm.controls.resgatante.touched && petForm.controls.resgatante.errors) {
+                <mat-error>{{ petForm.controls.resgatante | formError }}</mat-error>
+              }
+            </mat-form-field>
+          </div>
+
           <!-- Data de Entrada -->
-          <div class="col-12 col-md-5">
+          <div class="col-12 col-md-6">
             <mat-form-field appearance="outline" class="w-100">
               <mat-label>Data de Entrada {{ !isEditing() ? '*' : '' }}</mat-label>
-              <input matInput [matDatepicker]="pickerEntrada" formControlName="data_entrada" placeholder="dd/mm/aaaa" [readonly]="isEditing()" />
-              <mat-datepicker-toggle matIconSuffix [for]="pickerEntrada" [disabled]="isEditing()"></mat-datepicker-toggle>
+              <input
+                matInput
+                [matDatepicker]="pickerEntrada"
+                formControlName="data_entrada"
+                placeholder="dd/mm/aaaa"
+                [readonly]="isEditing()"
+              />
+              <mat-datepicker-toggle
+                matIconSuffix
+                [for]="pickerEntrada"
+                [disabled]="isEditing()"
+              ></mat-datepicker-toggle>
               <mat-datepicker #pickerEntrada></mat-datepicker>
               @if (petForm.controls.data_entrada.touched && petForm.controls.data_entrada.errors) {
                 <mat-error>{{ petForm.controls.data_entrada | formError }}</mat-error>
               }
+            </mat-form-field>
+          </div>
+
+          <!-- Observações -->
+          <div class="col-12">
+            <mat-form-field appearance="outline" class="w-100">
+              <mat-label>Observações da Entrada</mat-label>
+              <textarea
+                matInput
+                formControlName="observacoes"
+                rows="3"
+                placeholder="Ex: Condições de saúde no resgate, comportamento inicial, etc."
+                maxlength="200"
+                [readonly]="isEditing()"
+              ></textarea>
+              <mat-icon matPrefix class="me-2 text-muted">notes</mat-icon>
             </mat-form-field>
           </div>
         </div>
