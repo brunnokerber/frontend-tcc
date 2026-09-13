@@ -15,12 +15,16 @@ body {
 }
 
 html {
-  @include mat.theme((color: (primary: mat.$azure-palette,
+  @include mat.theme(
+    (
+      color: (
+        primary: mat.$azure-palette,
         tertiary: mat.$blue-palette,
       ),
       typography: Roboto,
       density: 0,
-    ));
+    )
+  );
 }
 
 body {
@@ -29,7 +33,12 @@ body {
   color-scheme: light;
   background-color: var(--mat-sys-surface);
   color: var(--mat-sys-on-surface);
-  font-family: 'Roboto', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-family:
+    'Roboto',
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    sans-serif;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -52,6 +61,119 @@ mat-select,
   cursor: pointer;
 }
 
+/* Material Design 3 Surface & Color Utility Classes */
+
+.bg-surface-card {
+  background-color: var(--mat-sys-surface-container-lowest);
+}
+
+.bg-surface-subtle {
+  background-color: var(--mat-sys-surface-container);
+}
+
+.text-surface-main {
+  color: var(--mat-sys-on-surface);
+}
+
+.text-surface-muted {
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.border-surface {
+  border-color: var(--mat-sys-outline-variant);
+}
+
+/* Harmonize Bootstrap form controls with Material Tokens */
+.form-control,
+.form-select {
+  background-color: var(--mat-sys-surface-container-lowest);
+  color: var(--mat-sys-on-surface);
+  border-color: var(--mat-sys-outline-variant);
+
+  &:focus {
+    background-color: var(--mat-sys-surface-container-lowest);
+    color: var(--mat-sys-on-surface);
+    border-color: var(--mat-sys-primary);
+  }
+
+  &::placeholder {
+    color: var(--mat-sys-on-surface-variant);
+    opacity: 0.7;
+  }
+}
+
+.input-group-text {
+  background-color: var(--mat-sys-surface-container);
+  color: var(--mat-sys-on-surface-variant);
+  border-color: var(--mat-sys-outline-variant);
+}
+
+/* Harmonize Bootstrap Tables with Material Theme */
+.table {
+  --bs-table-bg: transparent;
+  --bs-table-color: var(--mat-sys-on-surface);
+  --bs-table-border-color: var(--mat-sys-outline-variant);
+  --bs-table-striped-bg: var(--mat-sys-surface-container-low);
+  --bs-table-hover-bg: var(--mat-sys-surface-container);
+  color: var(--mat-sys-on-surface);
+}
+
+:root {
+  --color-status-success: #16a34a;
+  --color-status-success-bg: rgba(22, 163, 74, 0.14);
+
+  --color-status-warning: #d97706;
+  --color-status-warning-bg: rgba(217, 119, 6, 0.14);
+
+  --color-status-quarentena: #ea580c;
+  --color-status-quarentena-bg: rgba(234, 88, 12, 0.14);
+
+  --color-status-adopted: #e11d48;
+  --color-status-adopted-bg: rgba(225, 29, 72, 0.14);
+
+  --color-status-obito: var(--mat-sys-on-surface-variant);
+  --color-status-obito-bg: var(--mat-sys-surface-container-high);
+}
+
+.text-status-success {
+  color: var(--color-status-success);
+}
+.text-status-warning {
+  color: var(--color-status-warning);
+}
+.text-status-adopted {
+  color: var(--color-status-adopted);
+}
+.text-status-obito {
+  color: var(--color-status-obito);
+}
+
+.bg-status-primary {
+  background-color: var(--mat-sys-primary-container);
+  color: var(--mat-sys-on-primary-container);
+}
+
+.bg-status-success {
+  background-color: var(--color-status-success-bg);
+  color: var(--color-status-success);
+}
+
+.bg-status-warning {
+  background-color: var(--color-status-warning-bg);
+  color: var(--color-status-warning);
+}
+
+.bg-status-adopted {
+  background-color: var(--color-status-adopted-bg);
+  color: var(--color-status-adopted);
+}
+
+.bg-status-obito {
+  background-color: var(--color-status-obito-bg);
+  color: var(--color-status-obito);
+  border: 1px solid var(--mat-sys-outline-variant);
+}
+
 /* Status Badges */
 .badge-status {
   display: inline-flex;
@@ -66,32 +188,28 @@ mat-select,
 }
 
 .badge-status-disponivel {
-  background-color: #dcfce7;
-  color: #15803d;
-  border: 1px solid #bbf7d0;
+  background-color: var(--color-status-success-bg);
+  color: var(--color-status-success);
 }
 
 .badge-status-tratamento {
-  background-color: #fef3c7;
-  color: #b45309;
-  border: 1px solid #fde68a;
+  background-color: var(--color-status-warning-bg);
+  color: var(--color-status-warning);
 }
 
 .badge-status-quarentena {
-  background-color: #ffedd5;
-  color: #c2410c;
-  border: 1px solid #fed7aa;
+  background-color: var(--color-status-quarentena-bg);
+  color: var(--color-status-quarentena);
 }
 
 .badge-status-adotado {
-  background-color: #dbeafe;
-  color: #1d4ed8;
-  border: 1px solid #bfdbfe;
+  background-color: var(--color-status-adopted-bg);
+  color: var(--color-status-adopted);
 }
 
 .badge-status-obito {
-  background-color: var(--mat-sys-surface-container-high);
-  color: var(--mat-sys-on-surface-variant);
+  background-color: var(--color-status-obito-bg);
+  color: var(--color-status-obito);
   border: 1px solid var(--mat-sys-outline-variant);
 }
 
@@ -122,4 +240,24 @@ mat-select,
   --mat-snack-bar-container-color: var(--mat-sys-primary);
   --mat-snack-bar-supporting-text-color: #ffffff;
   --mat-snack-bar-button-color: #e0e0e0;
+}
+
+/* Material Button Icon & Label Vertical Centering */
+.mat-mdc-button,
+.mat-mdc-unelevated-button,
+.mat-mdc-raised-button,
+.mat-mdc-outlined-button {
+  .mdc-button__label {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    vertical-align: middle;
+  }
+
+  mat-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    vertical-align: middle;
+  }
 }

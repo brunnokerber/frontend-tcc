@@ -13,7 +13,6 @@
     font-size: 28px;
     width: 28px;
     height: 28px;
-    line-height: 28px;
   }
 }
 
@@ -21,9 +20,7 @@
   background-color: var(--mat-sys-surface-container-lowest);
   border: 1px solid var(--mat-sys-outline-variant);
   color: var(--mat-sys-on-surface);
-  transition:
-    transform 0.2s ease,
-    box-shadow 0.2s ease;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 
   &:hover {
     transform: translateY(-2px);
@@ -44,42 +41,16 @@
     font-size: 22px;
     width: 22px;
     height: 22px;
-    line-height: 22px;
   }
 }
 
-.bg-light-primary {
-  background-color: var(--mat-sys-primary-container);
-  color: var(--mat-sys-on-primary-container);
-}
-
-.bg-light-success {
-  background-color: #dcfce7;
-  color: #15803d;
-}
-
-.bg-light-warning {
-  background-color: #fef3c7;
-  color: #b45309;
-}
-
-.bg-light-info {
-  background-color: var(--mat-sys-secondary-container);
-  color: var(--mat-sys-on-secondary-container);
-}
-
-.bg-light-danger {
-  background-color: var(--mat-sys-error-container);
-  color: var(--mat-sys-on-error-container);
-}
-
 .shadow-xs {
-  box-shadow:
-    0 1px 3px rgba(0, 0, 0, 0.04),
-    0 1px 2px rgba(0, 0, 0, 0.02);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.02);
 }
 
-.filter-panel {
+.filter-panel,
+.table-responsive-desktop,
+.empty-state {
   background-color: var(--mat-sys-surface-container-lowest);
   border: 1px solid var(--mat-sys-outline-variant);
   color: var(--mat-sys-on-surface);
@@ -99,7 +70,6 @@
     font-size: 22px;
     width: 22px;
     height: 22px;
-    line-height: 22px;
   }
 
   &.bg-dog {
@@ -111,11 +81,6 @@
     background-color: var(--mat-sys-tertiary-container);
     color: var(--mat-sys-on-tertiary-container);
   }
-}
-
-.table-responsive-desktop {
-  background-color: var(--mat-sys-surface-container-lowest);
-  border: 1px solid var(--mat-sys-outline-variant);
 }
 
 .custom-pet-table {
@@ -159,11 +124,6 @@
 .pet-card-details {
   background-color: var(--mat-sys-surface-container);
   color: var(--mat-sys-on-surface);
-}
-
-.empty-state {
-  background-color: var(--mat-sys-surface-container-lowest);
-  border: 1px solid var(--mat-sys-outline-variant);
 }
 
 .empty-icon-circle {
