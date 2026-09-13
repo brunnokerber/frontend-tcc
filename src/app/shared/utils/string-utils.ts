@@ -34,3 +34,25 @@ export function parseIsoToDate(dateStr?: string | null): Date | null {
   return new Date(year, month - 1, day);
 }
 
+/**
+ * Remove todos os caracteres não numéricos.
+ */
+export function onlyDigits(val?: string | null): string {
+  if (!val) return '';
+  return val.replace(/\D/g, '');
+}
+
+/**
+ * Formata um número de telefone com DDD (10 ou 11 dígitos).
+ */
+export function formatPhone(val?: string | null): string {
+  if (!val) return '';
+  const digits = onlyDigits(val);
+  if (digits.length === 11) {
+    return `(${digits.substring(0, 2)}) ${digits.substring(2, 7)}-${digits.substring(7)}`;
+  }
+  if (digits.length === 10) {
+    return `(${digits.substring(0, 2)}) ${digits.substring(2, 6)}-${digits.substring(6)}`;
+  }
+  return val;
+}
