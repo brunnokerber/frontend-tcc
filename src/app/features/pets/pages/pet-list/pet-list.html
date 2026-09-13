@@ -213,7 +213,7 @@
         <tr>
           <th scope="col" class="ps-4">Pet</th>
           <th scope="col">Espécie / Sexo</th>
-          <th scope="col">Porte / Pelagem</th>
+          <th scope="col">Porte / Senioridade</th>
           <th scope="col">Status</th>
           <th scope="col">Origem / Entrada</th>
           <th scope="col">Identificação</th>
@@ -252,12 +252,15 @@
             </div>
           </td>
 
-          <!-- Porte & Cor -->
+          <!-- Porte, Senioridade & Cor -->
           <td>
             <div class="small">
               <div>
                 <span class="text-surface-muted">Porte:</span>
                 <strong>{{ pet.porte || 'N/I' }}</strong>
+                @if (pet.senioridade) {
+                <span class="badge bg-surface-subtle text-surface-muted border border-surface ms-1">{{ pet.senioridade }}</span>
+                }
               </div>
               <div>
                 <span class="text-surface-muted">Cor:</span>
@@ -362,8 +365,11 @@
           <div class="pet-card-details rounded-2 p-2 my-2 small">
             <div class="row g-1">
               <div class="col-6">
-                <span class="text-surface-muted d-block">Porte:</span>
+                <span class="text-surface-muted d-block">Porte / Fase:</span>
                 <strong>{{ pet.porte || 'N/I' }}</strong>
+                @if (pet.senioridade) {
+                <span class="text-surface-muted small"> ({{ pet.senioridade }})</span>
+                }
               </div>
               <div class="col-6">
                 <span class="text-surface-muted d-block">Cor:</span>

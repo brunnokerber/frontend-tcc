@@ -12,6 +12,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { ToastService } from '@core/services/toast.service';
 import { FormErrorPipe } from '@shared/pipes/form-error.pipe';
+import { DateMaskDirective } from '@shared/directives/date-mask.directive';
 import { dateToIsoString, parseIsoToDate, sanitize } from '@shared/utils/string-utils';
 import {
   calculateSenioridade,
@@ -42,6 +43,7 @@ import { PetsService } from '../../services/pets.service';
     MatDatepickerModule,
     MatProgressSpinnerModule,
     FormErrorPipe,
+    DateMaskDirective,
   ],
   templateUrl: './pet-form.html',
   styleUrls: ['./pet-form.scss'],

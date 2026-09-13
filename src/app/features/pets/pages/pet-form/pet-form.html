@@ -120,6 +120,8 @@
               <mat-label>Data de Nascimento (Estimada)</mat-label>
               <input
                 matInput
+                appDateMask
+                maxlength="10"
                 [matDatepicker]="pickerNascimento"
                 formControlName="data_nascimento"
                 placeholder="dd/mm/aaaa"
@@ -198,6 +200,8 @@
               <mat-label>Data da Castração</mat-label>
               <input
                 matInput
+                appDateMask
+                maxlength="10"
                 [matDatepicker]="pickerCastracao"
                 formControlName="data_castracao"
                 placeholder="dd/mm/aaaa"
@@ -345,6 +349,8 @@
               <mat-label>Data de Entrada {{ !isEditing() ? '*' : '' }}</mat-label>
               <input
                 matInput
+                appDateMask
+                maxlength="10"
                 [matDatepicker]="pickerEntrada"
                 formControlName="data_entrada"
                 placeholder="dd/mm/aaaa"

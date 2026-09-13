@@ -10,7 +10,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSelectModule } from '@angular/material/select';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import {
   PORTE_OPTIONS,
   SENIORIDADE_OPTIONS,
@@ -42,6 +42,7 @@ import { PetsService } from '../../services/pets.service';
 })
 export default class PetListComponent implements OnInit {
   public petsService = inject(PetsService);
+  private route = inject(ActivatedRoute);
   private router = inject(Router);
 
   // Filtros em Signals
@@ -75,18 +76,34 @@ export default class PetListComponent implements OnInit {
   );
 
   ngOnInit() {
+    const qp = this.route.snapshot.queryParams;
+    if (qp['search']) this.search.set(qp['search']);
+    if (qp['tipo_pet']) this.tipoFilter.set(qp['tipo_pet']);
+    if (qp['sexo']) this.sexoFilter.set(qp['sexo']);
+    if (qp['status']) this.statusFilter.set(qp['status']);
+    if (qp['senioridade']) this.senioridadeFilter.set(qp['senioridade']);
+    if (qp['porte']) this.porteFilter.set(qp['porte']);
+
     this.applyFilters();
   }
 
   applyFilters() {
-    this.petsService.fetchPets({
-      search: this.search(),
+    const filterParams = {
+      search: this.search() || undefined,
       tipo_pet: this.tipoFilter() || undefined,
       sexo: this.sexoFilter() || undefined,
       status: this.statusFilter() || undefined,
       senioridade: this.senioridadeFilter() || undefined,
       porte: this.porteFilter() || undefined,
+    };
+
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: filterParams,
+      replaceUrl: true,
     });
+
+    this.petsService.fetchPets(filterParams);
   }
 
   clearFilters() {
