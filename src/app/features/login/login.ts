@@ -9,6 +9,7 @@ import { Router } from '@angular/router';
 
 import { AuthService } from '@core/auth/services/auth.service';
 import { ToastService } from '@core/services/toast.service';
+import { environment } from '@env/environment';
 import { FormErrorPipe } from '@shared/pipes/form-error.pipe';
 
 @Component({
@@ -27,6 +28,8 @@ export default class Login {
   private authService = inject(AuthService);
   private router = inject(Router);
   private toast = inject(ToastService);
+
+  readonly ongName = environment.ongName;
 
   hidePassword = signal(true);
   isLoading = signal(false);
