@@ -1,0 +1,128 @@
+<div class="container-fluid px-3 px-md-4 py-2">
+  <!-- Cabeçalho com botão de retorno -->
+  <div class="row align-items-center mb-4 g-3">
+    <div class="col-12 col-md-8">
+      <div class="d-flex align-items-center gap-3">
+        <a
+          routerLink="/veterinarios"
+          mat-icon-button
+          class="btn-back border border-surface shadow-2xs me-1"
+          title="Voltar para a lista"
+        >
+          <mat-icon>arrow_back</mat-icon>
+        </a>
+        <div>
+          <h1 class="h3 fw-bold mb-1">
+            {{ isEditing() ? 'Editar Veterinário' : 'Novo Veterinário' }}
+          </h1>
+          <p class="text-surface-muted small mb-0">
+            {{
+              isEditing()
+                ? 'Atualize as informações cadastrais do profissional.'
+                : 'Preencha os dados do profissional para cadastrá-lo no sistema.'
+            }}
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  @if (isLoading()) {
+    <div class="d-flex flex-column align-items-center justify-content-center py-5">
+      <mat-spinner diameter="44"></mat-spinner>
+      <span class="text-surface-muted mt-3 small">Carregando dados do veterinário...</span>
+    </div>
+  } @else {
+    <form [formGroup]="vetForm" (ngSubmit)="onSubmit()" class="vet-form-wrapper">
+      <!-- CARD: Dados Profissionais -->
+      <div class="form-card p-3 p-md-4 rounded-3 shadow-xs mb-4">
+        <div class="d-flex align-items-center gap-2 mb-3 pb-2 border-bottom border-surface">
+          <mat-icon class="text-primary">badge</mat-icon>
+          <h2 class="h6 fw-bold mb-0">Dados do(a) Profissional</h2>
+        </div>
+
+        <div class="row g-3">
+          <!-- Nome -->
+          <div class="col-12">
+            <mat-form-field appearance="outline" class="w-100">
+              <mat-label>Nome Completo *</mat-label>
+              <input
+                matInput
+                formControlName="nome"
+                placeholder="Ex: Dra. Ana Paula Silva, Dr. Carlos Eduardo"
+                maxlength="30"
+              />
+              <mat-icon matPrefix class="me-2 text-muted">person</mat-icon>
+              @if (vetForm.controls.nome.touched && vetForm.controls.nome.errors) {
+                <mat-error>{{ vetForm.controls.nome | formError }}</mat-error>
+              }
+            </mat-form-field>
+          </div>
+
+          <!-- CRVET -->
+          <div class="col-12 col-md-6">
+            <mat-form-field appearance="outline" class="w-100">
+              <mat-label>CRVET (Registro Profissional) *</mat-label>
+              <input
+                matInput
+                formControlName="crvet"
+                placeholder="Ex: 12345/RS, CRMV-RS 9876"
+                maxlength="30"
+              />
+              <mat-icon matPrefix class="me-2 text-muted">health_and_safety</mat-icon>
+              @if (vetForm.controls.crvet.touched && vetForm.controls.crvet.errors) {
+                <mat-error>{{ vetForm.controls.crvet | formError }}</mat-error>
+              }
+            </mat-form-field>
+          </div>
+
+          <!-- Telefone -->
+          <div class="col-12 col-md-6">
+            <mat-form-field appearance="outline" class="w-100">
+              <mat-label>Telefone / WhatsApp *</mat-label>
+              <input
+                matInput
+                appPhoneMask
+                maxlength="15"
+                formControlName="telefone"
+                placeholder="(00) 00000-0000"
+              />
+              <mat-icon matPrefix class="me-2 text-muted">call</mat-icon>
+              @if (vetForm.controls.telefone.touched && vetForm.controls.telefone.errors) {
+                <mat-error>{{ vetForm.controls.telefone | formError }}</mat-error>
+              }
+            </mat-form-field>
+          </div>
+        </div>
+      </div>
+
+      <!-- Barra de Ações Inferior -->
+      <div class="d-flex align-items-center justify-content-end gap-2 pt-2 mb-5">
+        <button type="button" mat-stroked-button routerLink="/veterinarios" [disabled]="isSaving()">
+          Cancelar
+        </button>
+        <button type="submit" mat-flat-button color="primary" [disabled]="isSaving()" class="px-4">
+          @if (isSaving()) {
+            <span class="d-inline-flex align-items-center justify-content-center gap-2">
+              <span
+                class="spinner-border spinner-border-sm"
+                role="status"
+                aria-hidden="true"
+              ></span>
+              <span>Salvando...</span>
+            </span>
+          } @else {
+            <span class="d-inline-flex align-items-center justify-content-center gap-2">
+              <mat-icon style="font-size: 20px; width: 20px; height: 20px; line-height: 20px"
+                >save</mat-icon
+              >
+              <span class="d-inline-flex align-items-center">
+                {{ isEditing() ? 'Atualizar Veterinário' : 'Cadastrar Veterinário' }}
+              </span>
+            </span>
+          }
+        </button>
+      </div>
+    </form>
+  }
+</div>

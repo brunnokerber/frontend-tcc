@@ -6,11 +6,11 @@ export const routes: Routes = [
   {
     path: '',
     redirectTo: 'pets',
-    pathMatch: 'full'
+    pathMatch: 'full',
   },
   {
     path: 'login',
-    loadComponent: () => import('./features/login/login')
+    loadComponent: () => import('./features/login/login'),
   },
   {
     path: '',
@@ -19,12 +19,16 @@ export const routes: Routes = [
     children: [
       {
         path: 'pets',
-        loadChildren: () => import('./features/pets/pets.routes')
-      }
-    ]
+        loadChildren: () => import('./features/pets/pets.routes'),
+      },
+      {
+        path: 'veterinarios',
+        loadChildren: () => import('./features/veterinarios/veterinarios.routes'),
+      },
+    ],
   },
   {
     path: '**',
-    redirectTo: 'pets'
-  }
-];
+    redirectTo: 'pets',
+  },
+];

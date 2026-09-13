@@ -3,8 +3,9 @@ import { Component, inject, signal } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
-import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { AuthService } from '@core/auth/services/auth.service';
+import { environment } from '@env/environment';
 
 @Component({
   selector: 'app-main-layout',
@@ -23,8 +24,8 @@ import { AuthService } from '@core/auth/services/auth.service';
 })
 export class MainLayoutComponent {
   private authService = inject(AuthService);
-  private router = inject(Router);
 
+  public readonly ongName = environment.ongName;
   public user = this.authService.getUser();
   public mobileMenuOpen = signal(false);
 

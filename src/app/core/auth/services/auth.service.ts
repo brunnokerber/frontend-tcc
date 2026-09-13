@@ -1,11 +1,11 @@
 import { HttpClient } from '@angular/common/http';
 import { computed, inject, Injectable, signal } from '@angular/core';
 import { Router } from '@angular/router';
-import { Observable, tap } from 'rxjs';
+import { catchError, map, Observable, of, switchMap, tap } from 'rxjs';
 
 import { environment } from '@env/environment';
 
-import type { LoginRequest, LoginResponse } from '../models/login.model';
+import type { AppRole, LoginRequest, LoginResponse } from '../models/login.model';
 
 
 @Injectable({ providedIn: 'root' })
@@ -27,6 +27,9 @@ export class AuthService {
     return true;
   });
 
+  public readonly role = computed(() => this.currentUser()?.user?.role ?? null);
+  public readonly isAdmin = computed(() => this.role() === 'admin');
+
   public getToken(): string | null {
     return this.currentUser()?.access_token || null;
   }
@@ -37,6 +40,10 @@ export class AuthService {
 
   public getUser(): LoginResponse['user'] | null {
     return this.currentUser()?.user || null;
+  }
+
+  public getRole(): AppRole | null {
+    return this.currentUser()?.user?.role ?? null;
   }
 
   public getUserSignal() {
@@ -56,9 +63,27 @@ export class AuthService {
     localStorage.removeItem('currentUser');
   }
 
+  private fetchUserRole(userId: string, accessToken: string): Observable<AppRole> {
+    return this.http.get<{ role: AppRole }[]>(
+      `${environment.apiUrl}/rest/v1/profiles`,
+      {
+        headers: {
+          apikey: environment.apiKey,
+          Authorization: `Bearer ${accessToken}`
+        },
+        params: {
+          id: `eq.${userId}`,
+          select: 'role'
+        }
+      }
+    ).pipe(
+      map(profiles => profiles[0]?.role ?? 'user'),
+      catchError(() => of('user' as AppRole))
+    );
+  }
+
   //========================================  
   public login(request: LoginRequest): Observable<LoginResponse> {
-    const params = { grant_type: 'password' };
     return this.http.post<LoginResponse>(
       `${this.API_URL}/v1/token`, 
       request, 
@@ -71,6 +96,23 @@ export class AuthService {
         }
       }
     ).pipe(
+      switchMap((resp) => {
+        const userId = resp.user?.id;
+        const accessToken = resp.access_token;
+        if (!userId || !accessToken) {
+          return of(resp);
+        }
+
+        return this.fetchUserRole(userId, accessToken).pipe(
+          map((role) => ({
+            ...resp,
+            user: {
+              ...resp.user,
+              role
+            }
+          }))
+        );
+      }),
       tap((resp) => {
         this.saveUserToStorage(resp);
         this.currentUser.set(resp);

@@ -1,3 +1,5 @@
+export type AppRole = 'user' | 'admin';
+
 export interface LoginRequest {
     email: string;
     password: string;
@@ -9,8 +11,9 @@ export interface LoginResponse {
     expires_in: number;
     expires_at: number;
     refresh_token: string;
-    user:{
+    user: {
         id: string;
         email: string;
-    }
+        role?: AppRole;
+    };
 }

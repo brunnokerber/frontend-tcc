@@ -1,11 +1,11 @@
 <div class="login-container">
 
-  <h1 class="title">Peludinhos do Vale</h1>
+  <h1 class="title">{{ ongName }}</h1>
 
   <mat-card class="login-card">
     <mat-card-header>
       <mat-card-title>
-        Seja bem-vindo ao login da Peludinhos do Vale
+        Seja bem-vindo ao login da {{ ongName }}
       </mat-card-title>
       <mat-card-subtitle>
         Insira seu email e senha abaixo
@@ -35,7 +35,7 @@
         </mat-form-field>
 
         @if (errorMessage()) {
-        <div class="api-error">
+        <div>
           {{ errorMessage() }}
         </div>
         }
