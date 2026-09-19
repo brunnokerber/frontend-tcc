@@ -16,6 +16,7 @@ import {
   ConsultaExame,
   getSexoIcon,
   getStatusBadgeClass,
+  getTipoFaIcon,
   getTipoIcon,
   Pet,
   PetLocal,
@@ -211,6 +212,7 @@ export default class PetDetailComponent implements OnInit {
 
   readonly getStatusBadgeClass = getStatusBadgeClass;
   readonly getTipoIcon = getTipoIcon;
+  readonly getTipoFaIcon = getTipoFaIcon;
   readonly getSexoIcon = getSexoIcon;
 
   goBack() {

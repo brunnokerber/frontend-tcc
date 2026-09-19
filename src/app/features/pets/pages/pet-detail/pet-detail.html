@@ -49,7 +49,7 @@
         <div class="d-flex align-items-center gap-3">
           <div class="pet-hero-avatar rounded-circle d-flex align-items-center justify-content-center"
             [ngClass]="p.tipo_pet === 'Gato' ? 'bg-cat' : 'bg-dog'">
-            <mat-icon>{{ getTipoIcon(p.tipo_pet) }}</mat-icon>
+            <i [class]="getTipoFaIcon(p.tipo_pet)"></i>
           </div>
           <div>
             <div class="d-flex align-items-center gap-2">

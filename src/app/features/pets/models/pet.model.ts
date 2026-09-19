@@ -105,10 +105,17 @@ export interface PetFilter {
   porte?: string;
 }
 
-export const TIPO_PET_OPTIONS = [
-  { label: 'Cachorro', value: 'Cachorro', icon: 'pets' },
-  { label: 'Gato', value: 'Gato', icon: 'cruelty_free' },
-  { label: 'Outro', value: 'Outro', icon: 'pest_control_rodent' },
+export interface TipoPetOption {
+  label: string;
+  value: string;
+  icon?: string;
+  faIcon?: string;
+}
+
+export const TIPO_PET_OPTIONS: readonly TipoPetOption[] = [
+  { label: 'Cachorro', value: 'Cachorro', faIcon: 'fa-solid fa-dog', icon: 'pets' },
+  { label: 'Gato', value: 'Gato', faIcon: 'fa-solid fa-cat', icon: 'pets' },
+  { label: 'Outro', value: 'Outro', faIcon: 'fa-solid fa-paw', icon: 'pest_control_rodent' },
 ] as const;
 
 export const SEXO_OPTIONS = [
@@ -190,10 +197,16 @@ export function getStatusBadgeClass(status?: string | null): string {
   return found?.badgeClass || 'badge-status-disponivel';
 }
 
-export function getTipoIcon(tipo?: string | null): string {
-  if (!tipo) return 'pest_control_rodent';
+export function getTipoFaIcon(tipo?: string | null): string {
+  if (!tipo) return 'fa-solid fa-paw';
   const found = TIPO_PET_OPTIONS.find((t) => t.value.toLowerCase() === tipo.toLowerCase());
-  return found?.icon || 'pest_control_rodent';
+  return found?.faIcon || 'fa-solid fa-paw';
+}
+
+export function getTipoIcon(tipo?: string | null): string {
+  if (!tipo) return 'pets';
+  const found = TIPO_PET_OPTIONS.find((t) => t.value.toLowerCase() === tipo.toLowerCase());
+  return found?.icon || 'pets';
 }
 
 export function getSexoIcon(sexo?: string | null): string {
