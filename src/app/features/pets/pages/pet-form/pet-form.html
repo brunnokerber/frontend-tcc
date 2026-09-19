@@ -3,14 +3,15 @@
   <div class="row align-items-center mb-4 g-3">
     <div class="col-12 col-md-8">
       <div class="d-flex align-items-center gap-3">
-        <a
-          routerLink="/pets"
+        <button
+          type="button"
+          (click)="goBack()"
           mat-icon-button
           class="btn-back border border-surface shadow-2xs me-1"
-          title="Voltar para a lista"
+          title="Voltar"
         >
           <mat-icon>arrow_back</mat-icon>
-        </a>
+        </button>
         <div>
           <h1 class="h3 fw-bold mb-1">
             {{ isEditing() ? 'Editar Pet: ' + (existingPet()?.nome || '') : 'Cadastrar Novo Pet' }}
@@ -388,7 +389,7 @@
 
       <!-- Barra de Ações Inferior -->
       <div class="d-flex align-items-center justify-content-end gap-2 pt-2 mb-5">
-        <button type="button" mat-stroked-button routerLink="/pets" [disabled]="isSaving()">
+        <button type="button" mat-stroked-button (click)="goBack()" [disabled]="isSaving()">
           Cancelar
         </button>
         <button type="submit" mat-flat-button color="primary" [disabled]="isSaving()" class="px-4">

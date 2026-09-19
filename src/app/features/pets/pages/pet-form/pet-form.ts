@@ -9,7 +9,8 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSelectModule } from '@angular/material/select';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
+import { NavigationService } from '@core/services/navigation.service';
 import { ToastService } from '@core/services/toast.service';
 import { FormErrorPipe } from '@shared/pipes/form-error.pipe';
 import { DateMaskDirective } from '@shared/directives/date-mask.directive';
@@ -33,7 +34,6 @@ import { PetsService } from '../../services/pets.service';
   imports: [
     CommonModule,
     ReactiveFormsModule,
-    RouterLink,
     MatCardModule,
     MatButtonModule,
     MatIconModule,
@@ -52,6 +52,7 @@ export default class PetFormComponent implements OnInit {
   private fb = inject(FormBuilder);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
+  private nav = inject(NavigationService);
   private petsService = inject(PetsService);
   private toast = inject(ToastService);
 
@@ -191,7 +192,7 @@ export default class PetFormComponent implements OnInit {
 
         const updated = await this.petsService.updatePet(this.petId()!, updateDto);
         if (updated) {
-          this.router.navigate(['/pets']);
+          this.goBack();
         }
       } else {
         const createDto: PetCreateDto = {
@@ -226,5 +227,9 @@ export default class PetFormComponent implements OnInit {
     } finally {
       this.isSaving.set(false);
     }
+  }
+
+  goBack() {
+    this.nav.back('/pets');
   }
 }

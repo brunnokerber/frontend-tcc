@@ -317,9 +317,12 @@
             </div>
           </td>
 
-          <!-- Ações (Apenas Leitura/Docs e Edição) -->
+          <!-- Ações (Detalhes, Docs e Edição) -->
           <td class="text-end pe-4">
             <div class="d-flex align-items-center justify-content-end gap-1">
+              <button matIconButton color="primary" (click)="goToDetails(pet)" matTooltip="Ver detalhes do Pet">
+                <mat-icon>visibility</mat-icon>
+              </button>
               @if (pet.link_documentos) {
               <a [href]="pet.link_documentos" target="_blank" rel="noopener noreferrer" matIconButton color="primary"
                 matTooltip="Abrir Prontuário / Drive">
@@ -396,8 +399,8 @@
             </div>
           </div>
 
-          <!-- Ações Mobile (Apenas Leitura/Docs e Edição) -->
-          <div class="mt-auto pt-2 border-top border-surface d-flex align-items-center justify-content-between">
+          <!-- Ações Mobile (Detalhes, Docs e Edição) -->
+          <div class="mt-auto pt-2 border-top border-surface d-flex align-items-center justify-content-between flex-wrap gap-2">
             @if (pet.link_documentos) {
             <a [href]="pet.link_documentos" target="_blank" rel="noopener noreferrer"
               class="btn btn-sm btn-outline-secondary d-flex align-items-center gap-1">
@@ -407,7 +410,11 @@
             } @else {
             <div></div>
             }
-            <div>
+            <div class="d-flex align-items-center gap-2">
+              <button mat-stroked-button color="primary" class="btn-sm" (click)="goToDetails(pet)">
+                <mat-icon style="font-size: 16px; width: 16px; height: 16px">visibility</mat-icon>
+                <span>Detalhes</span>
+              </button>
               <button mat-stroked-button color="primary" class="btn-sm" (click)="goToEdit(pet.id)">
                 <mat-icon style="font-size: 16px; width: 16px; height: 16px">edit</mat-icon>
                 <span>Editar</span>

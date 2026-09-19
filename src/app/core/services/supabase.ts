@@ -16,7 +16,7 @@ export class SupabaseService {
       environment.apiKey,
       {
         accessToken: async () => {
-          const token = this.authService.getToken();
+          const token = await this.authService.getValidToken();
           return token ? token : ''; 
         }
       }

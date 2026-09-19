@@ -12,6 +12,10 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import {
+  getSexoIcon,
+  getStatusBadgeClass,
+  getTipoIcon,
+  Pet,
   PORTE_OPTIONS,
   SENIORIDADE_OPTIONS,
   SEXO_OPTIONS,
@@ -116,36 +120,12 @@ export default class PetListComponent implements OnInit {
     this.applyFilters();
   }
 
-  getStatusBadgeClass(status: string): string {
-    switch (status) {
-      case 'Disponível':
-        return 'badge-status-disponivel';
-      case 'Em Tratamento':
-        return 'badge-status-tratamento';
-      case 'Quarentena':
-        return 'badge-status-quarentena';
-      case 'Adotado':
-        return 'badge-status-adotado';
-      case 'Óbito':
-        return 'badge-status-obito';
-      default:
-        return 'badge-status-disponivel';
-    }
-  }
+  readonly getStatusBadgeClass = getStatusBadgeClass;
+  readonly getTipoIcon = getTipoIcon;
+  readonly getSexoIcon = getSexoIcon;
 
-  getTipoIcon(tipo: string): string {
-    switch (tipo?.toLowerCase()) {
-      case 'cachorro':
-        return 'pets';
-      case 'gato':
-        return 'cruelty_free';
-      default:
-        return 'pest_control_rodent';
-    }
-  }
-
-  getSexoIcon(sexo: string): string {
-    return sexo === 'Fêmea' ? 'female' : 'male';
+  goToDetails(pet: Pet) {
+    this.router.navigate(['/pets/detalhes', pet.id], { state: { pet } });
   }
 
   goToEdit(id: number) {

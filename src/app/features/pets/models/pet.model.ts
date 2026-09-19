@@ -1,4 +1,6 @@
 import { Audit } from '@core/audit/models/audit.model';
+import { Local } from '@features/locais/models/local.model';
+import { Veterinario } from '@features/veterinarios/models/veterinario.model';
 
 export interface Pet extends Audit {
   id: number;
@@ -17,6 +19,9 @@ export interface Pet extends Audit {
   chip?: string | null;
   rga?: string | null;
   entradas?: Entrada[];
+  vacinas?: Vacina[];
+  consultas_exames?: ConsultaExame[];
+  pets_locais?: PetLocal[];
 }
 
 export interface Entrada extends Audit {
@@ -28,6 +33,42 @@ export interface Entrada extends Audit {
   resgatante: string;
   observacoes?: string | null;
 }
+
+export interface Vacina extends Audit {
+  id?: number;
+  id_pet: number;
+  nome_vacina: string;
+  data_prevista?: string | null;
+  data_aplicacao?: string | null;
+  custo?: number | null;
+  id_veterinario?: number | null;
+  veterinario?: Veterinario | null;
+}
+
+export interface ConsultaExame extends Audit {
+  id?: number;
+  id_pet: number;
+  id_veterinario?: number | null;
+  operacao_medicamento: string;
+  data_realizacao: string;
+  custo?: number | null;
+  tipo_operacao?: string | null;
+  veterinario?: Veterinario | null;
+}
+
+export interface PetLocal extends Audit {
+  id?: number;
+  id_pet: number;
+  id_local: number;
+  motivo_saida?: string | null;
+  data_reentrada?: string | null;
+  data_saida?: string | null;
+  valor_auxilio?: number | null;
+  obs?: string | null;
+  locais?: Local | null;
+}
+
+export type SortOrderMode = 'cronologico' | 'valor';
 
 export interface PetCreateDto extends entradaDto {
   tipo_pet: string;
@@ -141,5 +182,23 @@ export function calculateSenioridade(birthDateVal: unknown): Senioridade | null 
     return 'Adulto';
   }
   return 'Sênior';
+}
+
+export function getStatusBadgeClass(status?: string | null): string {
+  if (!status) return 'badge-status-disponivel';
+  const found = STATUS_OPTIONS.find((s) => s.value.toLowerCase() === status.toLowerCase());
+  return found?.badgeClass || 'badge-status-disponivel';
+}
+
+export function getTipoIcon(tipo?: string | null): string {
+  if (!tipo) return 'pest_control_rodent';
+  const found = TIPO_PET_OPTIONS.find((t) => t.value.toLowerCase() === tipo.toLowerCase());
+  return found?.icon || 'pest_control_rodent';
+}
+
+export function getSexoIcon(sexo?: string | null): string {
+  if (!sexo) return 'male';
+  const found = SEXO_OPTIONS.find((s) => s.value.toLowerCase() === sexo.toLowerCase());
+  return found?.icon || 'male';
 }
 

@@ -1,0 +1,622 @@
+<div class="container-fluid px-3 px-md-4 py-3 detail-page-container">
+  <!-- Loading Geral -->
+  @if (loadingPet()) {
+  <div class="d-flex flex-column align-items-center justify-content-center py-5">
+    <mat-spinner diameter="48"></mat-spinner>
+    <p class="text-surface-muted mt-3 fw-medium">Carregando dados do animal...</p>
+  </div>
+  } @else if (pet(); as p) {
+  <!-- Barra de Navegação e Ações Rápidas -->
+  <div class="row align-items-center mb-4 g-3">
+    <div class="col-12 col-md-6 d-flex align-items-center gap-2">
+      <button mat-icon-button (click)="goBack()" matTooltip="Voltar para a listagem de pets" class="btn-back">
+        <mat-icon>arrow_back</mat-icon>
+      </button>
+      <div>
+        <div class="d-flex align-items-center gap-2 flex-wrap">
+          <h1 class="h3 fw-bold mb-0">{{ p.nome }}</h1>
+          <span class="badge-status {{ getStatusBadgeClass(p.status) }}">
+            {{ p.status }}
+          </span>
+        </div>
+        <p class="text-surface-muted small mb-0 mt-1">
+          Registro #{{ p.id }} &bull; Cadastrado em {{ p.created_at | date: 'dd/MM/yyyy' }}
+        </p>
+      </div>
+    </div>
+
+    <div class="col-12 col-md-6 d-flex justify-content-md-end gap-2 flex-wrap">
+      @if (p.link_documentos) {
+      <a [href]="p.link_documentos" target="_blank" rel="noopener noreferrer" mat-stroked-button color="primary"
+        class="d-flex align-items-center gap-1 rounded-3">
+        <mat-icon>open_in_new</mat-icon>
+        <span>Prontuário / Docs</span>
+      </a>
+      }
+      <button mat-flat-button color="primary" (click)="goToEdit()"
+        class="d-flex align-items-center gap-2 py-2 px-3 rounded-3 shadow-sm">
+        <mat-icon>edit</mat-icon>
+        <span class="fw-semibold">Editar Cadastro</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Hero Card: Perfil Rápido + Resumo de Saúde / Finanças -->
+  <div class="hero-card p-3 p-md-4 rounded-3 shadow-xs mb-4">
+    <div class="row g-4 align-items-center">
+      <!-- Identificação Principal -->
+      <div class="col-12 col-lg-5">
+        <div class="d-flex align-items-center gap-3">
+          <div class="pet-hero-avatar rounded-circle d-flex align-items-center justify-content-center"
+            [ngClass]="p.tipo_pet === 'Gato' ? 'bg-cat' : 'bg-dog'">
+            <mat-icon>{{ getTipoIcon(p.tipo_pet) }}</mat-icon>
+          </div>
+          <div>
+            <div class="d-flex align-items-center gap-2">
+              <span class="fs-5 fw-bold">{{ p.nome }}</span>
+              <mat-icon [matTooltip]="p.sexo" class="text-surface-muted"
+                style="font-size: 20px; width: 20px; height: 20px;">
+                {{ getSexoIcon(p.sexo) }}
+              </mat-icon>
+            </div>
+            <div class="text-surface-muted small">
+              {{ p.tipo_pet }} &bull; {{ p.raca || 'Sem raça definida' }} &bull; {{ p.porte || 'Porte N/I' }}
+            </div>
+            <!-- Identificadores (Apenas existentes) -->
+            <div class="d-flex align-items-center gap-1 flex-wrap mt-2">
+              @if (p.chip) {
+              <span class="badge bg-surface-subtle text-surface-main border border-surface">
+                <mat-icon class="badge-mini-icon">memory</mat-icon> Chip: {{ p.chip }}
+              </span>
+              }
+              @if (p.rga) {
+              <span class="badge bg-surface-subtle text-surface-muted border border-surface">
+                <mat-icon class="badge-mini-icon">badge</mat-icon> RGA: {{ p.rga }}
+              </span>
+              }
+              @if (p.moura) {
+              <span class="badge bg-surface-subtle text-surface-muted border border-surface">
+                <mat-icon class="badge-mini-icon">tag</mat-icon> Moura: {{ p.moura }}
+              </span>
+              }
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Métricas / Totais Rápidos -->
+      <div class="col-12 col-lg-7">
+        <div class="row g-2">
+          <!-- Total Investido em Saúde -->
+          <div class="col-6 col-sm-3">
+            <div class="metric-box p-2 rounded-2 text-center">
+              <span class="text-surface-muted d-block small">Total em Saúde</span>
+              <span class="fw-bold fs-6 text-primary">{{ totalInvestidoGeral() | currency: 'BRL' : 'symbol' : '1.2-2'
+                }}</span>
+            </div>
+          </div>
+
+          <!-- Total Vacinas -->
+          <div class="col-6 col-sm-3">
+            <div class="metric-box p-2 rounded-2 text-center">
+              <span class="text-surface-muted d-block small">Vacinas</span>
+              <span class="fw-bold fs-6">{{ vacinas().length }}</span>
+            </div>
+          </div>
+
+          <!-- Total Consultas/Exames -->
+          <div class="col-6 col-sm-3">
+            <div class="metric-box p-2 rounded-2 text-center">
+              <span class="text-surface-muted d-block small">Procedimentos</span>
+              <span class="fw-bold fs-6">{{ consultasExames().length }}</span>
+            </div>
+          </div>
+
+          <!-- Dias no Abrigo -->
+          <div class="col-6 col-sm-3">
+            <div class="metric-box p-2 rounded-2 text-center">
+              <span class="text-surface-muted d-block small">Tempo Acolhido</span>
+              <span class="fw-bold fs-6">
+                @if (diasNoAbrigo() !== null) {
+                {{ diasNoAbrigo() }} dias
+                } @else {
+                Não informado
+                }
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Grid Principal de Dados e Seções -->
+  <div class="row g-4">
+    <!-- COLUNA DA ESQUERDA: Cadastro e Origem -->
+    <div class="col-12 col-xl-4">
+      <div class="section-card p-3 p-md-4 rounded-3 shadow-xs h-100">
+        <div class="d-flex align-items-center justify-content-between mb-3 border-bottom border-surface pb-2">
+          <div class="d-flex align-items-center gap-2">
+            <mat-icon class="text-primary">info</mat-icon>
+            <h2 class="h5 fw-bold mb-0">Cadastro & Entrada</h2>
+          </div>
+          <button mat-icon-button (click)="goToEdit()" matTooltip="Editar cadastro" class="btn-sm">
+            <mat-icon>edit</mat-icon>
+          </button>
+        </div>
+
+        <!-- SUBSEÇÃO 1: Identificação Básica -->
+        <div class="sub-section-block">
+          <div class="sub-section-header d-flex align-items-center gap-2">
+            <mat-icon class="text-primary" style="font-size: 18px; width: 18px; height: 18px">badge</mat-icon>
+            <h3 class="sub-section-title mb-0">1. Identificação Básica</h3>
+          </div>
+          <div class="info-grid">
+            <div class="info-item">
+              <span class="info-label">Nome do Pet</span>
+              <span class="info-val">{{ p.nome || 'Não informado' }}</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">Status</span>
+              <span class="info-val">{{ p.status || 'Não informado' }}</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">Espécie</span>
+              <span class="info-val">{{ p.tipo_pet || 'Não informado' }}</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">Sexo</span>
+              <span class="info-val">{{ p.sexo || 'Não informado' }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- SUBSEÇÃO 2: Idade & Características Físicas -->
+        <div class="sub-section-block">
+          <div class="sub-section-header d-flex align-items-center gap-2">
+            <mat-icon class="text-primary" style="font-size: 18px; width: 18px; height: 18px">straighten</mat-icon>
+            <h3 class="sub-section-title mb-0">2. Idade & Características Físicas</h3>
+          </div>
+          <div class="info-grid">
+            <div class="info-item">
+              <span class="info-label">Data de Nascimento</span>
+              <span class="info-val">
+                {{ p.data_nascimento ? (p.data_nascimento | date: 'dd/MM/yyyy') : 'Não informada' }}
+              </span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">Fase da Vida</span>
+              <span class="info-val">{{ p.senioridade || 'Não informada' }}</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">Raça</span>
+              <span class="info-val">{{ p.raca || 'Não informada' }}</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">Porte</span>
+              <span class="info-val">{{ p.porte || 'Não informado' }}</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">Cor Majoritária</span>
+              <span class="info-val">{{ p.cor_majoritaria || 'Não informada' }}</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">Castração</span>
+              <span class="info-val">
+                {{ p.data_castracao ? ('Castrado em ' + (p.data_castracao | date: 'dd/MM/yyyy')) : 'Não castrado / Não
+                informado' }}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- SUBSEÇÃO 3: Identificação & Registros Oficiais -->
+        <div class="sub-section-block">
+          <div class="sub-section-header d-flex align-items-center gap-2">
+            <mat-icon class="text-primary" style="font-size: 18px; width: 18px; height: 18px">qr_code</mat-icon>
+            <h3 class="sub-section-title mb-0">3. Identificação & Registros</h3>
+          </div>
+          <div class="info-grid">
+            <div class="info-item">
+              <span class="info-label">Número do Chip</span>
+              <span class="info-val">{{ p.chip || 'Não informado' }}</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">RGA</span>
+              <span class="info-val">{{ p.rga || 'Não informado' }}</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">Código Moura</span>
+              <span class="info-val">{{ p.moura || 'Não informado' }}</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">Prontuário / Drive</span>
+              <span class="info-val">
+                @if (p.link_documentos) {
+                <a [href]="p.link_documentos" target="_blank" rel="noopener noreferrer"
+                  class="text-primary text-decoration-none d-inline-flex align-items-center gap-1">
+                  <span>Acessar Link</span>
+                  <mat-icon style="font-size: 14px; width: 14px; height: 14px">open_in_new</mat-icon>
+                </a>
+                } @else {
+                Não informado
+                }
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- SUBSEÇÃO 4: Dados de Resgate e Entrada -->
+        <div class="sub-section-block">
+          <div class="sub-section-header d-flex align-items-center gap-2">
+            <mat-icon class="text-primary" style="font-size: 18px; width: 18px; height: 18px">input</mat-icon>
+            <h3 class="sub-section-title mb-0">4. Registro de Entrada / Resgate</h3>
+          </div>
+          @if (p.entradas && p.entradas.length > 0) {
+          @for (ent of p.entradas; track ent.id || $index) {
+          <div class="info-grid">
+            <div class="info-item">
+              <span class="info-label">Data de Entrada</span>
+              <span class="info-val">{{ ent.data_entrada ? (ent.data_entrada | date: 'dd/MM/yyyy') : 'Não informada'
+                }}</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">Local de Origem</span>
+              <span class="info-val">{{ ent.local_origem || 'Não informado' }}</span>
+            </div>
+            <div class="info-item col-span-2">
+              <span class="info-label">Resgatante</span>
+              <span class="info-val">{{ ent.resgatante || 'Não informado' }}</span>
+            </div>
+            <div class="info-item col-span-2">
+              <span class="info-label">Observações da Entrada</span>
+              <p
+                class="info-val text-surface-muted small mb-0 bg-surface-subtle p-2 rounded-2 border border-surface mt-1">
+                {{ ent.observacoes || 'Nenhuma observação informada.' }}
+              </p>
+            </div>
+          </div>
+          }
+          } @else {
+          <div class="info-grid">
+            <div class="info-item">
+              <span class="info-label">Data de Entrada</span>
+              <span class="info-val">Não informada</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">Local de Origem</span>
+              <span class="info-val">Não informado</span>
+            </div>
+            <div class="info-item col-span-2">
+              <span class="info-label">Resgatante</span>
+              <span class="info-val">Não informado</span>
+            </div>
+            <div class="info-item col-span-2">
+              <span class="info-label">Observações da Entrada</span>
+              <p
+                class="info-val text-surface-muted small mb-0 bg-surface-subtle p-2 rounded-2 border border-surface mt-1">
+                Nenhuma observação informada.
+              </p>
+            </div>
+          </div>
+          }
+        </div>
+      </div>
+    </div>
+
+    <!-- COLUNA DA DIREITA: Vacinas, Procedimentos e Locais -->
+    <div class="col-12 col-xl-8">
+      <div class="d-flex flex-column gap-4">
+
+        <!-- CARD 1: VACINAS -->
+        <div class="section-card p-3 p-md-4 rounded-3 shadow-xs">
+          <div
+            class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3 pb-2 border-bottom border-surface">
+            <div class="d-flex align-items-center gap-2">
+              <mat-icon class="text-success">vaccines</mat-icon>
+              <div>
+                <h2 class="h5 fw-bold mb-0">Vacinas</h2>
+                <span class="text-surface-muted small">Histórico vacinal e doses agendadas</span>
+              </div>
+            </div>
+
+            <div class="d-flex align-items-center gap-2 flex-wrap">
+              <!-- Toggle de Ordenação -->
+              <mat-button-toggle-group [value]="vacinaSortMode()" (change)="setVacinaSort($event.value)"
+                aria-label="Ordenação de Vacinas" class="toggle-dense">
+                <mat-button-toggle value="cronologico" matTooltip="Ordenar por Data">
+                  <mat-icon class="toggle-icon">calendar_today</mat-icon> Data
+                </mat-button-toggle>
+                <mat-button-toggle value="valor" matTooltip="Ordenar por Maior Valor">
+                  <mat-icon class="toggle-icon">attach_money</mat-icon> Valor
+                </mat-button-toggle>
+              </mat-button-toggle-group>
+
+              <!-- Botão Adicionar Vacina (Stub) -->
+              <button mat-stroked-button color="primary" (click)="openAddVacina()" class="btn-sm rounded-3">
+                <mat-icon>add</mat-icon> Adicionar
+              </button>
+            </div>
+          </div>
+
+          @if (loadingDetails()) {
+          <div class="text-center py-4">
+            <mat-spinner diameter="32" class="mx-auto"></mat-spinner>
+          </div>
+          } @else if (sortedVacinas().length > 0) {
+          <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0 custom-detail-table">
+              <thead>
+                <tr>
+                  <th>Vacina</th>
+                  <th>Data Prevista</th>
+                  <th>Data Aplicada</th>
+                  <th>Custo</th>
+                  <th>Veterinário</th>
+                  <th class="text-end">Ações</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (vac of sortedVacinas(); track vac.id || $index) {
+                <tr>
+                  <td>
+                    <div class="fw-semibold">{{ vac.nome_vacina }}</div>
+                  </td>
+                  <td>
+                    <span class="text-surface-muted small">
+                      {{ vac.data_prevista ? (vac.data_prevista | date: 'dd/MM/yyyy') : '-' }}
+                    </span>
+                  </td>
+                  <td>
+                    @if (vac.data_aplicacao) {
+                    <span class="badge bg-success-subtle text-success border border-success-subtle">
+                      {{ vac.data_aplicacao | date: 'dd/MM/yyyy' }}
+                    </span>
+                    } @else {
+                    <span class="badge bg-warning-subtle text-warning border border-warning-subtle">
+                      Pendente
+                    </span>
+                    }
+                  </td>
+                  <td>
+                    <span class="fw-medium text-surface-main">
+                      {{ (vac.custo || 0) | currency: 'BRL' : 'symbol' : '1.2-2' }}
+                    </span>
+                  </td>
+                  <td>
+                    @if (vac.veterinario) {
+                    <div class="small">
+                      <strong>{{ vac.veterinario.nome }}</strong>
+                      @if (vac.veterinario.crvet) {
+                      <span class="text-surface-muted d-block" style="font-size: 0.75rem">CRVET: {{
+                        vac.veterinario.crvet }}</span>
+                      }
+                    </div>
+                    } @else {
+                    <span class="text-surface-muted small">-</span>
+                    }
+                  </td>
+                  <td class="text-end">
+                    <button mat-icon-button (click)="openEditVacina(vac)" matTooltip="Editar Vacina" class="btn-sm">
+                      <mat-icon>edit</mat-icon>
+                    </button>
+                  </td>
+                </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+          } @else {
+          <div class="empty-state p-4 text-center rounded-2 border border-surface bg-surface-subtle">
+            <mat-icon class="text-surface-muted mb-2"
+              style="font-size: 36px; width: 36px; height: 36px">vaccines</mat-icon>
+            <p class="mb-1 fw-semibold text-surface-main">Nenhuma vacina registrada</p>
+            <p class="text-surface-muted small mb-2">Cadastre as vacinas aplicadas ou previstas para este animal.</p>
+            <button mat-stroked-button color="primary" (click)="openAddVacina()" class="btn-sm">
+              <mat-icon>add</mat-icon> Registrar Vacina
+            </button>
+          </div>
+          }
+        </div>
+
+        <!-- CARD 2: PROCEDIMENTOS, CONSULTAS & MEDICAMENTOS -->
+        <div class="section-card p-3 p-md-4 rounded-3 shadow-xs">
+          <div
+            class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3 pb-2 border-bottom border-surface">
+            <div class="d-flex align-items-center gap-2">
+              <mat-icon class="text-warning">medical_services</mat-icon>
+              <div>
+                <h2 class="h5 fw-bold mb-0">Consultas, Exames & Medicamentos</h2>
+                <span class="text-surface-muted small">Procedimentos clínicos e tratamentos realizados</span>
+              </div>
+            </div>
+
+            <div class="d-flex align-items-center gap-2 flex-wrap">
+              <!-- Toggle de Ordenação -->
+              <mat-button-toggle-group [value]="procedimentoSortMode()" (change)="setProcedimentoSort($event.value)"
+                aria-label="Ordenação de Procedimentos" class="toggle-dense">
+                <mat-button-toggle value="cronologico" matTooltip="Ordenar por Data">
+                  <mat-icon class="toggle-icon">calendar_today</mat-icon> Data
+                </mat-button-toggle>
+                <mat-button-toggle value="valor" matTooltip="Ordenar por Maior Custo">
+                  <mat-icon class="toggle-icon">attach_money</mat-icon> Valor
+                </mat-button-toggle>
+              </mat-button-toggle-group>
+
+              <!-- Botão Adicionar Procedimento (Stub) -->
+              <button mat-stroked-button color="primary" (click)="openAddProcedimento()" class="btn-sm rounded-3">
+                <mat-icon>add</mat-icon> Adicionar
+              </button>
+            </div>
+          </div>
+
+          @if (loadingDetails()) {
+          <div class="text-center py-4">
+            <mat-spinner diameter="32" class="mx-auto"></mat-spinner>
+          </div>
+          } @else if (sortedConsultas().length > 0) {
+          <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0 custom-detail-table">
+              <thead>
+                <tr>
+                  <th>Operação / Medicamento</th>
+                  <th>Tipo</th>
+                  <th>Data</th>
+                  <th>Custo</th>
+                  <th>Veterinário</th>
+                  <th class="text-end">Ações</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (proc of sortedConsultas(); track proc.id || $index) {
+                <tr>
+                  <td>
+                    <div class="fw-semibold">{{ proc.operacao_medicamento }}</div>
+                  </td>
+                  <td>
+                    <span class="badge bg-surface-subtle text-surface-main border border-surface">
+                      {{ proc.tipo_operacao || 'Consulta' }}
+                    </span>
+                  </td>
+                  <td>
+                    <span class="text-surface-muted small">
+                      {{ proc.data_realizacao | date: 'dd/MM/yyyy' }}
+                    </span>
+                  </td>
+                  <td>
+                    <span class="fw-medium text-surface-main">
+                      {{ (proc.custo || 0) | currency: 'BRL' : 'symbol' : '1.2-2' }}
+                    </span>
+                  </td>
+                  <td>
+                    @if (proc.veterinario) {
+                    <div class="small">
+                      <strong>{{ proc.veterinario.nome }}</strong>
+                      @if (proc.veterinario.crvet) {
+                      <span class="text-surface-muted d-block" style="font-size: 0.75rem">CRVET: {{
+                        proc.veterinario.crvet }}</span>
+                      }
+                    </div>
+                    } @else {
+                    <span class="text-surface-muted small">-</span>
+                    }
+                  </td>
+                  <td class="text-end">
+                    <button mat-icon-button (click)="openEditProcedimento(proc)" matTooltip="Editar Registro"
+                      class="btn-sm">
+                      <mat-icon>edit</mat-icon>
+                    </button>
+                  </td>
+                </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+          } @else {
+          <div class="empty-state p-4 text-center rounded-2 border border-surface bg-surface-subtle">
+            <mat-icon class="text-surface-muted mb-2"
+              style="font-size: 36px; width: 36px; height: 36px">medical_services</mat-icon>
+            <p class="mb-1 fw-semibold text-surface-main">Nenhum procedimento ou exame registrado</p>
+            <p class="text-surface-muted small mb-2">Mantenha o histórico médico e cirúrgico do animal atualizado.</p>
+            <button mat-stroked-button color="primary" (click)="openAddProcedimento()" class="btn-sm">
+              <mat-icon>add</mat-icon> Registrar Procedimento
+            </button>
+          </div>
+          }
+        </div>
+
+        <!-- CARD 3: HISTÓRICO DE LOCAIS DE PASSAGEM -->
+        <div class="section-card p-3 p-md-4 rounded-3 shadow-xs">
+          <div
+            class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3 pb-2 border-bottom border-surface">
+            <div class="d-flex align-items-center gap-2">
+              <mat-icon class="text-info">location_on</mat-icon>
+              <div>
+                <h2 class="h5 fw-bold mb-0">Locais de Passagem</h2>
+                <span class="text-surface-muted small">Histórico de lares temporários, clínicas e acolhimentos</span>
+              </div>
+            </div>
+
+            <button mat-stroked-button color="primary" (click)="openAddLocal()" class="btn-sm rounded-3">
+              <mat-icon>add</mat-icon> Adicionar Local
+            </button>
+          </div>
+
+          <!-- Alerta de observação de implementação futura -->
+          <div class="alert alert-info py-2 px-3 rounded-2 small d-flex align-items-center gap-2 mb-3">
+            <mat-icon style="font-size: 18px; width: 18px; height: 18px">info</mat-icon>
+            <span>
+              <strong>Em expansão:</strong> O módulo completo de gestão de locais parceiros está em fase de
+              estruturação. As passagens registradas são exibidas abaixo.
+            </span>
+          </div>
+
+          @if (loadingDetails()) {
+          <div class="text-center py-4">
+            <mat-spinner diameter="32" class="mx-auto"></mat-spinner>
+          </div>
+          } @else if (sortedLocais().length > 0) {
+          <div class="timeline-container">
+            @for (loc of sortedLocais(); track loc.id || $index) {
+            <div class="timeline-item p-3 mb-2 rounded-2 border border-surface bg-surface-subtle">
+              <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
+                <div>
+                  <div class="fw-bold text-surface-main">
+                    {{ loc.locais?.local || 'Local #' + loc.id_local }}
+                    @if (loc.locais?.tipo_local) {
+                    <span class="badge bg-secondary-subtle text-secondary ms-1">{{ loc.locais?.tipo_local }}</span>
+                    }
+                  </div>
+                  <div class="text-surface-muted small mt-1">
+                    @if (loc.data_saida) {
+                    <span>Saída: {{ loc.data_saida | date: 'dd/MM/yyyy' }}</span>
+                    }
+                    @if (loc.data_reentrada) {
+                    <span class="ms-2">&bull; Reentrada: {{ loc.data_reentrada | date: 'dd/MM/yyyy' }}</span>
+                    }
+                  </div>
+                  @if (loc.motivo_saida) {
+                  <div class="small mt-1">
+                    <span class="text-surface-muted">Motivo:</span> {{ loc.motivo_saida }}
+                  </div>
+                  }
+                  @if (loc.obs) {
+                  <div class="small text-surface-muted fst-italic mt-1">
+                    "{{ loc.obs }}"
+                  </div>
+                  }
+                </div>
+
+                <div class="text-end">
+                  @if (loc.valor_auxilio) {
+                  <span class="badge bg-primary-subtle text-primary border border-primary-subtle d-block mb-1">
+                    Auxílio: {{ loc.valor_auxilio | currency: 'BRL' : 'symbol' : '1.2-2' }}
+                  </span>
+                  }
+                  <button mat-icon-button (click)="openEditLocal(loc)" matTooltip="Editar Passagem" class="btn-sm">
+                    <mat-icon>edit</mat-icon>
+                  </button>
+                </div>
+              </div>
+            </div>
+            }
+          </div>
+          } @else {
+          <div class="empty-state p-4 text-center rounded-2 border border-surface bg-surface-subtle">
+            <mat-icon class="text-surface-muted mb-2"
+              style="font-size: 36px; width: 36px; height: 36px">holiday_village</mat-icon>
+            <p class="mb-1 fw-semibold text-surface-main">Nenhum histórico de local de passagem</p>
+            <p class="text-surface-muted small mb-2">Registre quando o animal for encaminhado a lares temporários ou
+              clínicas.</p>
+            <button mat-stroked-button color="primary" (click)="openAddLocal()" class="btn-sm">
+              <mat-icon>add</mat-icon> Registrar Passagem
+            </button>
+          </div>
+          }
+        </div>
+
+      </div>
+    </div>
+  </div>
+  }
+</div>
