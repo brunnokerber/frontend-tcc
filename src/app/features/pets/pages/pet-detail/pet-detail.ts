@@ -23,7 +23,10 @@ import {
   SortOrderMode,
   Vacina,
 } from '../../models/pet.model';
+import { ConsultasExamesService } from '../../services/consultas-exames.service';
+import { PetsLocaisService } from '../../services/pets-locais.service';
 import { PetsService } from '../../services/pets.service';
+import { VacinasService } from '../../services/vacinas.service';
 
 @Component({
   selector: 'app-pet-detail',
@@ -50,6 +53,9 @@ export default class PetDetailComponent implements OnInit {
   private router = inject(Router);
   private nav = inject(NavigationService);
   public petsService = inject(PetsService);
+  public vacinasService = inject(VacinasService);
+  public consultasExamesService = inject(ConsultasExamesService);
+  public petsLocaisService = inject(PetsLocaisService);
   private toast = inject(ToastService);
 
   public petId = signal<number | null>(null);
@@ -187,9 +193,9 @@ export default class PetDetailComponent implements OnInit {
     this.loadingDetails.set(true);
     try {
       const [vacs, consultas, locais] = await Promise.all([
-        this.petsService.getVacinasByPetId(id),
-        this.petsService.getConsultasExamesByPetId(id),
-        this.petsService.getPetsLocaisByPetId(id),
+        this.vacinasService.getVacinasByPetId(id),
+        this.consultasExamesService.getConsultasExamesByPetId(id),
+        this.petsLocaisService.getPetsLocaisByPetId(id),
       ]);
 
       this.vacinas.set(vacs);
@@ -226,13 +232,18 @@ export default class PetDetailComponent implements OnInit {
     }
   }
 
-  // --- Stubs para ações futuras ---
   openAddVacina() {
-    this.toast.info('O módulo de cadastro de vacinas será implementado na próxima etapa.');
+    const p = this.pet();
+    if (p) {
+      this.router.navigate(['/pets', p.id, 'vacinas', 'nova'], { state: { pet: p } });
+    }
   }
 
   openEditVacina(vacina: Vacina) {
-    this.toast.info(`Edição da vacina "${vacina.nome_vacina}" será implementada na próxima etapa.`);
+    const p = this.pet();
+    if (p && vacina.id) {
+      this.router.navigate(['/pets', p.id, 'vacinas', vacina.id, 'editar'], { state: { pet: p } });
+    }
   }
 
   openAddProcedimento() {

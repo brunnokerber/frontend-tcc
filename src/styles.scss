@@ -115,6 +115,11 @@ mat-select,
   --bs-table-border-color: var(--mat-sys-outline-variant);
   --bs-table-striped-bg: var(--mat-sys-surface-container-low);
   --bs-table-hover-bg: var(--mat-sys-surface-container);
+  --bs-table-hover-color: var(--mat-sys-on-surface);
+  color: var(--mat-sys-on-surface);
+}
+
+.table-hover > tbody > tr:hover > * {
   color: var(--mat-sys-on-surface);
 }
 
@@ -138,12 +143,15 @@ mat-select,
 .text-status-success {
   color: var(--color-status-success);
 }
+
 .text-status-warning {
   color: var(--color-status-warning);
 }
+
 .text-status-adopted {
   color: var(--color-status-adopted);
 }
+
 .text-status-obito {
   color: var(--color-status-obito);
 }

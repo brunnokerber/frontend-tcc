@@ -1,0 +1,95 @@
+<div class="dialog-container p-4">
+  <div class="d-flex align-items-center justify-content-between mb-3 pb-1">
+    <div class="d-flex align-items-center gap-2">
+      <div class="dialog-icon-wrapper rounded-circle d-flex align-items-center justify-content-center bg-primary-subtle text-primary">
+        <mat-icon>{{ isEditing() ? 'edit' : 'medical_services' }}</mat-icon>
+      </div>
+      <div>
+        <h2 class="h5 fw-bold mb-0">
+          {{ isEditing() ? 'Editar Veterinário' : 'Novo Veterinário' }}
+        </h2>
+        <span class="text-surface-muted small">
+          {{ isEditing() ? 'Atualize as informações do profissional' : 'Cadastre rapidamente o profissional' }}
+        </span>
+      </div>
+    </div>
+    <button mat-icon-button type="button" (click)="onCancel()" [disabled]="isSaving()">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <form [formGroup]="vetForm" (ngSubmit)="onSave()">
+    <div class="row g-3 py-2">
+      <!-- Nome -->
+      <div class="col-12">
+        <mat-form-field appearance="outline" class="w-100">
+          <mat-label>Nome Completo do Veterinário *</mat-label>
+          <input
+            matInput
+            formControlName="nome"
+            placeholder="Ex: Dra. Juliana Silveira"
+            maxlength="30"
+            cdkFocusInitial
+          />
+          <mat-icon matPrefix class="me-2 text-muted">person</mat-icon>
+          @if (vetForm.controls.nome.touched && vetForm.controls.nome.errors) {
+            <mat-error>{{ vetForm.controls.nome | formError }}</mat-error>
+          }
+        </mat-form-field>
+      </div>
+
+      <!-- CRVET -->
+      <div class="col-12 col-md-6">
+        <mat-form-field appearance="outline" class="w-100">
+          <mat-label>CRVET *</mat-label>
+          <input
+            matInput
+            formControlName="crvet"
+            placeholder="Ex: RS-12345"
+            maxlength="30"
+          />
+          <mat-icon matPrefix class="me-2 text-muted">badge</mat-icon>
+          @if (vetForm.controls.crvet.touched && vetForm.controls.crvet.errors) {
+            <mat-error>{{ vetForm.controls.crvet | formError }}</mat-error>
+          }
+        </mat-form-field>
+      </div>
+
+      <!-- Telefone / WhatsApp -->
+      <div class="col-12 col-md-6">
+        <mat-form-field appearance="outline" class="w-100">
+          <mat-label>Telefone / WhatsApp *</mat-label>
+          <input
+            matInput
+            appPhoneMask
+            formControlName="telefone"
+            placeholder="(51) 99999-9999"
+            maxlength="15"
+          />
+          <mat-icon matPrefix class="me-2 text-muted">phone</mat-icon>
+          @if (vetForm.controls.telefone.touched && vetForm.controls.telefone.errors) {
+            <mat-error>{{ vetForm.controls.telefone | formError }}</mat-error>
+          }
+        </mat-form-field>
+      </div>
+    </div>
+
+    <!-- Ações -->
+    <div class="d-flex align-items-center justify-content-end gap-2 pt-3 mt-1">
+      <button type="button" mat-stroked-button (click)="onCancel()" [disabled]="isSaving()">
+        Cancelar
+      </button>
+      <button type="submit" mat-flat-button color="primary" [disabled]="isSaving()" class="px-4">
+        @if (isSaving()) {
+          <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+          <span>Salvando...</span>
+        } @else {
+          <span class="d-inline-flex align-items-center justify-content-center gap-2">
+            <mat-icon>save</mat-icon>
+            <span>{{ isEditing() ? 'Atualizar Veterinário' : 'Salvar Veterinário' }}</span>
+          </span>
+        }
+      </button>
+    </div>
+  </form>
+</div>

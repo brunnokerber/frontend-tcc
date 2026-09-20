@@ -1,6 +1,11 @@
 import { Audit } from '@core/audit/models/audit.model';
-import { Local } from '@features/locais/models/local.model';
-import { Veterinario } from '@features/veterinarios/models/veterinario.model';
+import { ConsultaExame } from './consulta-exame.model';
+import { PetLocal } from './pet-local.model';
+import { Vacina } from './vacina.model';
+
+export * from './consulta-exame.model';
+export * from './pet-local.model';
+export * from './vacina.model';
 
 export interface Pet extends Audit {
   id: number;
@@ -33,42 +38,6 @@ export interface Entrada extends Audit {
   resgatante: string;
   observacoes?: string | null;
 }
-
-export interface Vacina extends Audit {
-  id?: number;
-  id_pet: number;
-  nome_vacina: string;
-  data_prevista?: string | null;
-  data_aplicacao?: string | null;
-  custo?: number | null;
-  id_veterinario?: number | null;
-  veterinario?: Veterinario | null;
-}
-
-export interface ConsultaExame extends Audit {
-  id?: number;
-  id_pet: number;
-  id_veterinario?: number | null;
-  operacao_medicamento: string;
-  data_realizacao: string;
-  custo?: number | null;
-  tipo_operacao?: string | null;
-  veterinario?: Veterinario | null;
-}
-
-export interface PetLocal extends Audit {
-  id?: number;
-  id_pet: number;
-  id_local: number;
-  motivo_saida?: string | null;
-  data_reentrada?: string | null;
-  data_saida?: string | null;
-  valor_auxilio?: number | null;
-  obs?: string | null;
-  locais?: Local | null;
-}
-
-export type SortOrderMode = 'cronologico' | 'valor';
 
 export interface PetCreateDto extends entradaDto {
   tipo_pet: string;
@@ -214,4 +183,3 @@ export function getSexoIcon(sexo?: string | null): string {
   const found = SEXO_OPTIONS.find((s) => s.value.toLowerCase() === sexo.toLowerCase());
   return found?.icon || 'male';
 }
-

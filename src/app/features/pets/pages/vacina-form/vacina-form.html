@@ -1,0 +1,205 @@
+<div class="vacina-form-container container-xl py-4">
+  <!-- Cabeçalho da Página -->
+  <div class="d-flex align-items-center justify-content-between mb-4 pb-1">
+    <div class="d-flex align-items-center gap-3">
+      <button mat-icon-button (click)="goBack()" matTooltip="Voltar aos detalhes do pet" type="button">
+        <mat-icon>arrow_back</mat-icon>
+      </button>
+      <div>
+        <h1 class="h4 fw-bold mb-0">
+          {{ isEditing() ? 'Editar Registro de Vacina' : 'Registrar Nova Vacina' }}
+        </h1>
+        <span class="text-surface-muted small">
+          {{ isEditing() ? 'Atualize as informações clínicas desta dose' : 'Adicione uma nova vacina ou agendamento para o animal' }}
+        </span>
+      </div>
+    </div>
+  </div>
+
+  @if (isLoading()) {
+    <div class="d-flex flex-column align-items-center justify-content-center py-5">
+      <mat-spinner diameter="48"></mat-spinner>
+      <span class="mt-3 text-surface-muted">Carregando dados da vacina...</span>
+    </div>
+  } @else {
+    <!-- CARD DE CONTEXTO DO PET -->
+    @if (pet(); as p) {
+      <div class="pet-context-card p-3 p-md-4 rounded-3 shadow-xs mb-4">
+        <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+          <div class="d-flex align-items-center gap-3">
+            <div
+              class="pet-avatar rounded-circle d-flex align-items-center justify-content-center"
+              [ngClass]="p.tipo_pet === 'Gato' ? 'bg-cat' : 'bg-dog'"
+            >
+              <i [class]="getTipoFaIcon(p.tipo_pet)"></i>
+            </div>
+            <div>
+              <div class="d-flex align-items-center gap-2">
+                <span class="fs-6 fw-bold">{{ p.nome }}</span>
+                <mat-icon
+                  [matTooltip]="p.sexo"
+                  class="text-surface-muted"
+                  style="font-size: 18px; width: 18px; height: 18px"
+                >
+                  {{ getSexoIcon(p.sexo) }}
+                </mat-icon>
+                <span class="badge-status {{ getStatusBadgeClass(p.status) }} ms-1">
+                  {{ p.status }}
+                </span>
+              </div>
+              <div class="text-surface-muted small">
+                ID #{{ p.id }} &bull; {{ p.tipo_pet }} &bull; {{ p.raca || 'Sem raça definida' }} &bull; {{ p.porte || 'Porte N/I' }}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- FORMULÁRIO -->
+    <form [formGroup]="vacinaForm" (ngSubmit)="onSubmit()" class="vacina-form-wrapper">
+      <div class="form-card p-3 p-md-4 rounded-3 shadow-xs mb-4">
+        <!-- Seção 1: Identificação da Vacina -->
+        <div class="d-flex align-items-center gap-2 mb-3 pb-1">
+          <mat-icon class="text-primary">vaccines</mat-icon>
+          <h2 class="h6 fw-bold mb-0">Dados da Vacina</h2>
+        </div>
+
+        <div class="row g-3">
+          <!-- Nome da Vacina com Autocomplete Filtrado -->
+          <div class="col-12">
+            <mat-form-field appearance="outline" class="w-100">
+              <mat-label>Nome da Vacina / Antígeno *</mat-label>
+              <input
+                matInput
+                formControlName="nome_vacina"
+                [matAutocomplete]="autoVacina"
+                placeholder="Ex: V10, Antirrábica, Giárdiase, Quíntupla Felina"
+                maxlength="30"
+              />
+              <mat-icon matPrefix class="me-2 text-muted">medication</mat-icon>
+              <mat-autocomplete #autoVacina="matAutocomplete">
+                @for (sug of filteredVacinas(); track sug) {
+                  <mat-option [value]="sug">{{ sug }}</mat-option>
+                }
+              </mat-autocomplete>
+              @if (vacinaForm.controls.nome_vacina.touched && vacinaForm.controls.nome_vacina.errors) {
+                <mat-error>{{ vacinaForm.controls.nome_vacina | formError }}</mat-error>
+              }
+            </mat-form-field>
+          </div>
+
+          <!-- Data Prevista (Agendamento) -->
+          <div class="col-12 col-md-6">
+            <mat-form-field appearance="outline" class="w-100">
+              <mat-label>Data Prevista (Agendamento) *</mat-label>
+              <input
+                matInput
+                appDateMask
+                maxlength="10"
+                [matDatepicker]="pickerPrevista"
+                formControlName="data_prevista"
+                placeholder="dd/mm/aaaa"
+              />
+              <mat-datepicker-toggle matIconSuffix [for]="pickerPrevista"></mat-datepicker-toggle>
+              <mat-datepicker #pickerPrevista></mat-datepicker>
+              <mat-hint>Data estimada para aplicação desta dose</mat-hint>
+              @if (vacinaForm.controls.data_prevista.touched && vacinaForm.controls.data_prevista.errors) {
+                <mat-error>{{ vacinaForm.controls.data_prevista | formError }}</mat-error>
+              }
+            </mat-form-field>
+          </div>
+
+          <!-- Data de Aplicação Efetiva -->
+          <div class="col-12 col-md-6">
+            <mat-form-field appearance="outline" class="w-100">
+              <mat-label>Data de Aplicação Efetiva</mat-label>
+              <input
+                matInput
+                appDateMask
+                maxlength="10"
+                [matDatepicker]="pickerAplicacao"
+                formControlName="data_aplicacao"
+                placeholder="dd/mm/aaaa"
+              />
+              <mat-datepicker-toggle matIconSuffix [for]="pickerAplicacao"></mat-datepicker-toggle>
+              <mat-datepicker #pickerAplicacao></mat-datepicker>
+              <mat-hint>Preencha quando a dose for efetivamente administrada</mat-hint>
+              @if (vacinaForm.controls.data_aplicacao.touched && vacinaForm.controls.data_aplicacao.errors) {
+                <mat-error>{{ vacinaForm.controls.data_aplicacao | formError }}</mat-error>
+              }
+            </mat-form-field>
+          </div>
+
+          <!-- Custo Financeiro -->
+          <div class="col-12 col-md-5">
+            <mat-form-field appearance="outline" class="w-100">
+              <mat-label>Custo da Dose (R$)</mat-label>
+              <input
+                matInput
+                type="number"
+                step="0.01"
+                min="0"
+                formControlName="custo"
+                placeholder="0,00"
+              />
+              <span matTextPrefix class="me-1 text-muted">R$&nbsp;</span>
+              <mat-icon matSuffix class="text-muted">payments</mat-icon>
+              @if (vacinaForm.controls.custo.touched && vacinaForm.controls.custo.errors) {
+                <mat-error>{{ vacinaForm.controls.custo | formError }}</mat-error>
+              }
+            </mat-form-field>
+          </div>
+
+          <!-- Veterinário Responsável com Botão de Cadastro Rápido -->
+          <div class="col-12 col-md-7">
+            <div class="d-flex align-items-start gap-2">
+              <mat-form-field appearance="outline" class="flex-grow-1">
+                <mat-label>Veterinário(a) Aplicador</mat-label>
+                <mat-select formControlName="id_veterinario">
+                  <mat-option [value]="null">-- Nenhum selecionado --</mat-option>
+                  @for (vet of veterinarios(); track vet.id) {
+                    <mat-option [value]="vet.id">
+                      {{ vet.nome }} (CRVET: {{ vet.crvet }})
+                    </mat-option>
+                  }
+                </mat-select>
+                <mat-icon matPrefix class="me-2 text-muted">medical_services</mat-icon>
+              </mat-form-field>
+
+              <button
+                type="button"
+                mat-stroked-button
+                color="primary"
+                class="btn-new-vet"
+                (click)="openNewVeterinarioDialog()"
+                matTooltip="Cadastrar novo veterinário sem sair da tela"
+              >
+                <mat-icon>person_add</mat-icon>
+                <span class="d-none d-sm-inline">Novo</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Barra de Ações Inferior -->
+      <div class="d-flex align-items-center justify-content-end gap-2 pt-2 mb-5">
+        <button type="button" mat-stroked-button (click)="goBack()" [disabled]="isSaving()">
+          Cancelar
+        </button>
+        <button type="submit" mat-flat-button color="primary" [disabled]="isSaving()" class="px-4">
+          @if (isSaving()) {
+            <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+            <span>Salvando...</span>
+          } @else {
+            <span class="d-inline-flex align-items-center justify-content-center gap-2">
+              <mat-icon>save</mat-icon>
+              <span>{{ isEditing() ? 'Atualizar Vacina' : 'Salvar Registro de Vacina' }}</span>
+            </span>
+          }
+        </button>
+      </div>
+    </form>
+  }
+</div>

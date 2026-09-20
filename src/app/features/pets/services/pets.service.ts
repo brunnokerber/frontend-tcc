@@ -3,18 +3,15 @@ import { AuthService } from '@core/auth/services/auth.service';
 import { SupabaseService } from '@core/services/supabase';
 import { ToastService } from '@core/services/toast.service';
 import {
-  ConsultaExame,
   Entrada,
   Pet,
   PetCreateDto,
   PetFilter,
-  PetLocal,
   PetUpdateDto,
-  Vacina,
 } from '../models/pet.model';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class PetsService {
   private supabase = inject(SupabaseService);
@@ -43,7 +40,9 @@ export class PetsService {
       if (filter) {
         if (filter.search && filter.search.trim()) {
           const s = `%${filter.search.trim()}%`;
-          query = query.or(`nome.ilike.${s},chip.ilike.${s},rga.ilike.${s}`);
+          query = query.or(
+            `nome.ilike.${s},raca.ilike.${s},chip.ilike.${s},rga.ilike.${s},moura.ilike.${s}`
+          );
         }
         if (filter.tipo_pet) {
           query = query.eq('tipo_pet', filter.tipo_pet);
@@ -97,84 +96,6 @@ export class PetsService {
     } catch (err: any) {
       this.toast.error(err.message || 'Erro ao buscar dados do pet.');
       return null;
-    } finally {
-      this.loadingSignal.set(false);
-    }
-  }
-
-  async getVacinasByPetId(petId: number): Promise<Vacina[]> {
-    try {
-      const { data, error } = await this.supabase.client
-        .from('vacinas')
-        .select('*, veterinario:id_veterinario(*)')
-        .eq('id_pet', petId)
-        .order('data_aplicacao', { ascending: false, nullsFirst: false });
-
-      if (error) {
-        console.warn('Tabela vacinas vazia ou com erro de consulta:', error.message);
-        return [];
-      }
-      return (data as Vacina[]) || [];
-    } catch (err: any) {
-      console.warn('Erro ao carregar vacinas do pet:', err);
-      return [];
-    }
-  }
-
-  async getConsultasExamesByPetId(petId: number): Promise<ConsultaExame[]> {
-    try {
-      const { data, error } = await this.supabase.client
-        .from('consultas_exames')
-        .select('*, veterinario:id_veterinario(*)')
-        .eq('id_pet', petId)
-        .order('data_realizacao', { ascending: false, nullsFirst: false });
-
-      if (error) {
-        console.warn('Tabela consultas_exames vazia ou com erro de consulta:', error.message);
-        return [];
-      }
-      return (data as ConsultaExame[]) || [];
-    } catch (err: any) {
-      console.warn('Erro ao carregar consultas/exames do pet:', err);
-      return [];
-    }
-  }
-
-  async getPetsLocaisByPetId(petId: number): Promise<PetLocal[]> {
-    try {
-      const { data, error } = await this.supabase.client
-        .from('pets_locais')
-        .select('*, locais:id_local(*)')
-        .eq('id_pet', petId)
-        .order('data_saida', { ascending: false, nullsFirst: false });
-
-      if (error) {
-        console.warn('Tabela pets_locais vazia ou com erro de consulta:', error.message);
-        return [];
-      }
-      return (data as PetLocal[]) || [];
-    } catch (err: any) {
-      console.warn('Erro ao carregar histórico de locais do pet:', err);
-      return [];
-    }
-  }
-
-  async getFullPetDetailsById(id: number): Promise<{
-    pet: Pet | null;
-    vacinas: Vacina[];
-    consultasExames: ConsultaExame[];
-    petsLocais: PetLocal[];
-  }> {
-    this.loadingSignal.set(true);
-    try {
-      const [pet, vacinas, consultasExames, petsLocais] = await Promise.all([
-        this.getPetById(id),
-        this.getVacinasByPetId(id),
-        this.getConsultasExamesByPetId(id),
-        this.getPetsLocaisByPetId(id),
-      ]);
-
-      return { pet, vacinas, consultasExames, petsLocais };
     } finally {
       this.loadingSignal.set(false);
     }
@@ -245,7 +166,7 @@ export class PetsService {
         .from('pets')
         .update({
           ...dto,
-          updated_at: new Date().toISOString()
+          updated_at: new Date().toISOString(),
         })
         .eq('id', id)
         .select('*, entradas(*)')

@@ -18,7 +18,8 @@
       <button
         mat-flat-button
         color="primary"
-        routerLink="/veterinarios/novo"
+        type="button"
+        (click)="openVeterinarioDialog()"
         class="btn-create d-flex align-items-center gap-2 py-2 px-3 rounded-3 shadow-sm"
       >
         <mat-icon>add</mat-icon>
@@ -71,6 +72,7 @@
       <div class="col-12 col-md-4 col-lg-3 d-flex justify-content-end gap-2">
         <button
           mat-stroked-button
+          type="button"
           (click)="clearFilters()"
           class="btn-clear flex-grow-1 flex-md-grow-0"
         >
@@ -80,6 +82,7 @@
         <button
           mat-flat-button
           color="primary"
+          type="button"
           (click)="applyFilters()"
           class="flex-grow-1 flex-md-grow-0"
         >
@@ -111,7 +114,8 @@
         <button
           mat-flat-button
           color="primary"
-          routerLink="/veterinarios/novo"
+          type="button"
+          (click)="openVeterinarioDialog()"
           class="rounded-pill px-4"
         >
           <mat-icon>add</mat-icon>
@@ -177,6 +181,7 @@
                       (click)="copyPhone(vet.telefone, $event)"
                       matTooltip="Copiar telefone"
                       aria-label="Copiar telefone"
+                      type="button"
                     >
                       <mat-icon>content_copy</mat-icon>
                     </button>
@@ -196,8 +201,9 @@
                     <button
                       matIconButton
                       color="primary"
-                      (click)="goToEdit(vet.id)"
+                      (click)="openVeterinarioDialog(vet)"
                       matTooltip="Editar dados do Veterinário"
+                      type="button"
                     >
                       <mat-icon>edit</mat-icon>
                     </button>
@@ -254,6 +260,7 @@
                         (click)="copyPhone(vet.telefone, $event)"
                         matTooltip="Copiar telefone"
                         aria-label="Copiar telefone"
+                        type="button"
                       >
                         <mat-icon>content_copy</mat-icon>
                       </button>
@@ -274,7 +281,8 @@
                     mat-stroked-button
                     color="primary"
                     class="btn-sm"
-                    (click)="goToEdit(vet.id)"
+                    type="button"
+                    (click)="openVeterinarioDialog(vet)"
                   >
                     <mat-icon style="font-size: 16px; width: 16px; height: 16px">edit</mat-icon>
                     <span>Editar</span>

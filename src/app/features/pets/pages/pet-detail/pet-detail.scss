@@ -138,6 +138,8 @@
 
 /* Custom table styling */
 .custom-detail-table {
+  --bs-table-hover-bg: var(--mat-sys-surface-container);
+  --bs-table-hover-color: var(--mat-sys-on-surface);
   font-size: 0.875rem;
 
   thead th {
@@ -153,6 +155,11 @@
   tbody td {
     padding: 0.75rem;
     border-bottom: 1px solid var(--mat-sys-outline-variant);
+    color: var(--mat-sys-on-surface);
+  }
+
+  tbody tr:hover > * {
+    color: var(--mat-sys-on-surface);
   }
 }
 

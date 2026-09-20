@@ -3,30 +3,30 @@ import { Audit } from '@core/audit/models/audit.model';
 export interface Local extends Audit {
   id: number;
   tipo_local: string;
-  contato?: string | null;
-  telefone?: string | null;
+  contato: string;
+  telefone: string;
   local: string;
-  bairro?: string | null;
-  rua?: string | null;
-  numero?: number | null;
+  bairro: string;
+  rua: string;
+  numero: number;
   complemento?: string | null;
-  cidade?: string | null;
-  estado?: string | null;
-  cep?: string | null;
+  cidade: string;
+  estado: string;
+  cep: string;
 }
 
 export interface LocalCreateDto {
   tipo_local: string;
-  contato?: string | null;
-  telefone?: string | null;
+  contato: string;
+  telefone: string;
   local: string;
-  bairro?: string | null;
-  rua?: string | null;
-  numero?: number | null;
+  bairro: string;
+  rua: string;
+  numero: number;
   complemento?: string | null;
-  cidade?: string | null;
-  estado?: string | null;
-  cep?: string | null;
+  cidade: string;
+  estado: string;
+  cep: string;
 }
 
 export type LocalUpdateDto = Partial<LocalCreateDto>;

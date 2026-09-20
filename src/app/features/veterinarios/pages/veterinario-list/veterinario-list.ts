@@ -3,14 +3,17 @@ import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { ToastService } from '@core/services/toast.service';
 import { formatPhone, onlyDigits } from '@shared/utils/string-utils';
+import { VeterinarioDialogComponent } from '../../components/veterinario-dialog/veterinario-dialog';
+import { Veterinario } from '../../models/veterinario.model';
 import { VeterinariosService } from '../../services/veterinarios.service';
 
 @Component({
@@ -19,7 +22,6 @@ import { VeterinariosService } from '../../services/veterinarios.service';
   imports: [
     CommonModule,
     FormsModule,
-    RouterLink,
     MatCardModule,
     MatButtonModule,
     MatIconModule,
@@ -27,6 +29,7 @@ import { VeterinariosService } from '../../services/veterinarios.service';
     MatFormFieldModule,
     MatProgressSpinnerModule,
     MatTooltipModule,
+    MatDialogModule,
   ],
   templateUrl: './veterinario-list.html',
   styleUrls: ['./veterinario-list.scss'],
@@ -35,6 +38,7 @@ export default class VeterinarioListComponent implements OnInit {
   public veterinariosService = inject(VeterinariosService);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
+  private dialog = inject(MatDialog);
   private toast = inject(ToastService);
 
   public search = signal<string>('');
@@ -67,8 +71,21 @@ export default class VeterinarioListComponent implements OnInit {
     this.applyFilters();
   }
 
-  goToEdit(id: number): void {
-    this.router.navigate(['/veterinarios', id, 'editar']);
+  openVeterinarioDialog(vet?: Veterinario): void {
+    const dialogRef = this.dialog.open(VeterinarioDialogComponent, {
+      width: '520px',
+      disableClose: true,
+      autoFocus: false,
+      data: {
+        veterinario: vet || null,
+      },
+    });
+
+    dialogRef.afterClosed().subscribe((result: Veterinario | null) => {
+      if (result) {
+        this.applyFilters();
+      }
+    });
   }
 
   formatPhone(phone?: string | null): string {
