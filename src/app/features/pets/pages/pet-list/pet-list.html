@@ -226,8 +226,8 @@
           <!-- Nome e ID -->
           <td class="ps-4">
             <div class="d-flex align-items-center gap-3">
-              <div class="pet-avatar rounded-circle d-flex align-items-center justify-content-center"
-                [ngClass]="pet.tipo_pet === 'Gato' ? 'bg-cat' : 'bg-dog'">
+              <div class="pet-avatar rounded-circle"
+                [ngClass]="getTipoBadgeClass(pet.tipo_pet)">
                 <i [class]="getTipoFaIcon(pet.tipo_pet)"></i>
               </div>
               <div>
@@ -349,8 +349,8 @@
           <!-- Cabeçalho do Card -->
           <div class="d-flex align-items-center justify-content-between mb-2">
             <div class="d-flex align-items-center gap-2">
-              <div class="pet-avatar rounded-circle d-flex align-items-center justify-content-center"
-                [ngClass]="pet.tipo_pet === 'Gato' ? 'bg-cat' : 'bg-dog'">
+              <div class="pet-avatar rounded-circle"
+                [ngClass]="getTipoBadgeClass(pet.tipo_pet)">
                 <i [class]="getTipoFaIcon(pet.tipo_pet)"></i>
               </div>
               <div>

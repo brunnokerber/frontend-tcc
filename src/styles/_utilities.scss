@@ -1,0 +1,33 @@
+/* Reset e estilos fundamentais */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  height: 100dvh;
+}
+
+/* Material Design 3 Surface & Color Utility Classes */
+.bg-surface-card {
+  background-color: var(--mat-sys-surface-container-lowest);
+}
+
+.bg-surface-subtle {
+  background-color: var(--mat-sys-surface-container);
+}
+
+.text-surface-main {
+  color: var(--mat-sys-on-surface);
+}
+
+.text-surface-muted,
+.text-muted {
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.border-surface {
+  border-color: var(--mat-sys-outline-variant);
+}

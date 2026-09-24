@@ -24,6 +24,14 @@ export const PETS_ROUTES: Routes = [
   {
     path: ':petId/vacinas/:vacinaId/editar',
     loadComponent: () => import('./pages/vacina-form/vacina-form'),
+  },
+  {
+    path: ':petId/procedimentos/novo',
+    loadComponent: () => import('./pages/procedimento-form/procedimento-form'),
+  },
+  {
+    path: ':petId/procedimentos/:procedimentoId/editar',
+    loadComponent: () => import('./pages/procedimento-form/procedimento-form'),
   }
 ];
 

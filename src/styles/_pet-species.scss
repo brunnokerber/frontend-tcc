@@ -1,0 +1,95 @@
+/* Pet Species Contrast Tokens */
+:root {
+  --color-pet-dog: #0284c7;
+  --color-pet-dog-bg: rgba(2, 132, 199, 0.14);
+  --color-pet-dog-text: #0369a1;
+
+  --color-pet-cat: #ea580c;
+  --color-pet-cat-bg: rgba(234, 88, 12, 0.14);
+  --color-pet-cat-text: #c2410c;
+
+  --color-pet-other: #64748b;
+  --color-pet-other-bg: rgba(100, 116, 139, 0.14);
+  --color-pet-other-text: #475569;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-pet-dog-bg: rgba(56, 189, 248, 0.2);
+    --color-pet-dog-text: #7dd3fc;
+
+    --color-pet-cat-bg: rgba(251, 146, 60, 0.2);
+    --color-pet-cat-text: #fdba74;
+
+    --color-pet-other-bg: rgba(148, 163, 184, 0.2);
+    --color-pet-other-text: #cbd5e1;
+  }
+}
+
+/* Pet Avatar Common Base Class */
+.pet-avatar {
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  mat-icon,
+  i {
+    font-size: 22px;
+    width: 22px;
+    height: 22px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+.pet-hero-avatar {
+  width: 64px;
+  height: 64px;
+  min-width: 64px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+
+  mat-icon,
+  i {
+    font-size: 28px;
+    width: 28px;
+    height: 28px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+/* Pet Species Badges & Avatars */
+.bg-dog {
+  background-color: var(--color-pet-dog-bg);
+  color: var(--color-pet-dog-text);
+}
+
+.bg-cat {
+  background-color: var(--color-pet-cat-bg);
+  color: var(--color-pet-cat-text);
+}
+
+.bg-other {
+  background-color: var(--mat-sys-surface-container);
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.text-dog {
+  color: var(--color-pet-dog-text);
+}
+
+.text-cat {
+  color: var(--color-pet-cat-text);
+}

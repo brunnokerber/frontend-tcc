@@ -47,8 +47,8 @@
       <!-- Identificação Principal -->
       <div class="col-12 col-lg-5">
         <div class="d-flex align-items-center gap-3">
-          <div class="pet-hero-avatar rounded-circle d-flex align-items-center justify-content-center"
-            [ngClass]="p.tipo_pet === 'Gato' ? 'bg-cat' : 'bg-dog'">
+          <div class="pet-hero-avatar rounded-circle"
+            [ngClass]="getTipoBadgeClass(p.tipo_pet)">
             <i [class]="getTipoFaIcon(p.tipo_pet)"></i>
           </div>
           <div>
@@ -443,20 +443,11 @@
                 </mat-button-toggle>
               </mat-button-toggle-group>
 
-              <!-- Botão Adicionar Procedimento (Stub) -->
+              <!-- Botão Adicionar Procedimento -->
               <button mat-stroked-button color="primary" (click)="openAddProcedimento()" class="btn-sm rounded-3">
                 <mat-icon>add</mat-icon> Adicionar
               </button>
             </div>
-          </div>
-
-          <!-- Alerta de observação de implementação futura -->
-          <div class="alert alert-info py-2 px-3 rounded-2 small d-flex align-items-center gap-2 mb-3">
-            <mat-icon style="font-size: 18px; width: 18px; height: 18px">info</mat-icon>
-            <span>
-              <strong>Em expansão:</strong> O módulo completo de gestão de locais parceiros está em fase de
-              estruturação. As passagens registradas são exibidas abaixo.
-            </span>
           </div>
 
           @if (loadingDetails()) {

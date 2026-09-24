@@ -14,8 +14,8 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import {
   getSexoIcon,
   getStatusBadgeClass,
+  getTipoBadgeClass,
   getTipoFaIcon,
-  getTipoIcon,
   Pet,
   PORTE_OPTIONS,
   SENIORIDADE_OPTIONS,
@@ -122,7 +122,7 @@ export default class PetListComponent implements OnInit {
   }
 
   readonly getStatusBadgeClass = getStatusBadgeClass;
-  readonly getTipoIcon = getTipoIcon;
+  readonly getTipoBadgeClass = getTipoBadgeClass;
   readonly getTipoFaIcon = getTipoFaIcon;
   readonly getSexoIcon = getSexoIcon;
 

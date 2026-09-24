@@ -56,37 +56,6 @@
   color: var(--mat-sys-on-surface);
 }
 
-.pet-avatar {
-  width: 40px;
-  height: 40px;
-  min-width: 40px;
-  border-radius: 50%;
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  mat-icon,
-  i {
-    font-size: 20px;
-    width: 20px;
-    height: 20px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  &.bg-dog {
-    background-color: var(--mat-sys-primary-container);
-    color: var(--mat-sys-on-primary-container);
-  }
-
-  &.bg-cat {
-    background-color: var(--mat-sys-tertiary-container);
-    color: var(--mat-sys-on-tertiary-container);
-  }
-}
-
 .custom-pet-table {
   --bs-table-bg: var(--mat-sys-surface-container-lowest);
   --bs-table-hover-bg: var(--mat-sys-surface-container);

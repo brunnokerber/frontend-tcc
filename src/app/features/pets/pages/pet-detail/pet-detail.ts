@@ -16,8 +16,8 @@ import {
   ConsultaExame,
   getSexoIcon,
   getStatusBadgeClass,
+  getTipoBadgeClass,
   getTipoFaIcon,
-  getTipoIcon,
   Pet,
   PetLocal,
   SortOrderMode,
@@ -217,7 +217,7 @@ export default class PetDetailComponent implements OnInit {
   }
 
   readonly getStatusBadgeClass = getStatusBadgeClass;
-  readonly getTipoIcon = getTipoIcon;
+  readonly getTipoBadgeClass = getTipoBadgeClass;
   readonly getTipoFaIcon = getTipoFaIcon;
   readonly getSexoIcon = getSexoIcon;
 
@@ -247,11 +247,17 @@ export default class PetDetailComponent implements OnInit {
   }
 
   openAddProcedimento() {
-    this.toast.info('O módulo de registro de consultas e exames será implementado na próxima etapa.');
+    const p = this.pet();
+    if (p) {
+      this.router.navigate(['/pets', p.id, 'procedimentos', 'novo'], { state: { pet: p } });
+    }
   }
 
   openEditProcedimento(proc: ConsultaExame) {
-    this.toast.info(`Edição de "${proc.operacao_medicamento}" será implementada na próxima etapa.`);
+    const p = this.pet();
+    if (p && proc.id) {
+      this.router.navigate(['/pets', p.id, 'procedimentos', proc.id, 'editar'], { state: { pet: p } });
+    }
   }
 
   openAddLocal() {

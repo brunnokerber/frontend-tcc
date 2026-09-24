@@ -1,7 +1,6 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatDatepickerModule } from '@angular/material/datepicker';
@@ -22,23 +21,23 @@ import { DateMaskDirective } from '@shared/directives/date-mask.directive';
 import { FormErrorPipe } from '@shared/pipes/form-error.pipe';
 import { dateToIsoString, parseIsoToDate, sanitize } from '@shared/utils/string-utils';
 import {
+  ConsultaExame,
+  ConsultaExameCreateDto,
+  ConsultaExameUpdateDto,
+  TIPO_OPERACAO_OPTIONS,
+} from '../../models/consulta-exame.model';
+import {
   getSexoIcon,
   getStatusBadgeClass,
   getTipoBadgeClass,
   getTipoFaIcon,
   Pet,
 } from '../../models/pet.model';
-import {
-  VACINAS_SUGESTOES,
-  Vacina,
-  VacinaCreateDto,
-  VacinaUpdateDto,
-} from '../../models/vacina.model';
+import { ConsultasExamesService } from '../../services/consultas-exames.service';
 import { PetsService } from '../../services/pets.service';
-import { VacinasService } from '../../services/vacinas.service';
 
 @Component({
-  selector: 'app-vacina-form',
+  selector: 'app-procedimento-form',
   standalone: true,
   imports: [
     CommonModule,
@@ -52,29 +51,28 @@ import { VacinasService } from '../../services/vacinas.service';
     MatDatepickerModule,
     MatProgressSpinnerModule,
     MatTooltipModule,
-    MatAutocompleteModule,
     MatDialogModule,
     FormErrorPipe,
     DateMaskDirective,
   ],
-  templateUrl: './vacina-form.html',
-  styleUrls: ['./vacina-form.scss'],
+  templateUrl: './procedimento-form.html',
+  styleUrls: ['./procedimento-form.scss'],
 })
-export default class VacinaFormComponent implements OnInit {
+export default class ProcedimentoFormComponent implements OnInit {
   private fb = inject(FormBuilder);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private nav = inject(NavigationService);
   private petsService = inject(PetsService);
-  private vacinasService = inject(VacinasService);
+  private consultasExamesService = inject(ConsultasExamesService);
   private veterinariosService = inject(VeterinariosService);
   private dialog = inject(MatDialog);
   private toast = inject(ToastService);
 
   public petId = signal<number | null>(null);
-  public vacinaId = signal<number | null>(null);
+  public procedimentoId = signal<number | null>(null);
   public pet = signal<Pet | null>(null);
-  public existingVacina = signal<Vacina | null>(null);
+  public existingProcedimento = signal<ConsultaExame | null>(null);
 
   public isEditing = signal<boolean>(false);
   public isLoading = signal<boolean>(false);
@@ -82,34 +80,12 @@ export default class VacinaFormComponent implements OnInit {
   public loadingVets = signal<boolean>(false);
 
   public veterinarios = signal<Veterinario[]>([]);
-  public vacinasSugestoes = VACINAS_SUGESTOES;
-  public vacinaSearchText = signal<string>('');
+  public tipoOperacaoOptions = TIPO_OPERACAO_OPTIONS;
 
-  // Filtro inteligente e insensível a maiúsculas/acentos
-  public filteredVacinas = computed(() => {
-    const query = (this.vacinaSearchText() || '')
-      .toLowerCase()
-      .normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '')
-      .trim();
-
-    if (!query) {
-      return this.vacinasSugestoes;
-    }
-
-    return this.vacinasSugestoes.filter((v) => {
-      const normalized = v
-        .toLowerCase()
-        .normalize('NFD')
-        .replace(/[\u0300-\u036f]/g, '');
-      return normalized.includes(query);
-    });
-  });
-
-  public vacinaForm = this.fb.group({
-    nome_vacina: ['', [Validators.required, Validators.maxLength(30)]],
-    data_prevista: [null as Date | null, [Validators.required]],
-    data_aplicacao: [null as Date | null],
+  public procedimentoForm = this.fb.group({
+    tipo_operacao: ['', [Validators.required, Validators.maxLength(30)]],
+    operacao_medicamento: ['', [Validators.required, Validators.maxLength(300)]],
+    data_realizacao: [null as Date | null, [Validators.required]],
     custo: [null as number | null, [Validators.min(0)]],
     id_veterinario: [null as number | null],
   });
@@ -120,13 +96,8 @@ export default class VacinaFormComponent implements OnInit {
   readonly getStatusBadgeClass = getStatusBadgeClass;
 
   async ngOnInit(): Promise<void> {
-    // Monitora a digitação no campo de vacina para filtrar o autocomplete em tempo real
-    this.vacinaForm.controls.nome_vacina.valueChanges.subscribe((val) => {
-      this.vacinaSearchText.set(val || '');
-    });
-
     const petIdParam = this.route.snapshot.paramMap.get('petId');
-    const vacinaIdParam = this.route.snapshot.paramMap.get('vacinaId');
+    const procIdParam = this.route.snapshot.paramMap.get('procedimentoId');
 
     if (!petIdParam) {
       this.toast.error('Pet não identificado.');
@@ -143,22 +114,21 @@ export default class VacinaFormComponent implements OnInit {
 
     this.petId.set(idPet);
 
-    // Carregar veterinários e dados do pet em paralelo
+    // Carregar dados do pet e veterinários em paralelo
     await Promise.all([this.loadPetData(idPet), this.loadVeterinarios()]);
 
-    // Verificar se é modo de edição
-    if (vacinaIdParam) {
-      const idVac = parseInt(vacinaIdParam, 10);
-      if (!isNaN(idVac)) {
+    // Se estiver em modo edição
+    if (procIdParam) {
+      const idProc = parseInt(procIdParam, 10);
+      if (!isNaN(idProc)) {
         this.isEditing.set(true);
-        this.vacinaId.set(idVac);
-        await this.loadVacinaData(idVac);
+        this.procedimentoId.set(idProc);
+        await this.loadProcedimentoData(idProc);
       }
     }
   }
 
   async loadPetData(id: number): Promise<void> {
-    // Tenta obter dados do pet via history state (otimização)
     const statePet = history.state?.pet as Pet | undefined;
     if (statePet && statePet.id === id) {
       this.pet.set(statePet);
@@ -186,26 +156,26 @@ export default class VacinaFormComponent implements OnInit {
     }
   }
 
-  async loadVacinaData(id: number): Promise<void> {
+  async loadProcedimentoData(id: number): Promise<void> {
     this.isLoading.set(true);
     try {
-      const vacina = await this.vacinasService.getVacinaById(id);
-      if (!vacina) {
-        this.toast.error('Registro de vacina não encontrado.');
+      const proc = await this.consultasExamesService.getConsultaExameById(id);
+      if (!proc) {
+        this.toast.error('Registro clínico não encontrado.');
         this.goBack();
         return;
       }
 
-      this.existingVacina.set(vacina);
-      this.vacinaForm.patchValue({
-        nome_vacina: vacina.nome_vacina,
-        data_prevista: parseIsoToDate(vacina.data_prevista),
-        data_aplicacao: parseIsoToDate(vacina.data_aplicacao),
-        custo: vacina.custo != null ? Number(vacina.custo) : null,
-        id_veterinario: vacina.id_veterinario || null,
+      this.existingProcedimento.set(proc);
+      this.procedimentoForm.patchValue({
+        tipo_operacao: proc.tipo_operacao,
+        operacao_medicamento: proc.operacao_medicamento,
+        data_realizacao: parseIsoToDate(proc.data_realizacao),
+        custo: proc.custo != null ? Number(proc.custo) : null,
+        id_veterinario: proc.id_veterinario || null,
       });
     } catch (err: any) {
-      this.toast.error(err.message || 'Erro ao carregar dados da vacina.');
+      this.toast.error(err.message || 'Erro ao carregar dados do procedimento.');
     } finally {
       this.isLoading.set(false);
     }
@@ -220,18 +190,17 @@ export default class VacinaFormComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe((newVet: Veterinario | null) => {
       if (newVet) {
-        // Atualiza a lista local e seleciona o veterinário criado
         const currentList = this.veterinarios();
         this.veterinarios.set([newVet, ...currentList.filter((v) => v.id !== newVet.id)]);
-        this.vacinaForm.controls.id_veterinario.setValue(newVet.id);
+        this.procedimentoForm.controls.id_veterinario.setValue(newVet.id);
         this.toast.info(`Veterinário(a) "${newVet.nome}" selecionado(a) automaticamente.`);
       }
     });
   }
 
   async onSubmit(): Promise<void> {
-    if (this.vacinaForm.invalid) {
-      this.vacinaForm.markAllAsTouched();
+    if (this.procedimentoForm.invalid) {
+      this.procedimentoForm.markAllAsTouched();
       this.toast.warning('Por favor, preencha todos os campos obrigatórios corretamente.');
       return;
     }
@@ -242,40 +211,43 @@ export default class VacinaFormComponent implements OnInit {
       return;
     }
 
-    const formValues = this.vacinaForm.getRawValue();
+    const formValues = this.procedimentoForm.getRawValue();
     this.isSaving.set(true);
 
     try {
-      if (this.isEditing() && this.vacinaId()) {
-        const updateDto: VacinaUpdateDto = {
-          nome_vacina: sanitize(formValues.nome_vacina) || '',
-          data_prevista: dateToIsoString(formValues.data_prevista) || undefined,
-          data_aplicacao: dateToIsoString(formValues.data_aplicacao),
+      if (this.isEditing() && this.procedimentoId()) {
+        const updateDto: ConsultaExameUpdateDto = {
+          tipo_operacao: formValues.tipo_operacao || undefined,
+          operacao_medicamento: sanitize(formValues.operacao_medicamento) || '',
+          data_realizacao: dateToIsoString(formValues.data_realizacao) || undefined,
           custo: formValues.custo != null ? Number(formValues.custo) : null,
           id_veterinario: formValues.id_veterinario || null,
         };
 
-        const updated = await this.vacinasService.updateVacina(this.vacinaId()!, updateDto);
+        const updated = await this.consultasExamesService.updateConsultaExame(
+          this.procedimentoId()!,
+          updateDto
+        );
         if (updated) {
           this.goBack();
         }
       } else {
-        const createDto: VacinaCreateDto = {
+        const createDto: ConsultaExameCreateDto = {
           id_pet: currentPetId,
-          nome_vacina: sanitize(formValues.nome_vacina) || '',
-          data_prevista: dateToIsoString(formValues.data_prevista) || '',
-          data_aplicacao: dateToIsoString(formValues.data_aplicacao),
+          tipo_operacao: formValues.tipo_operacao || 'Outro',
+          operacao_medicamento: sanitize(formValues.operacao_medicamento) || '',
+          data_realizacao: dateToIsoString(formValues.data_realizacao) || '',
           custo: formValues.custo != null ? Number(formValues.custo) : null,
           id_veterinario: formValues.id_veterinario || null,
         };
 
-        const created = await this.vacinasService.createVacina(createDto);
+        const created = await this.consultasExamesService.createConsultaExame(createDto);
         if (created) {
           this.goBack();
         }
       }
     } catch (err) {
-      console.error('Erro ao salvar vacina:', err);
+      console.error('Erro ao salvar procedimento/consulta:', err);
     } finally {
       this.isSaving.set(false);
     }

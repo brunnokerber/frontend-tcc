@@ -1,0 +1,28 @@
+/* CDK Overlays & Material SnackBars / Toasts */
+.cdk-overlay-container {
+  z-index: 2000;
+}
+
+.toast-success {
+  --mat-snack-bar-container-color: #2e7d32;
+  --mat-snack-bar-supporting-text-color: #ffffff;
+  --mat-snack-bar-button-color: #e0e0e0;
+}
+
+.toast-error {
+  --mat-snack-bar-container-color: #b71c1c;
+  --mat-snack-bar-supporting-text-color: #ffffff;
+  --mat-snack-bar-button-color: #e0e0e0;
+}
+
+.toast-warning {
+  --mat-snack-bar-container-color: #ff9800;
+  --mat-snack-bar-supporting-text-color: #ffffff;
+  --mat-snack-bar-button-color: #e0e0e0;
+}
+
+.toast-info {
+  --mat-snack-bar-container-color: var(--mat-sys-primary);
+  --mat-snack-bar-supporting-text-color: #ffffff;
+  --mat-snack-bar-button-color: #e0e0e0;
+}

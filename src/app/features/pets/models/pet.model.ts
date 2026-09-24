@@ -172,10 +172,12 @@ export function getTipoFaIcon(tipo?: string | null): string {
   return found?.faIcon || 'fa-solid fa-paw';
 }
 
-export function getTipoIcon(tipo?: string | null): string {
-  if (!tipo) return 'pets';
-  const found = TIPO_PET_OPTIONS.find((t) => t.value.toLowerCase() === tipo.toLowerCase());
-  return found?.icon || 'pets';
+export function getTipoBadgeClass(tipo?: string | null): string {
+  if (!tipo) return 'bg-dog';
+  const t = tipo.trim().toLowerCase();
+  if (t === 'gato') return 'bg-cat';
+  if (t === 'cachorro') return 'bg-dog';
+  return 'bg-other';
 }
 
 export function getSexoIcon(sexo?: string | null): string {

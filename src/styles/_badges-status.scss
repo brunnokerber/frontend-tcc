@@ -1,0 +1,98 @@
+/* Status Color Variables */
+:root {
+  --color-status-success: #16a34a;
+  --color-status-success-bg: rgba(22, 163, 74, 0.14);
+
+  --color-status-warning: #d97706;
+  --color-status-warning-bg: rgba(217, 119, 6, 0.14);
+
+  --color-status-quarentena: #ea580c;
+  --color-status-quarentena-bg: rgba(234, 88, 12, 0.14);
+
+  --color-status-adopted: #e11d48;
+  --color-status-adopted-bg: rgba(225, 29, 72, 0.14);
+
+  --color-status-obito: var(--mat-sys-on-surface-variant);
+  --color-status-obito-bg: var(--mat-sys-surface-container-high);
+}
+
+.text-status-success {
+  color: var(--color-status-success);
+}
+
+.text-status-warning {
+  color: var(--color-status-warning);
+}
+
+.text-status-adopted {
+  color: var(--color-status-adopted);
+}
+
+.text-status-obito {
+  color: var(--color-status-obito);
+}
+
+.bg-status-primary {
+  background-color: var(--mat-sys-primary-container);
+  color: var(--mat-sys-on-primary-container);
+}
+
+.bg-status-success {
+  background-color: var(--color-status-success-bg);
+  color: var(--color-status-success);
+}
+
+.bg-status-warning {
+  background-color: var(--color-status-warning-bg);
+  color: var(--color-status-warning);
+}
+
+.bg-status-adopted {
+  background-color: var(--color-status-adopted-bg);
+  color: var(--color-status-adopted);
+}
+
+.bg-status-obito {
+  background-color: var(--color-status-obito-bg);
+  color: var(--color-status-obito);
+  border: 1px solid var(--mat-sys-outline-variant);
+}
+
+/* Status Badges */
+.badge-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.3rem 0.65rem;
+  font-size: 0.775rem;
+  font-weight: 600;
+  border-radius: 9999px;
+  line-height: 1;
+  text-transform: capitalize;
+}
+
+.badge-status-disponivel {
+  background-color: var(--color-status-success-bg);
+  color: var(--color-status-success);
+}
+
+.badge-status-tratamento {
+  background-color: var(--color-status-warning-bg);
+  color: var(--color-status-warning);
+}
+
+.badge-status-quarentena {
+  background-color: var(--color-status-quarentena-bg);
+  color: var(--color-status-quarentena);
+}
+
+.badge-status-adotado {
+  background-color: var(--color-status-adopted-bg);
+  color: var(--color-status-adopted);
+}
+
+.badge-status-obito {
+  background-color: var(--color-status-obito-bg);
+  color: var(--color-status-obito);
+  border: 1px solid var(--mat-sys-outline-variant);
+}

@@ -28,9 +28,9 @@ export type ConsultaExameUpdateDto = Partial<
 export const TIPO_OPERACAO_OPTIONS = [
   'Consulta de Rotina',
   'Consulta Emergencial',
-  'Exame de Sangue (Hemograma)',
-  'Exame de Imagem (Raio-X / Ultrassom)',
+  'Exame de Sangue',
+  'Exame de Imagem',
   'Procedimento Cirúrgico',
-  'Medicação / Tratamento Contínuo',
+  'Medicamento',
   'Outro',
 ] as const;

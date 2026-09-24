@@ -1,0 +1,60 @@
+/* Form Controls Theme Harmonization & Cursor */
+select,
+.form-select,
+mat-select,
+.mat-mdc-select,
+.mat-mdc-select-trigger,
+.mat-mdc-select-value,
+.mat-mdc-option {
+  cursor: pointer;
+}
+
+/* Material Form Field Prefix/Suffix Icons */
+.mat-mdc-form-field {
+  --mat-form-field-leading-icon-color: var(--mat-sys-on-surface-variant);
+  --mat-form-field-trailing-icon-color: var(--mat-sys-on-surface-variant);
+
+  .mat-mdc-form-field-icon-prefix,
+  .mat-mdc-form-field-icon-suffix,
+  [matPrefix],
+  [matSuffix] {
+    color: var(--mat-sys-on-surface-variant);
+    transition: color 0.2s ease-in-out;
+
+    &.text-muted {
+      color: var(--mat-sys-on-surface-variant);
+    }
+  }
+
+  &.mat-focused {
+    .mat-mdc-form-field-icon-prefix,
+    [matPrefix] {
+      color: var(--mat-sys-primary);
+    }
+  }
+}
+
+/* Harmonize Bootstrap form controls with Material Tokens */
+.form-control,
+.form-select {
+  background-color: var(--mat-sys-surface-container-lowest);
+  color: var(--mat-sys-on-surface);
+  border-color: var(--mat-sys-outline-variant);
+
+  &:focus {
+    background-color: var(--mat-sys-surface-container-lowest);
+    color: var(--mat-sys-on-surface);
+    border-color: var(--mat-sys-primary);
+  }
+
+  &::placeholder {
+    color: var(--mat-sys-on-surface-variant);
+    opacity: 0.7;
+  }
+}
+
+.input-group-text {
+  background-color: var(--mat-sys-surface-container);
+  color: var(--mat-sys-on-surface-variant);
+  border-color: var(--mat-sys-outline-variant);
+}
