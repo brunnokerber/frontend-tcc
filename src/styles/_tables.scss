@@ -7,6 +7,11 @@
   --bs-table-hover-bg: var(--mat-sys-surface-container);
   --bs-table-hover-color: var(--mat-sys-on-surface);
   color: var(--mat-sys-on-surface);
+
+  th,
+  td {
+    vertical-align: middle;
+  }
 }
 
 .table-hover > tbody > tr:hover > * {

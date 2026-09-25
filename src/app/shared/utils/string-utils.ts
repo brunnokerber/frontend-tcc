@@ -56,3 +56,16 @@ export function formatPhone(val?: string | null): string {
   }
   return val;
 }
+
+/**
+ * Formata um CEP (8 dígitos: 00000-000).
+ */
+export function formatCep(val?: string | null): string {
+  if (!val) return '';
+  const digits = onlyDigits(val);
+  if (digits.length === 8) {
+    return `${digits.substring(0, 5)}-${digits.substring(5)}`;
+  }
+  return val;
+}
+

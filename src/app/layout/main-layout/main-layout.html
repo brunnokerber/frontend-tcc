@@ -36,6 +36,14 @@
             <mat-icon class="fs-5">medical_services</mat-icon>
             <span>Veterinários</span>
           </a>
+          <a
+            routerLink="/locais"
+            routerLinkActive="active"
+            class="nav-btn d-flex align-items-center gap-2 text-decoration-none px-3 py-2 rounded-3"
+          >
+            <mat-icon class="fs-5">location_on</mat-icon>
+            <span>Locais</span>
+          </a>
         </nav>
 
         <!-- Ações do Usuário Desktop & Botão Mobile -->
@@ -101,6 +109,15 @@
           >
             <mat-icon>medical_services</mat-icon>
             <span class="fw-medium">Veterinários</span>
+          </a>
+          <a
+            routerLink="/locais"
+            routerLinkActive="active"
+            class="mobile-nav-link d-flex align-items-center gap-3 p-2 rounded-3 text-decoration-none"
+            (click)="closeMobileMenu()"
+          >
+            <mat-icon>location_on</mat-icon>
+            <span class="fw-medium">Locais</span>
           </a>
         </div>
 

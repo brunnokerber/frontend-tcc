@@ -12,6 +12,9 @@
   --color-status-adopted: #e11d48;
   --color-status-adopted-bg: rgba(225, 29, 72, 0.14);
 
+  --color-status-info: #0284c7;
+  --color-status-info-bg: rgba(2, 132, 199, 0.14);
+
   --color-status-obito: var(--mat-sys-on-surface-variant);
   --color-status-obito-bg: var(--mat-sys-surface-container-high);
 }
@@ -28,6 +31,10 @@
   color: var(--color-status-adopted);
 }
 
+.text-status-info {
+  color: var(--color-status-info);
+}
+
 .text-status-obito {
   color: var(--color-status-obito);
 }
@@ -35,6 +42,11 @@
 .bg-status-primary {
   background-color: var(--mat-sys-primary-container);
   color: var(--mat-sys-on-primary-container);
+}
+
+.bg-status-info {
+  background-color: var(--color-status-info-bg);
+  color: var(--color-status-info);
 }
 
 .bg-status-success {

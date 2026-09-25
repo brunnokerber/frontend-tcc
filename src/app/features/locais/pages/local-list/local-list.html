@@ -1,0 +1,398 @@
+<div class="container-fluid px-3 px-md-4">
+  <!-- Cabeçalho da Página -->
+  <div class="row align-items-center mb-4 g-3">
+    <div class="col-12 col-md-7">
+      <div class="d-flex align-items-center gap-3">
+        <div class="header-icon-box d-flex align-items-center justify-content-center">
+          <mat-icon>location_on</mat-icon>
+        </div>
+        <div>
+          <h1 class="h3 fw-bold mb-1">Locais & Lares Temporários</h1>
+          <p class="text-surface-muted small mb-0">
+            Consulte, cadastre e gerencie lares de passagem, abrigos e clínicas parceiras.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-12 col-md-5 d-flex justify-content-md-end gap-2">
+      <button
+        mat-flat-button
+        color="primary"
+        type="button"
+        (click)="openLocalDialog()"
+        class="btn-create d-flex align-items-center gap-2 py-2 px-3 rounded-3 shadow-sm"
+      >
+        <mat-icon>add</mat-icon>
+        <span class="fw-semibold">Cadastrar Novo Local</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Cards de Estatísticas Rápidas -->
+  <div class="row g-3 mb-4">
+    <!-- Total Locais -->
+    <div class="col-6 col-md-4 col-xl-3">
+      <div class="stat-card p-3 rounded-3 shadow-xs">
+        <div class="d-flex align-items-center justify-content-between">
+          <div>
+            <span class="text-surface-muted small d-block mb-1">Total de Locais</span>
+            <span class="fs-4 fw-bold">{{ totalLocais() }}</span>
+          </div>
+          <div class="stat-icon-wrapper bg-status-primary">
+            <mat-icon>domain</mat-icon>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Lares Temporários -->
+    <div class="col-6 col-md-4 col-xl-3">
+      <div class="stat-card p-3 rounded-3 shadow-xs">
+        <div class="d-flex align-items-center justify-content-between">
+          <div>
+            <span class="text-surface-muted small d-block mb-1">Lares Temporários</span>
+            <span class="fs-4 fw-bold text-status-success">{{ totalLares() }}</span>
+          </div>
+          <div class="stat-icon-wrapper bg-status-success">
+            <mat-icon>home</mat-icon>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Clínicas & Hospitais -->
+    <div class="col-6 col-md-4 col-xl-3">
+      <div class="stat-card p-3 rounded-3 shadow-xs">
+        <div class="d-flex align-items-center justify-content-between">
+          <div>
+            <span class="text-surface-muted small d-block mb-1">Clínicas Parceiras</span>
+            <span class="fs-4 fw-bold text-status-warning">{{ totalClinicas() }}</span>
+          </div>
+          <div class="stat-icon-wrapper bg-status-warning">
+            <mat-icon>local_hospital</mat-icon>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Feiras & Eventos de Exposição -->
+    <div class="col-6 col-md-4 col-xl-3">
+      <div class="stat-card p-3 rounded-3 shadow-xs">
+        <div class="d-flex align-items-center justify-content-between">
+          <div>
+            <span class="text-surface-muted small d-block mb-1">Feiras / Exposição</span>
+            <span class="fs-4 fw-bold text-status-info">{{ totalExposicoes() }}</span>
+          </div>
+          <div class="stat-icon-wrapper bg-status-info">
+            <mat-icon>storefront</mat-icon>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PAINEL DE FILTRO E BUSCA -->
+  <div class="filter-panel p-3 p-md-4 rounded-3 shadow-xs mb-4">
+    <div class="row g-3 align-items-end">
+      <!-- Campo a Filtrar -->
+      <div class="col-12 col-md-4 col-lg-3">
+        <label class="form-label small fw-semibold text-surface-muted mb-1">
+          Filtrar por Coluna
+        </label>
+        <select
+          class="form-select bg-surface-card text-surface-main border-surface"
+          [ngModel]="searchField()"
+          (ngModelChange)="onSearchFieldChange($event)"
+        >
+          @for (field of searchFields; track field.value) {
+            <option [value]="field.value">{{ field.label }}</option>
+          }
+        </select>
+      </div>
+
+      <!-- Termo ou Seleção de Valor -->
+      <div class="col-12 col-md-5 col-lg-6">
+        <label class="form-label small fw-semibold text-surface-muted mb-1">
+          Termo de Busca / Valor
+        </label>
+
+        @if (searchField() === 'tipo_local') {
+          <select
+            class="form-select bg-surface-card text-surface-main border-surface"
+            [ngModel]="searchValue()"
+            (ngModelChange)="searchValue.set($event)"
+            (keyup.enter)="applyFilters()"
+          >
+            <option value="">Selecione o tipo de local...</option>
+            @for (tipo of tipoLocalOptions; track tipo.value) {
+              <option [value]="tipo.value">{{ tipo.label }}</option>
+            }
+          </select>
+        } @else {
+          <div class="input-group">
+            <span class="input-group-text bg-surface-subtle border-end-0 border-surface">
+              <i class="bi bi-search"></i>
+            </span>
+            <input
+              type="text"
+              class="form-control border-start-0 border-surface bg-surface-card text-surface-main"
+              [placeholder]="getSearchPlaceholder()"
+              [ngModel]="searchValue()"
+              (ngModelChange)="searchValue.set($event)"
+              (keyup.enter)="applyFilters()"
+            />
+            @if (searchValue()) {
+              <button
+                class="btn btn-outline-secondary border-start-0 border-surface"
+                type="button"
+                (click)="searchValue.set('')"
+                matTooltip="Limpar texto"
+              >
+                <mat-icon style="font-size: 18px; width: 18px; height: 18px">clear</mat-icon>
+              </button>
+            }
+          </div>
+        }
+      </div>
+
+      <!-- Botões de Ação de Filtro -->
+      <div class="col-12 col-md-3 col-lg-3 d-flex justify-content-end gap-2">
+        <button
+          mat-stroked-button
+          type="button"
+          (click)="clearFilters()"
+          class="btn-clear flex-grow-1 flex-md-grow-0"
+          [disabled]="!searchValue()"
+        >
+          <mat-icon>filter_alt_off</mat-icon>
+          <span>Limpar</span>
+        </button>
+        <button
+          mat-flat-button
+          color="primary"
+          type="button"
+          (click)="applyFilters()"
+          class="flex-grow-1 flex-md-grow-0 px-3"
+        >
+          <mat-icon>filter_list</mat-icon>
+          <span>Filtrar</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- FEEDBACK DE CARREGAMENTO -->
+  @if (locaisService.loading()) {
+    <div class="d-flex flex-column align-items-center justify-content-center py-5">
+      <mat-spinner diameter="48"></mat-spinner>
+      <span class="mt-3 text-surface-muted">Carregando locais cadastrados...</span>
+    </div>
+  } @else if (locaisService.locais().length === 0) {
+    <!-- ESTADO VAZIO -->
+    <div class="empty-state p-5 text-center rounded-3 shadow-xs">
+      <div class="empty-icon-circle mx-auto mb-3">
+        <mat-icon>location_off</mat-icon>
+      </div>
+      <h3 class="h5 fw-bold mb-1">Nenhum local encontrado</h3>
+      <p class="text-surface-muted small mb-4" style="max-width: 440px; margin: 0 auto">
+        Não encontramos nenhum estabelecimento ou lar cadastrado com os critérios pesquisados.
+      </p>
+      <button
+        mat-flat-button
+        color="primary"
+        (click)="openLocalDialog()"
+        class="rounded-pill px-4"
+      >
+        <mat-icon>add_location_alt</mat-icon>
+        <span>Cadastrar Novo Local</span>
+      </button>
+    </div>
+  } @else {
+    <!-- TABELA DESKTOP (Escondida em telas < 992px) -->
+    <div class="table-responsive-desktop d-none d-lg-block rounded-3 shadow-xs overflow-hidden">
+      <table class="table table-hover align-middle mb-0 custom-local-table">
+        <thead class="small fw-semibold">
+          <tr>
+            <th scope="col" class="ps-4">Local / Estabelecimento</th>
+            <th scope="col">Tipo</th>
+            <th scope="col">Responsável</th>
+            <th scope="col">Telefone / WhatsApp</th>
+            <th scope="col">Endereço</th>
+            <th scope="col" class="text-end pe-4" style="width: 100px">Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (loc of locaisService.locais(); track loc.id) {
+            <tr>
+              <!-- Local -->
+              <td class="ps-4">
+                <div class="d-flex align-items-center gap-3">
+                  <div class="local-avatar rounded-circle">
+                    <mat-icon>{{ getTipoIcon(loc.tipo_local) }}</mat-icon>
+                  </div>
+                  <div>
+                    <div class="fw-bold">{{ loc.local }}</div>
+                    <span class="text-surface-muted" style="font-size: 0.75rem">ID: #{{ loc.id }}</span>
+                  </div>
+                </div>
+              </td>
+
+              <!-- Tipo de Local -->
+              <td>
+                <span class="badge bg-surface-subtle text-surface-main border border-surface">
+                  {{ loc.tipo_local }}
+                </span>
+              </td>
+
+              <!-- Responsável -->
+              <td>
+                <span class="fw-medium small">{{ loc.contato }}</span>
+              </td>
+
+              <!-- Telefone -->
+              <td>
+                <div class="d-flex align-items-center gap-1">
+                  <a
+                    [href]="getWhatsAppLink(loc.telefone)"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="d-inline-flex align-items-center gap-1 text-decoration-none fw-medium text-success"
+                    matTooltip="Conversar no WhatsApp"
+                  >
+                    <i class="bi bi-whatsapp"></i>
+                    <span>{{ formatPhone(loc.telefone) }}</span>
+                  </a>
+                  <button
+                    type="button"
+                    mat-icon-button
+                    class="btn-copy-phone"
+                    matTooltip="Copiar telefone"
+                    aria-label="Copiar telefone"
+                    (click)="copyPhone(loc.telefone, $event)"
+                  >
+                    <mat-icon>content_copy</mat-icon>
+                  </button>
+                </div>
+              </td>
+
+              <!-- Endereço -->
+              <td>
+                <div class="d-flex align-items-center gap-1 small">
+                  <div>
+                    <span>{{ loc.rua }}, {{ loc.numero }}</span>
+                    @if (loc.complemento) {
+                      <span class="text-surface-muted"> ({{ loc.complemento }})</span>
+                    }
+                    <div class="text-surface-muted" style="font-size: 0.75rem">
+                      {{ loc.bairro }} &bull; {{ loc.cidade }}/{{ loc.estado }} &bull; CEP: {{ formatCep(loc.cep) }}
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    mat-icon-button
+                    class="btn-copy-phone ms-1"
+                    matTooltip="Copiar endereço completo"
+                    (click)="copyAddress(loc, $event)"
+                  >
+                    <mat-icon>content_copy</mat-icon>
+                  </button>
+                </div>
+              </td>
+
+              <!-- Ações -->
+              <td class="text-end pe-4">
+                <div class="d-flex align-items-center justify-content-end gap-1">
+                  <button
+                    mat-icon-button
+                    color="primary"
+                    matTooltip="Editar dados do local"
+                    type="button"
+                    (click)="openLocalDialog(loc)"
+                  >
+                    <mat-icon>edit</mat-icon>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <!-- CARDS MOBILE & TABLET (Visível em telas < 992px) -->
+    <div class="row g-3 d-lg-none">
+      @for (loc of locaisService.locais(); track loc.id) {
+        <div class="col-12 col-sm-6">
+          <div class="card local-mobile-card shadow-sm h-100 rounded-3 overflow-hidden">
+            <div class="card-body p-3 d-flex flex-column">
+              <!-- Cabeçalho -->
+              <div class="d-flex align-items-center justify-content-between mb-2">
+                <div class="d-flex align-items-center gap-2">
+                  <div class="local-avatar rounded-circle">
+                    <mat-icon>{{ getTipoIcon(loc.tipo_local) }}</mat-icon>
+                  </div>
+                  <div>
+                    <h5 class="fw-bold mb-0 fs-6">{{ loc.local }}</h5>
+                    <span class="badge bg-surface-subtle text-surface-main border border-surface mt-1" style="font-size: 0.7rem">
+                      {{ loc.tipo_local }}
+                    </span>
+                  </div>
+                </div>
+
+                <button
+                  mat-icon-button
+                  color="primary"
+                  matTooltip="Editar"
+                  (click)="openLocalDialog(loc)"
+                >
+                  <mat-icon>edit</mat-icon>
+                </button>
+              </div>
+
+              <!-- Detalhes de Endereço & Contato -->
+              <div class="local-card-details rounded-2 p-2 my-2 small">
+                <div class="mb-1">
+                  <span class="text-surface-muted d-block" style="font-size: 0.72rem">Responsável:</span>
+                  <strong>{{ loc.contato }}</strong>
+                </div>
+
+                <div class="mb-1">
+                  <span class="text-surface-muted d-block" style="font-size: 0.72rem">Telefone:</span>
+                  <div class="d-flex align-items-center gap-1">
+                    <a
+                      [href]="getWhatsAppLink(loc.telefone)"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      class="text-decoration-none fw-medium text-success d-flex align-items-center gap-1"
+                      matTooltip="Conversar no WhatsApp"
+                    >
+                      <i class="bi bi-whatsapp"></i>
+                      <span>{{ formatPhone(loc.telefone) }}</span>
+                    </a>
+                    <button
+                      mat-icon-button
+                      class="btn-copy-phone"
+                      (click)="copyPhone(loc.telefone, $event)"
+                      matTooltip="Copiar telefone"
+                      aria-label="Copiar telefone"
+                      type="button"
+                    >
+                      <mat-icon>content_copy</mat-icon>
+                    </button>
+                  </div>
+                </div>
+
+                <div>
+                  <span class="text-surface-muted d-block" style="font-size: 0.72rem">Endereço:</span>
+                  <span>{{ loc.rua }}, {{ loc.numero }} - {{ loc.bairro }}</span>
+                  <div class="text-surface-muted">{{ loc.cidade }}/{{ loc.estado }} &bull; {{ formatCep(loc.cep) }}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>

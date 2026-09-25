@@ -95,17 +95,31 @@
   <!-- Painel de Filtros e Busca -->
   <div class="filter-panel p-3 p-md-4 rounded-3 shadow-xs mb-4">
     <div class="row g-3">
-      <!-- Busca Textual -->
+      <!-- Busca por Nome do Pet -->
       <div class="col-12 col-lg-3 col-xl-3">
-        <label class="form-label small fw-semibold text-surface-muted mb-1">Buscar por Nome, Chip, RGA ou Cód.
-          Moura</label>
+        <label class="form-label small fw-semibold text-surface-muted mb-1">Buscar por Nome do Pet</label>
         <div class="input-group">
           <span class="input-group-text bg-surface-subtle border-end-0 border-surface">
-            <i class="bi bi-search text-muted"></i>
+            <i class="bi bi-search"></i>
           </span>
-          <input type="text" class="form-control border-start-0 border-surface bg-surface-card text-surface-main"
-            placeholder="Ex: Rex, 9810..., RGA123, MOURA-01" [ngModel]="search()" (ngModelChange)="search.set($event)"
-            (keyup.enter)="applyFilters()" />
+          <input
+            type="text"
+            class="form-control border-start-0 border-surface bg-surface-card text-surface-main"
+            placeholder="Ex: Rex, Mel, Thor..."
+            [ngModel]="search()"
+            (ngModelChange)="search.set($event)"
+            (keyup.enter)="applyFilters()"
+          />
+          @if (search()) {
+            <button
+              class="btn btn-outline-secondary border-start-0 border-surface"
+              type="button"
+              (click)="search.set(''); applyFilters()"
+              matTooltip="Limpar busca"
+            >
+              <mat-icon style="font-size: 18px; width: 18px; height: 18px">clear</mat-icon>
+            </button>
+          }
         </div>
       </div>
 
@@ -217,7 +231,7 @@
           <th scope="col">Status</th>
           <th scope="col">Origem / Entrada</th>
           <th scope="col">Identificação</th>
-          <th scope="col" class="text-end pe-4">Ações</th>
+          <th scope="col" class="text-end pe-4" style="width: 140px">Ações</th>
         </tr>
       </thead>
       <tbody>
@@ -241,7 +255,7 @@
           <td>
             <div class="d-flex flex-column gap-1">
               <span class="d-flex align-items-center gap-1 small fw-medium">
-                <i class="bi bi-tag text-muted"></i> {{ pet.tipo_pet }}
+                <i class="bi bi-tag"></i> {{ pet.tipo_pet }}
               </span>
               <span class="d-flex align-items-center gap-1 text-surface-muted small">
                 <mat-icon style="font-size: 18px; width: 18px; height: 18px">{{

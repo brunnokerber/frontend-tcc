@@ -16,5 +16,12 @@ export interface VeterinarioCreateDto {
 export type VeterinarioUpdateDto = Partial<VeterinarioCreateDto>;
 
 export interface VeterinarioFilter {
-  search?: string;
+  searchField?: string;
+  searchValue?: string;
 }
+
+export const VET_SEARCH_FIELDS_OPTIONS = [
+  { label: 'Nome do Veterinário(a)', value: 'nome', placeholder: 'Ex: Dra. Juliana, Dr. Carlos...' },
+  { label: 'CRVET', value: 'crvet', placeholder: 'Ex: RS-12345, 12345...' },
+  { label: 'Telefone / WhatsApp', value: 'telefone', placeholder: 'Ex: (51) 99999-9999' },
+] as const;

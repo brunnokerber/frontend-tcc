@@ -1,19 +1,61 @@
-/* Material Button Icon & Label Vertical Centering */
+/* Universal Material Icon Metric & Alignment Normalization */
+mat-icon,
+.mat-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  vertical-align: middle;
+  line-height: 1;
+  width: 24px;
+  height: 24px;
+  font-size: 24px;
+  letter-spacing: normal;
+  user-select: none;
+}
+
+/* Material MDC Icon Button Absolute Center Alignment */
+button.mat-mdc-icon-button,
+a.mat-mdc-icon-button,
+.mat-mdc-icon-button.mat-mdc-button-base,
+.mat-icon-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  vertical-align: middle;
+  line-height: 1;
+  padding: 0;
+
+  mat-icon,
+  .mat-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    vertical-align: middle;
+    line-height: 1;
+    margin: 0;
+  }
+}
+
+/* Material Standard Buttons Label & Icon Center Alignment */
 .mat-mdc-button,
 .mat-mdc-unelevated-button,
 .mat-mdc-raised-button,
-.mat-mdc-outlined-button {
+.mat-mdc-outlined-button,
+.mat-mdc-flat-button {
   .mdc-button__label {
     display: inline-flex;
     align-items: center;
     justify-content: center;
     vertical-align: middle;
+    line-height: 1;
   }
 
-  mat-icon {
+  mat-icon,
+  .mat-icon {
     display: inline-flex;
     align-items: center;
     justify-content: center;
     vertical-align: middle;
+    line-height: 1;
   }
 }

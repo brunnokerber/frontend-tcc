@@ -1,3 +1,17 @@
+:root {
+  --app-form-icon-color: #64748b;
+  --app-form-icon-hover: #1e293b;
+  --app-form-icon-focus: var(--mat-sys-primary, #0284c7);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --app-form-icon-color: #cbd5e1;
+    --app-form-icon-hover: #f8fafc;
+    --app-form-icon-focus: #38bdf8;
+  }
+}
+
 /* Form Controls Theme Harmonization & Cursor */
 select,
 .form-select,
@@ -11,25 +25,33 @@ mat-select,
 
 /* Material Form Field Prefix/Suffix Icons */
 .mat-mdc-form-field {
-  --mat-form-field-leading-icon-color: var(--mat-sys-on-surface-variant);
-  --mat-form-field-trailing-icon-color: var(--mat-sys-on-surface-variant);
+  --mat-form-field-leading-icon-color: var(--app-form-icon-color);
+  --mat-form-field-trailing-icon-color: var(--app-form-icon-color);
 
   .mat-mdc-form-field-icon-prefix,
   .mat-mdc-form-field-icon-suffix,
   [matPrefix],
   [matSuffix] {
-    color: var(--mat-sys-on-surface-variant);
-    transition: color 0.2s ease-in-out;
+    color: var(--app-form-icon-color);
+  }
 
-    &.text-muted {
-      color: var(--mat-sys-on-surface-variant);
+  &:hover {
+
+    .mat-mdc-form-field-icon-prefix,
+    .mat-mdc-form-field-icon-suffix,
+    [matPrefix],
+    [matSuffix] {
+      color: var(--app-form-icon-hover);
     }
   }
 
   &.mat-focused {
+
     .mat-mdc-form-field-icon-prefix,
-    [matPrefix] {
-      color: var(--mat-sys-primary);
+    .mat-mdc-form-field-icon-suffix,
+    [matPrefix],
+    [matSuffix] {
+      color: var(--app-form-icon-focus);
     }
   }
 }
@@ -40,21 +62,55 @@ mat-select,
   background-color: var(--mat-sys-surface-container-lowest);
   color: var(--mat-sys-on-surface);
   border-color: var(--mat-sys-outline-variant);
+  box-shadow: none;
+  outline: none;
+  transition: none;
 
   &:focus {
     background-color: var(--mat-sys-surface-container-lowest);
     color: var(--mat-sys-on-surface);
-    border-color: var(--mat-sys-primary);
+    border-color: var(--app-form-icon-focus);
+    box-shadow: none;
+    outline: none;
   }
 
   &::placeholder {
-    color: var(--mat-sys-on-surface-variant);
-    opacity: 0.7;
+    color: var(--app-form-icon-color);
+    opacity: 0.8;
   }
 }
 
-.input-group-text {
-  background-color: var(--mat-sys-surface-container);
-  color: var(--mat-sys-on-surface-variant);
-  border-color: var(--mat-sys-outline-variant);
+/* Input group icons with vibrant contrast and instant synchronization */
+.input-group {
+  .input-group-text {
+    background-color: var(--mat-sys-surface-container);
+    color: var(--app-form-icon-color);
+    border-color: var(--mat-sys-outline-variant);
+    transition: none;
+
+    mat-icon,
+    i {
+      color: var(--app-form-icon-color);
+      transition: none;
+    }
+  }
+
+  .form-control {
+    transition: none;
+  }
+
+  &:focus-within {
+    .input-group-text {
+      border-color: var(--app-form-icon-focus);
+
+      mat-icon,
+      i {
+        color: var(--app-form-icon-focus);
+      }
+    }
+
+    .form-control {
+      border-color: var(--app-form-icon-focus);
+    }
+  }
 }

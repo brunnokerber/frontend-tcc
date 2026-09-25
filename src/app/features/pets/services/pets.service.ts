@@ -39,10 +39,7 @@ export class PetsService {
 
       if (filter) {
         if (filter.search && filter.search.trim()) {
-          const s = `%${filter.search.trim()}%`;
-          query = query.or(
-            `nome.ilike.${s},raca.ilike.${s},chip.ilike.${s},rga.ilike.${s},moura.ilike.${s}`
-          );
+          query = query.ilike('nome', `%${filter.search.trim()}%`);
         }
         if (filter.tipo_pet) {
           query = query.eq('tipo_pet', filter.tipo_pet);

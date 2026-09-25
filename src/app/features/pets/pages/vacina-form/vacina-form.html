@@ -2,7 +2,12 @@
   <!-- Cabeçalho da Página -->
   <div class="d-flex align-items-center justify-content-between mb-4 pb-1">
     <div class="d-flex align-items-center gap-3">
-      <button mat-icon-button (click)="goBack()" matTooltip="Voltar aos detalhes do pet" type="button">
+      <button
+        mat-icon-button
+        (click)="goBack()"
+        matTooltip="Voltar aos detalhes do pet"
+        type="button"
+      >
         <mat-icon>arrow_back</mat-icon>
       </button>
       <div>
@@ -10,7 +15,12 @@
           {{ isEditing() ? 'Editar Registro de Vacina' : 'Registrar Nova Vacina' }}
         </h1>
         <span class="text-surface-muted small">
-          {{ isEditing() ? 'Atualize as informações clínicas desta dose' : 'Adicione uma nova vacina ou agendamento para o animal' }}
+          {{
+            isEditing()
+              ? 'Atualize as informações clínicas desta dose'
+              : 'Adicione uma nova vacina ou agendamento para
+          o animal'
+          }}
         </span>
       </div>
     </div>
@@ -27,10 +37,7 @@
       <div class="pet-context-card p-3 p-md-4 rounded-3 shadow-xs mb-4">
         <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
           <div class="d-flex align-items-center gap-3">
-            <div
-              class="pet-avatar rounded-circle"
-              [ngClass]="getTipoBadgeClass(p.tipo_pet)"
-            >
+            <div class="pet-avatar rounded-circle" [ngClass]="getTipoBadgeClass(p.tipo_pet)">
               <i [class]="getTipoFaIcon(p.tipo_pet)"></i>
             </div>
             <div>
@@ -48,7 +55,8 @@
                 </span>
               </div>
               <div class="text-surface-muted small">
-                ID #{{ p.id }} &bull; {{ p.tipo_pet }} &bull; {{ p.raca || 'Sem raça definida' }} &bull; {{ p.porte || 'Porte N/I' }}
+                ID #{{ p.id }} &bull; {{ p.tipo_pet }} &bull;
+                {{ p.raca || 'Sem raça definida' }} &bull; {{ p.porte || 'Porte N/I' }}
               </div>
             </div>
           </div>
@@ -77,13 +85,15 @@
                 placeholder="Ex: V10, Antirrábica, Giárdiase, Quíntupla Felina"
                 maxlength="30"
               />
-              <mat-icon matPrefix class="me-2 text-muted">medication</mat-icon>
+              <mat-icon matPrefix class="me-2">medication</mat-icon>
               <mat-autocomplete #autoVacina="matAutocomplete">
                 @for (sug of filteredVacinas(); track sug) {
                   <mat-option [value]="sug">{{ sug }}</mat-option>
                 }
               </mat-autocomplete>
-              @if (vacinaForm.controls.nome_vacina.touched && vacinaForm.controls.nome_vacina.errors) {
+              @if (
+                vacinaForm.controls.nome_vacina.touched && vacinaForm.controls.nome_vacina.errors
+              ) {
                 <mat-error>{{ vacinaForm.controls.nome_vacina | formError }}</mat-error>
               }
             </mat-form-field>
@@ -104,7 +114,10 @@
               <mat-datepicker-toggle matIconSuffix [for]="pickerPrevista"></mat-datepicker-toggle>
               <mat-datepicker #pickerPrevista></mat-datepicker>
               <mat-hint>Data estimada para aplicação desta dose</mat-hint>
-              @if (vacinaForm.controls.data_prevista.touched && vacinaForm.controls.data_prevista.errors) {
+              @if (
+                vacinaForm.controls.data_prevista.touched &&
+                vacinaForm.controls.data_prevista.errors
+              ) {
                 <mat-error>{{ vacinaForm.controls.data_prevista | formError }}</mat-error>
               }
             </mat-form-field>
@@ -125,7 +138,10 @@
               <mat-datepicker-toggle matIconSuffix [for]="pickerAplicacao"></mat-datepicker-toggle>
               <mat-datepicker #pickerAplicacao></mat-datepicker>
               <mat-hint>Preencha quando a dose for efetivamente administrada</mat-hint>
-              @if (vacinaForm.controls.data_aplicacao.touched && vacinaForm.controls.data_aplicacao.errors) {
+              @if (
+                vacinaForm.controls.data_aplicacao.touched &&
+                vacinaForm.controls.data_aplicacao.errors
+              ) {
                 <mat-error>{{ vacinaForm.controls.data_aplicacao | formError }}</mat-error>
               }
             </mat-form-field>
@@ -143,8 +159,8 @@
                 formControlName="custo"
                 placeholder="0,00"
               />
-              <span matTextPrefix class="me-1 text-muted">R$&nbsp;</span>
-              <mat-icon matSuffix class="text-muted">payments</mat-icon>
+              <span matTextPrefix class="me-1">R$&nbsp;</span>
+              <mat-icon matSuffix>payments</mat-icon>
               @if (vacinaForm.controls.custo.touched && vacinaForm.controls.custo.errors) {
                 <mat-error>{{ vacinaForm.controls.custo | formError }}</mat-error>
               }
@@ -164,7 +180,7 @@
                     </mat-option>
                   }
                 </mat-select>
-                <mat-icon matPrefix class="me-2 text-muted">medical_services</mat-icon>
+                <mat-icon matPrefix class="me-2">medical_services</mat-icon>
               </mat-form-field>
 
               <button

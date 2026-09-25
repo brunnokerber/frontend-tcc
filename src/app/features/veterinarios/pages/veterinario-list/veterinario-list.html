@@ -48,33 +48,60 @@
   <!-- Painel de Busca -->
   <div class="filter-panel p-3 p-md-4 rounded-3 shadow-xs mb-4">
     <div class="row g-3 align-items-end">
-      <!-- Busca Textual -->
-      <div class="col-12 col-md-8 col-lg-9">
+      <!-- Seleção da Coluna -->
+      <div class="col-12 col-md-4 col-lg-3">
         <label class="form-label small fw-semibold text-surface-muted mb-1">
-          Buscar por Nome, CRVET ou Telefone
+          Filtrar por Coluna
+        </label>
+        <select
+          class="form-select bg-surface-card text-surface-main border-surface"
+          [ngModel]="searchField()"
+          (ngModelChange)="onSearchFieldChange($event)"
+        >
+          @for (field of searchFields; track field.value) {
+            <option [value]="field.value">{{ field.label }}</option>
+          }
+        </select>
+      </div>
+
+      <!-- Termo de Busca -->
+      <div class="col-12 col-md-5 col-lg-6">
+        <label class="form-label small fw-semibold text-surface-muted mb-1">
+          Termo de Busca / Valor
         </label>
         <div class="input-group">
           <span class="input-group-text bg-surface-subtle border-end-0 border-surface">
-            <i class="bi bi-search text-muted"></i>
+            <i class="bi bi-search"></i>
           </span>
           <input
             type="text"
             class="form-control border-start-0 border-surface bg-surface-card text-surface-main"
-            placeholder="Ex: Dra. Ana, 12345/RS, (51) 99999-9999"
-            [ngModel]="search()"
-            (ngModelChange)="search.set($event)"
+            [placeholder]="getSearchPlaceholder()"
+            [ngModel]="searchValue()"
+            (ngModelChange)="searchValue.set($event)"
             (keyup.enter)="applyFilters()"
           />
+          @if (searchValue()) {
+            <button
+              class="btn btn-outline-secondary border-start-0 border-surface"
+              type="button"
+              (click)="searchValue.set('')"
+              matTooltip="Limpar texto"
+            >
+              <mat-icon style="font-size: 18px; width: 18px; height: 18px">clear</mat-icon>
+            </button>
+          }
         </div>
       </div>
 
       <!-- Botões de Ação de Filtro -->
-      <div class="col-12 col-md-4 col-lg-3 d-flex justify-content-end gap-2">
+      <div class="col-12 col-md-3 col-lg-3 d-flex justify-content-end gap-2">
         <button
           mat-stroked-button
           type="button"
           (click)="clearFilters()"
           class="btn-clear flex-grow-1 flex-md-grow-0"
+          [disabled]="!searchValue()"
         >
           <mat-icon>filter_alt_off</mat-icon>
           <span>Limpar</span>
@@ -84,9 +111,9 @@
           color="primary"
           type="button"
           (click)="applyFilters()"
-          class="flex-grow-1 flex-md-grow-0"
+          class="flex-grow-1 flex-md-grow-0 px-3"
         >
-          <mat-icon>search</mat-icon>
+          <mat-icon>filter_list</mat-icon>
           <span>Filtrar</span>
         </button>
       </div>
@@ -132,7 +159,7 @@
               <th scope="col">CRVET</th>
               <th scope="col">Telefone / Contato</th>
               <th scope="col">Data de Cadastro</th>
-              <th scope="col" class="text-end pe-4">Ações</th>
+              <th scope="col" class="text-end pe-4" style="width: 100px">Ações</th>
             </tr>
           </thead>
           <tbody>

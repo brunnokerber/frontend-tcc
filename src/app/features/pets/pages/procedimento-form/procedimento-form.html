@@ -75,7 +75,7 @@
                   <mat-option [value]="tipo">{{ tipo }}</mat-option>
                 }
               </mat-select>
-              <mat-icon matPrefix class="me-2 text-muted">category</mat-icon>
+              <mat-icon matPrefix class="me-2">category</mat-icon>
               @if (procedimentoForm.controls.tipo_operacao.touched && procedimentoForm.controls.tipo_operacao.errors) {
                 <mat-error>{{ procedimentoForm.controls.tipo_operacao | formError }}</mat-error>
               }
@@ -113,7 +113,7 @@
                 placeholder="Ex: Hemograma completo, Castração eletiva, Antibiótico Amoxicilina 250mg, Limpeza de tártaro..."
                 maxlength="300"
               />
-              <mat-icon matPrefix class="me-2 text-muted">description</mat-icon>
+              <mat-icon matPrefix class="me-2">description</mat-icon>
               <mat-hint align="end">
                 {{ procedimentoForm.controls.operacao_medicamento.value?.length || 0 }} / 300
               </mat-hint>
@@ -156,7 +156,7 @@
                     </mat-option>
                   }
                 </mat-select>
-                <mat-icon matPrefix class="me-2 text-muted">medical_services</mat-icon>
+                <mat-icon matPrefix class="me-2">medical_services</mat-icon>
               </mat-form-field>
 
               <button

@@ -25,6 +25,10 @@ export const routes: Routes = [
         path: 'veterinarios',
         loadChildren: () => import('./features/veterinarios/veterinarios.routes'),
       },
+      {
+        path: 'locais',
+        loadChildren: () => import('./features/locais/locais.routes'),
+      },
     ],
   },
   {

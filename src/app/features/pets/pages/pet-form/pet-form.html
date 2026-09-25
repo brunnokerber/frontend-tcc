@@ -53,7 +53,7 @@
                 placeholder="Ex: Bob, Pipoca, Thor"
                 maxlength="30"
               />
-              <mat-icon matPrefix class="me-2 text-muted">pets</mat-icon>
+              <mat-icon matPrefix class="me-2">pets</mat-icon>
               @if (petForm.controls.nome.touched && petForm.controls.nome.errors) {
                 <mat-error>{{ petForm.controls.nome | formError }}</mat-error>
               }
@@ -162,7 +162,7 @@
                 placeholder="Ex: SRD (Sem Raça Definida), Siamês, Labrador"
                 maxlength="30"
               />
-              <mat-icon matPrefix class="me-2 text-muted">category</mat-icon>
+              <mat-icon matPrefix class="me-2">category</mat-icon>
               @if (petForm.controls.raca.touched && petForm.controls.raca.errors) {
                 <mat-error>{{ petForm.controls.raca | formError }}</mat-error>
               }
@@ -191,7 +191,7 @@
                 placeholder="Ex: Marrom, Branco com manchas"
                 maxlength="30"
               />
-              <mat-icon matPrefix class="me-2 text-muted">palette</mat-icon>
+              <mat-icon matPrefix class="me-2">palette</mat-icon>
             </mat-form-field>
           </div>
 
@@ -237,7 +237,7 @@
                 placeholder="Ex: 981098108102938"
                 maxlength="30"
               />
-              <mat-icon matPrefix class="me-2 text-muted">memory</mat-icon>
+              <mat-icon matPrefix class="me-2">memory</mat-icon>
             </mat-form-field>
           </div>
 
@@ -251,7 +251,7 @@
                 placeholder="Ex: RGA-2024-0012"
                 maxlength="30"
               />
-              <mat-icon matPrefix class="me-2 text-muted">tag</mat-icon>
+              <mat-icon matPrefix class="me-2">tag</mat-icon>
             </mat-form-field>
           </div>
 
@@ -265,7 +265,7 @@
                 placeholder="Ex: MOURA-12345"
                 maxlength="30"
               />
-              <mat-icon matPrefix class="me-2 text-muted">badge</mat-icon>
+              <mat-icon matPrefix class="me-2">badge</mat-icon>
             </mat-form-field>
           </div>
 
@@ -279,7 +279,7 @@
                 placeholder="https://drive.google.com/..."
                 maxlength="200"
               />
-              <mat-icon matPrefix class="me-2 text-muted">link</mat-icon>
+              <mat-icon matPrefix class="me-2">link</mat-icon>
             </mat-form-field>
           </div>
         </div>
@@ -319,7 +319,7 @@
                 maxlength="50"
                 [readonly]="isEditing()"
               />
-              <mat-icon matPrefix class="me-2 text-muted">location_on</mat-icon>
+              <mat-icon matPrefix class="me-2">location_on</mat-icon>
               @if (petForm.controls.local_origem.touched && petForm.controls.local_origem.errors) {
                 <mat-error>{{ petForm.controls.local_origem | formError }}</mat-error>
               }
@@ -337,7 +337,7 @@
                 maxlength="50"
                 [readonly]="isEditing()"
               />
-              <mat-icon matPrefix class="me-2 text-muted">person</mat-icon>
+              <mat-icon matPrefix class="me-2">person</mat-icon>
               @if (petForm.controls.resgatante.touched && petForm.controls.resgatante.errors) {
                 <mat-error>{{ petForm.controls.resgatante | formError }}</mat-error>
               }
@@ -381,7 +381,7 @@
                 maxlength="200"
                 [readonly]="isEditing()"
               ></textarea>
-              <mat-icon matPrefix class="me-2 text-muted">notes</mat-icon>
+              <mat-icon matPrefix class="me-2">notes</mat-icon>
             </mat-form-field>
           </div>
         </div>

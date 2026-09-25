@@ -31,7 +31,7 @@
             maxlength="30"
             cdkFocusInitial
           />
-          <mat-icon matPrefix class="me-2 text-muted">person</mat-icon>
+          <mat-icon matPrefix class="me-2">person</mat-icon>
           @if (vetForm.controls.nome.touched && vetForm.controls.nome.errors) {
             <mat-error>{{ vetForm.controls.nome | formError }}</mat-error>
           }
@@ -39,7 +39,7 @@
       </div>
 
       <!-- CRVET -->
-      <div class="col-12 col-md-6">
+      <div class="col-12">
         <mat-form-field appearance="outline" class="w-100">
           <mat-label>CRVET *</mat-label>
           <input
@@ -48,7 +48,7 @@
             placeholder="Ex: RS-12345"
             maxlength="30"
           />
-          <mat-icon matPrefix class="me-2 text-muted">badge</mat-icon>
+          <mat-icon matPrefix class="me-2">badge</mat-icon>
           @if (vetForm.controls.crvet.touched && vetForm.controls.crvet.errors) {
             <mat-error>{{ vetForm.controls.crvet | formError }}</mat-error>
           }
@@ -56,7 +56,7 @@
       </div>
 
       <!-- Telefone / WhatsApp -->
-      <div class="col-12 col-md-6">
+      <div class="col-12">
         <mat-form-field appearance="outline" class="w-100">
           <mat-label>Telefone / WhatsApp *</mat-label>
           <input
@@ -66,7 +66,7 @@
             placeholder="(51) 99999-9999"
             maxlength="15"
           />
-          <mat-icon matPrefix class="me-2 text-muted">phone</mat-icon>
+          <mat-icon matPrefix class="me-2">phone</mat-icon>
           @if (vetForm.controls.telefone.touched && vetForm.controls.telefone.errors) {
             <mat-error>{{ vetForm.controls.telefone | formError }}</mat-error>
           }
