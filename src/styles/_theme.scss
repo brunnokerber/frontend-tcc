@@ -1,19 +1,33 @@
 @use '@angular/material' as mat;
 
-/* Material Design 3 Theme Definition */
+/* Material Design 3 Theme Definition - Light Theme */
 html {
-  @include mat.theme((color: (primary: mat.$azure-palette,
-        tertiary: mat.$blue-palette,
-      ),
-      typography: Roboto,
-      density: 0,
-    ));
+  @include mat.theme((
+    color: (
+      primary: mat.$azure-palette,
+      tertiary: mat.$blue-palette,
+      theme-type: light,
+    ),
+    typography: Roboto,
+    density: 0,
+  ));
+}
+
+/* Material Design 3 Theme Definition - Dark Theme */
+html.dark-theme,
+[data-bs-theme="dark"] {
+  @include mat.theme((
+    color: (
+      primary: mat.$azure-palette,
+      tertiary: mat.$blue-palette,
+      theme-type: dark,
+    ),
+  ));
 }
 
 body {
   margin: 0;
   overflow-x: hidden;
-  color-scheme: light;
   background-color: var(--mat-sys-surface);
   color: var(--mat-sys-on-surface);
   font-family:
@@ -23,12 +37,4 @@ body {
     'Segoe UI',
     sans-serif;
   -webkit-font-smoothing: antialiased;
-}
-
-@media (prefers-color-scheme: dark) {
-  body {
-    background-color: var(--mat-sys-surface);
-    color: var(--mat-sys-on-surface);
-    color-scheme: dark;
-  }
 }

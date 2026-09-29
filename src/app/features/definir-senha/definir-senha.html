@@ -1,0 +1,107 @@
+<div class="definir-senha-container">
+  <div class="brand-header text-center mb-2">
+    <div class="brand-badge d-inline-flex align-items-center justify-content-center mb-3">
+      <mat-icon class="brand-badge-icon">pets</mat-icon>
+    </div>
+    <h1 class="title mb-1">{{ ongName }}</h1>
+    <span class="subtitle text-surface-muted">Sistema de Gestão Animal &bull; Primeiro Acesso</span>
+  </div>
+
+  <mat-card class="definir-senha-card shadow-sm border">
+    <mat-card-header class="text-center pb-2">
+      <mat-card-title class="h5 fw-bold mb-1">
+        Definir Senha de Acesso
+      </mat-card-title>
+      <mat-card-subtitle class="small text-surface-muted">
+        @if (userEmail()) {
+          Configurando credenciais para <strong>{{ userEmail() }}</strong>
+        } @else {
+          Crie uma senha segura para acessar a plataforma
+        }
+      </mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content class="pt-3">
+      <form [formGroup]="passwordForm" (ngSubmit)="onSubmit()">
+        <!-- Campo: Nova Senha -->
+        <mat-form-field appearance="outline" class="full-width mb-1">
+          <mat-label>Nova Senha *</mat-label>
+          <input
+            matInput
+            [type]="hidePassword() ? 'password' : 'text'"
+            formControlName="password"
+            placeholder="Mínimo de 8 caracteres"
+            autocomplete="new-password"
+            id="password"
+          />
+          <button
+            mat-icon-button
+            matSuffix
+            (click)="togglePassword()"
+            type="button"
+            [attr.aria-label]="'Ocultar senha'"
+            [attr.aria-pressed]="hidePassword()"
+          >
+            <mat-icon>{{ hidePassword() ? 'visibility_off' : 'visibility' }}</mat-icon>
+          </button>
+          <mat-hint>Use pelo menos 8 caracteres</mat-hint>
+          @if (passwordForm.controls.password.touched && passwordForm.controls.password.errors) {
+            <mat-error>{{ passwordForm.controls.password | formError }}</mat-error>
+          }
+        </mat-form-field>
+
+        <!-- Campo: Confirmar Senha -->
+        <mat-form-field appearance="outline" class="full-width mb-1">
+          <mat-label>Confirmar Senha *</mat-label>
+          <input
+            matInput
+            [type]="hideConfirmPassword() ? 'password' : 'text'"
+            formControlName="confirmPassword"
+            placeholder="Repita a senha digitada"
+            autocomplete="new-password"
+            id="confirmPassword"
+          />
+          <button
+            mat-icon-button
+            matSuffix
+            (click)="toggleConfirmPassword()"
+            type="button"
+            [attr.aria-label]="'Ocultar confirmação de senha'"
+            [attr.aria-pressed]="hideConfirmPassword()"
+          >
+            <mat-icon>{{ hideConfirmPassword() ? 'visibility_off' : 'visibility' }}</mat-icon>
+          </button>
+          @if (passwordForm.controls.confirmPassword.touched && passwordForm.errors?.['passwordMismatch']) {
+            <mat-error>As senhas digitadas não coincidem.</mat-error>
+          }
+        </mat-form-field>
+
+        <!-- Mensagem de Erro se houver -->
+        @if (errorMessage()) {
+          <div class="alert alert-danger py-2 px-3 small rounded-3 mb-3">
+            {{ errorMessage() }}
+          </div>
+        }
+
+        <!-- Botão de Confirmação -->
+        <button
+          mat-flat-button
+          color="primary"
+          type="submit"
+          class="submit-btn full-width mt-2"
+          [disabled]="passwordForm.invalid || isLoading()"
+        >
+          @if (isLoading()) {
+            <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+            <span>Salvando senha...</span>
+          } @else {
+            <span class="d-inline-flex align-items-center justify-content-center gap-2">
+              <mat-icon>check_circle</mat-icon>
+              <span>Salvar Senha e Entrar</span>
+            </span>
+          }
+        </button>
+      </form>
+    </mat-card-content>
+  </mat-card>
+</div>

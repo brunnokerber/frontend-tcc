@@ -261,10 +261,16 @@ export default class PetDetailComponent implements OnInit {
   }
 
   openAddLocal() {
-    this.toast.info('O módulo de histórico de locais de passagem será implementado na próxima etapa.');
+    const p = this.pet();
+    if (p) {
+      this.router.navigate(['/pets', p.id, 'locais', 'novo'], { state: { pet: p } });
+    }
   }
 
   openEditLocal(local: PetLocal) {
-    this.toast.info('A edição de locais de passagem será implementada na próxima etapa.');
+    const p = this.pet();
+    if (p && local.id) {
+      this.router.navigate(['/pets', p.id, 'locais', local.id, 'editar'], { state: { pet: p } });
+    }
   }
 }

@@ -1,0 +1,130 @@
+<div class="user-dialog-container p-2 p-md-3">
+  <!-- Cabeçalho do Modal -->
+  <div class="d-flex align-items-center justify-content-between pb-3 mb-3 border-bottom">
+    <div class="d-flex align-items-center gap-3">
+      <div class="dialog-icon-box rounded-circle d-flex align-items-center justify-content-center">
+        <mat-icon>person_add</mat-icon>
+      </div>
+      <div>
+        <h2 class="h5 fw-bold mb-0">Convidar Novo Usuário</h2>
+        <span class="text-surface-muted small">
+          Envie um convite de acesso para novos colaboradores da ONG
+        </span>
+      </div>
+    </div>
+    <button
+      mat-icon-button
+      type="button"
+      (click)="onCancel()"
+      [disabled]="isSubmitting()"
+      matTooltip="Fechar modal"
+    >
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <form [formGroup]="inviteForm" (ngSubmit)="onSendInvite()">
+    <!-- Informação Explicativa -->
+    <div class="alert alert-info py-2 px-3 rounded-3 small d-flex align-items-center gap-2 mb-4">
+      <mat-icon style="font-size: 20px; width: 20px; height: 20px">mark_email_read</mat-icon>
+      <span>
+        O colaborador receberá um e-mail com link de confirmação para cadastrar sua senha de acesso.
+      </span>
+    </div>
+
+    <!-- Campo: E-mail do Usuário -->
+    <div class="mb-4">
+      <mat-form-field appearance="outline" class="w-100">
+        <mat-label>E-mail do Colaborador *</mat-label>
+        <input
+          matInput
+          type="email"
+          formControlName="email"
+          placeholder="exemplo@ong.org.br"
+          maxlength="100"
+          autocomplete="off"
+        />
+        <mat-icon matPrefix class="me-2">mail</mat-icon>
+        <mat-hint>Endereço eletrônico para onde o convite será enviado</mat-hint>
+        @if (inviteForm.controls.email.touched && inviteForm.controls.email.errors) {
+          <mat-error>{{ inviteForm.controls.email | formError }}</mat-error>
+        }
+      </mat-form-field>
+    </div>
+
+    <!-- Campo: Perfil de Acesso (Role) -->
+    <div class="mb-4">
+      <label class="form-label fw-semibold small mb-2 text-surface-main">
+        Perfil de Acesso (Permissões) *
+      </label>
+
+      <mat-radio-group formControlName="role" class="d-flex flex-column gap-2">
+        @for (opt of roleOptions; track opt.value) {
+          <div
+            class="role-card p-3 rounded-3 border transition-all cursor-pointer"
+            [class.role-selected]="inviteForm.controls.role.value === opt.value"
+            (click)="inviteForm.controls.role.setValue(opt.value)"
+          >
+            <div class="d-flex align-items-start gap-3">
+              <mat-radio-button [value]="opt.value" class="mt-1" color="primary"></mat-radio-button>
+              <div class="flex-grow-1">
+                <div class="d-flex align-items-center gap-2 mb-1">
+                  <mat-icon
+                    class="role-icon"
+                    [class.text-primary]="opt.value === 'admin'"
+                    [class.text-secondary]="opt.value === 'user'"
+                  >
+                    {{ opt.icon }}
+                  </mat-icon>
+                  <span class="fw-bold">{{ opt.label }}</span>
+                  <span
+                    class="badge small"
+                    [class.bg-primary-subtle]="opt.value === 'admin'"
+                    [class.text-primary]="opt.value === 'admin'"
+                    [class.bg-secondary-subtle]="opt.value === 'user'"
+                    [class.text-secondary]="opt.value === 'user'"
+                  >
+                    {{ opt.badge }}
+                  </span>
+                </div>
+                <p class="text-surface-muted small mb-0">
+                  {{ opt.description }}
+                </p>
+              </div>
+            </div>
+          </div>
+        }
+      </mat-radio-group>
+    </div>
+
+    <!-- Rodapé de Ações -->
+    <div class="d-flex align-items-center justify-content-end gap-2 pt-3 border-top">
+      <button
+        type="button"
+        mat-stroked-button
+        (click)="onCancel()"
+        [disabled]="isSubmitting()"
+      >
+        Cancelar
+      </button>
+
+      <button
+        type="submit"
+        mat-flat-button
+        color="primary"
+        [disabled]="isSubmitting()"
+        class="px-4"
+      >
+        @if (isSubmitting()) {
+          <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+          <span>Enviando convite...</span>
+        } @else {
+          <span class="d-inline-flex align-items-center justify-content-center gap-2">
+            <mat-icon>send</mat-icon>
+            <span>Disparar Convite</span>
+          </span>
+        }
+      </button>
+    </div>
+  </form>
+</div>

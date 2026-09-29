@@ -3,6 +3,62 @@
   z-index: 2000;
 }
 
+/* Modal Backdrops */
+.cdk-overlay-backdrop.cdk-overlay-dark-backdrop {
+  background-color: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+  transition: opacity 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+/* Material MDC Dialog Surface Styling */
+.mat-mdc-dialog-container .mat-mdc-dialog-surface {
+  border-radius: 16px;
+  border: 1px solid var(--mat-sys-outline-variant);
+  box-shadow:
+    0 16px 36px -4px rgba(0, 0, 0, 0.18),
+    0 4px 12px rgba(0, 0, 0, 0.08);
+  transition:
+    box-shadow 0.2s ease,
+    border-color 0.2s ease;
+}
+
+/* Dark Theme Specific Modal Enhancements */
+html.dark-theme,
+[data-bs-theme="dark"] {
+  .cdk-overlay-backdrop.cdk-overlay-dark-backdrop {
+    background-color: rgba(0, 0, 0, 0.78);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+  }
+
+  .mat-mdc-dialog-container .mat-mdc-dialog-surface {
+    background-color: var(--mat-sys-surface-container);
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    box-shadow:
+      0 24px 60px -8px rgba(0, 0, 0, 0.9),
+      0 0 0 1px rgba(255, 255, 255, 0.12),
+      0 8px 24px rgba(0, 0, 0, 0.6);
+  }
+
+  /* Material Menus / Dropdowns in Dark Theme */
+  .mat-mdc-menu-panel {
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    box-shadow:
+      0 12px 32px rgba(0, 0, 0, 0.75),
+      0 0 0 1px rgba(255, 255, 255, 0.08);
+  }
+
+  /* Material Select Panels & Autocomplete */
+  .mat-mdc-select-panel,
+  .mat-mdc-autocomplete-panel {
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    box-shadow:
+      0 12px 32px rgba(0, 0, 0, 0.75),
+      0 0 0 1px rgba(255, 255, 255, 0.08);
+  }
+}
+
 .toast-success {
   --mat-snack-bar-container-color: #2e7d32;
   --mat-snack-bar-supporting-text-color: #ffffff;

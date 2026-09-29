@@ -32,6 +32,14 @@ export const PETS_ROUTES: Routes = [
   {
     path: ':petId/procedimentos/:procedimentoId/editar',
     loadComponent: () => import('./pages/procedimento-form/procedimento-form'),
+  },
+  {
+    path: ':petId/locais/novo',
+    loadComponent: () => import('./pages/pet-local-form/pet-local-form'),
+  },
+  {
+    path: ':petId/locais/:petLocalId/editar',
+    loadComponent: () => import('./pages/pet-local-form/pet-local-form'),
   }
 ];
 

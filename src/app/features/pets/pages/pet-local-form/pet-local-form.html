@@ -1,0 +1,269 @@
+<div class="pet-local-form-container container-xl py-4">
+  <!-- Cabeçalho da Página -->
+  <div class="d-flex align-items-center justify-content-between mb-4 pb-1">
+    <div class="d-flex align-items-center gap-3">
+      <button
+        mat-icon-button
+        (click)="goBack()"
+        matTooltip="Voltar aos detalhes do pet"
+        type="button"
+      >
+        <mat-icon>arrow_back</mat-icon>
+      </button>
+      <div>
+        <h1 class="h4 fw-bold mb-0">
+          {{ isEditing() ? 'Editar Registro de Passagem' : 'Registrar Novo Local de Passagem' }}
+        </h1>
+        <span class="text-surface-muted small">
+          {{
+            isEditing()
+              ? 'Atualize as informações do local de acolhimento ou transferência do animal'
+              : 'Cadastre a passagem do pet por um lar temporário, clínica parceira ou hotelzinho'
+          }}
+        </span>
+      </div>
+    </div>
+  </div>
+
+  @if (isLoading()) {
+    <div class="d-flex flex-column align-items-center justify-content-center py-5">
+      <mat-spinner diameter="48"></mat-spinner>
+      <span class="mt-3 text-surface-muted">Carregando dados da passagem...</span>
+    </div>
+  } @else {
+    <!-- CARD DE CONTEXTO DO PET -->
+    @if (pet(); as p) {
+      <div class="pet-context-card p-3 p-md-4 rounded-3 shadow-xs mb-4">
+        <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+          <div class="d-flex align-items-center gap-3">
+            <div
+              class="pet-avatar rounded-circle"
+              [ngClass]="getTipoBadgeClass(p.tipo_pet)"
+            >
+              <i [class]="getTipoFaIcon(p.tipo_pet)"></i>
+            </div>
+            <div>
+              <div class="d-flex align-items-center gap-2">
+                <span class="fs-6 fw-bold">{{ p.nome }}</span>
+                <mat-icon
+                  [matTooltip]="p.sexo"
+                  class="text-surface-muted"
+                  style="font-size: 18px; width: 18px; height: 18px"
+                >
+                  {{ getSexoIcon(p.sexo) }}
+                </mat-icon>
+                <span class="badge-status {{ getStatusBadgeClass(p.status) }} ms-1">
+                  {{ p.status }}
+                </span>
+              </div>
+              <div class="text-surface-muted small">
+                ID #{{ p.id }} &bull; {{ p.tipo_pet }} &bull; {{ p.raca || 'Sem raça definida' }} &bull; {{ p.porte || 'Porte N/I' }}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- FORMULÁRIO -->
+    <form [formGroup]="petLocalForm" (ngSubmit)="onSubmit()" class="pet-local-form-wrapper">
+      <div class="form-card p-3 p-md-4 rounded-3 shadow-xs mb-4">
+        <!-- Seção: Dados da Estadia / Passagem -->
+        <div class="d-flex align-items-center gap-2 mb-3 pb-1">
+          <mat-icon class="text-info">location_on</mat-icon>
+          <h2 class="h6 fw-bold mb-0">Informações da Passagem / Acolhimento</h2>
+        </div>
+
+        <div class="row g-3">
+          <!-- Local Parceiro com Botão de Cadastro Rápido via Dialog -->
+          <div class="col-12">
+            <div class="d-flex align-items-start gap-2">
+              <mat-form-field appearance="outline" class="flex-grow-1">
+                <mat-label>Local / Estabelecimento Parceiro *</mat-label>
+                <mat-select formControlName="id_local">
+                  <mat-option [value]="null">-- Selecione um local cadastrado --</mat-option>
+                  @for (loc of locais(); track loc.id) {
+                    <mat-option [value]="loc.id">
+                      {{ loc.local }} ({{ loc.tipo_local }}) &bull; {{ loc.cidade }}/{{ loc.estado }}
+                    </mat-option>
+                  }
+                </mat-select>
+                <mat-icon matPrefix class="me-2">holiday_village</mat-icon>
+                <mat-hint>Lar temporário, clínica, abrigo ou hotel parceiro</mat-hint>
+                @if (
+                  petLocalForm.controls.id_local.touched &&
+                  petLocalForm.controls.id_local.errors
+                ) {
+                  <mat-error>{{ petLocalForm.controls.id_local | formError }}</mat-error>
+                }
+              </mat-form-field>
+
+              <button
+                type="button"
+                mat-stroked-button
+                color="primary"
+                class="btn-new-local"
+                (click)="openNewLocalDialog()"
+                matTooltip="Cadastrar novo local parceiro sem sair da tela"
+              >
+                <mat-icon>add_location_alt</mat-icon>
+                <span class="d-none d-sm-inline">Novo</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Data de Saída / Início da Passagem -->
+          <div class="col-12 col-md-6">
+            <mat-form-field appearance="outline" class="w-100">
+              <mat-label>Data de Início / Saída *</mat-label>
+              <input
+                matInput
+                appDateMask
+                maxlength="10"
+                [matDatepicker]="pickerSaida"
+                formControlName="data_saida"
+                placeholder="dd/mm/aaaa"
+              />
+              <mat-datepicker-toggle matIconSuffix [for]="pickerSaida"></mat-datepicker-toggle>
+              <mat-datepicker #pickerSaida></mat-datepicker>
+              <mat-hint>Data em que o animal foi transferido para este local</mat-hint>
+              @if (
+                petLocalForm.controls.data_saida.touched &&
+                petLocalForm.controls.data_saida.errors
+              ) {
+                <mat-error>{{ petLocalForm.controls.data_saida | formError }}</mat-error>
+              }
+            </mat-form-field>
+          </div>
+
+          <!-- Data de Retorno / Reentrada (Opcional) -->
+          <div class="col-12 col-md-6">
+            <mat-form-field appearance="outline" class="w-100">
+              <mat-label>Data de Término / Reentrada</mat-label>
+              <input
+                matInput
+                appDateMask
+                maxlength="10"
+                [matDatepicker]="pickerReentrada"
+                formControlName="data_reentrada"
+                placeholder="dd/mm/aaaa"
+              />
+              <mat-datepicker-toggle matIconSuffix [for]="pickerReentrada"></mat-datepicker-toggle>
+              <mat-datepicker #pickerReentrada></mat-datepicker>
+              <mat-hint>Preencha quando o animal retornar ou for transferido novamente</mat-hint>
+              @if (
+                petLocalForm.controls.data_reentrada.touched &&
+                petLocalForm.controls.data_reentrada.errors
+              ) {
+                <mat-error>{{ petLocalForm.controls.data_reentrada | formError }}</mat-error>
+              }
+            </mat-form-field>
+          </div>
+
+          <!-- Motivo da Saída / Encaminhamento -->
+          <div class="col-12 col-md-8">
+            <mat-form-field appearance="outline" class="w-100">
+              <mat-label>Motivo da Passagem / Encaminhamento</mat-label>
+              <input
+                matInput
+                formControlName="motivo_saida"
+                [matAutocomplete]="autoMotivo"
+                placeholder="Ex: Lar Temporário, Internação Clínica..."
+                maxlength="100"
+              />
+              <mat-icon matPrefix class="me-2">info</mat-icon>
+              <mat-autocomplete #autoMotivo="matAutocomplete">
+                @for (sug of filteredMotivos(); track sug) {
+                  <mat-option [value]="sug">{{ sug }}</mat-option>
+                }
+              </mat-autocomplete>
+              <mat-hint>Finalidade do acolhimento ou tratamento neste local</mat-hint>
+              @if (
+                petLocalForm.controls.motivo_saida.touched &&
+                petLocalForm.controls.motivo_saida.errors
+              ) {
+                <mat-error>{{ petLocalForm.controls.motivo_saida | formError }}</mat-error>
+              }
+            </mat-form-field>
+          </div>
+
+          <!-- Valor de Auxílio Financeiro (R$) -->
+          <div class="col-12 col-md-4">
+            <mat-form-field appearance="outline" class="w-100">
+              <mat-label>Valor de Auxílio (R$)</mat-label>
+              <input
+                matInput
+                type="number"
+                step="0.01"
+                min="0"
+                formControlName="valor_auxilio"
+                placeholder="0,00"
+              />
+              <span matTextPrefix class="me-1">R$&nbsp;</span>
+              <mat-icon matSuffix>payments</mat-icon>
+              <mat-hint>Custo de hospedagem ou diária acordada</mat-hint>
+              @if (
+                petLocalForm.controls.valor_auxilio.touched &&
+                petLocalForm.controls.valor_auxilio.errors
+              ) {
+                <mat-error>{{ petLocalForm.controls.valor_auxilio | formError }}</mat-error>
+              }
+            </mat-form-field>
+          </div>
+
+          <!-- Observações Gerais -->
+          <div class="col-12">
+            <mat-form-field appearance="outline" class="w-100">
+              <mat-label>Observações Adicionais</mat-label>
+              <textarea
+                matInput
+                rows="3"
+                formControlName="obs"
+                placeholder="Orientações sobre cuidados, alimentação especial, medicações a administrar no local, etc."
+                maxlength="500"
+              ></textarea>
+              <mat-hint align="end">
+                {{ petLocalForm.controls.obs.value?.length || 0 }}/500 caracteres
+              </mat-hint>
+              @if (
+                petLocalForm.controls.obs.touched &&
+                petLocalForm.controls.obs.errors
+              ) {
+                <mat-error>{{ petLocalForm.controls.obs | formError }}</mat-error>
+              }
+            </mat-form-field>
+          </div>
+        </div>
+      </div>
+
+      <!-- Barra de Ações Inferior -->
+      <div class="d-flex align-items-center justify-content-end gap-2 pt-2 mb-5">
+        <button
+          type="button"
+          mat-stroked-button
+          (click)="goBack()"
+          [disabled]="isSaving()"
+        >
+          Cancelar
+        </button>
+        <button
+          type="submit"
+          mat-flat-button
+          color="primary"
+          [disabled]="isSaving()"
+          class="px-4"
+        >
+          @if (isSaving()) {
+            <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+            <span>Salvando...</span>
+          } @else {
+            <span class="d-inline-flex align-items-center justify-content-center gap-2">
+              <mat-icon>save</mat-icon>
+              <span>{{ isEditing() ? 'Atualizar Passagem' : 'Salvar Local de Passagem' }}</span>
+            </span>
+          }
+        </button>
+      </div>
+    </form>
+  }
+</div>
