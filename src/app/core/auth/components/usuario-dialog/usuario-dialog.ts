@@ -50,6 +50,8 @@ export class UsuarioDialogComponent {
   private toast = inject(ToastService);
 
   public isSubmitting = signal<boolean>(false);
+  public userAlreadyExists = signal<boolean>(false);
+  public existingUserEmail = signal<string>('');
 
   public roleOptions: RoleOption[] = [
     {
@@ -85,6 +87,7 @@ export class UsuarioDialogComponent {
     const role = formValues.role || 'user';
 
     this.isSubmitting.set(true);
+    this.userAlreadyExists.set(false);
 
     try {
       await this.authService.inviteUser(email, role);
@@ -92,6 +95,36 @@ export class UsuarioDialogComponent {
       this.dialogRef.close({ email, role });
     } catch (err: any) {
       const errorMsg = err.message || 'Erro ao enviar convite para o usuário.';
+      const isRegistered =
+        errorMsg.toLowerCase().includes('já está cadastrado') ||
+        errorMsg.toLowerCase().includes('already') ||
+        errorMsg.toLowerCase().includes('registered');
+
+      if (isRegistered) {
+        this.userAlreadyExists.set(true);
+        this.existingUserEmail.set(email);
+        this.toast.warning('Este e-mail já possui cadastro. Você pode enviar um link de redefinição se desejar.');
+      } else {
+        this.toast.error(errorMsg);
+      }
+    } finally {
+      this.isSubmitting.set(false);
+    }
+  }
+
+  async onSendPasswordReset(): Promise<void> {
+    const email = this.existingUserEmail() || this.inviteForm.get('email')?.value?.trim().toLowerCase();
+    const role = this.inviteForm.get('role')?.value || 'user';
+
+    if (!email) return;
+
+    this.isSubmitting.set(true);
+    try {
+      await this.authService.sendResetPassword(email);
+      this.toast.success(`E-mail com link de redefinição de senha enviado com sucesso para "${email}"!`);
+      this.dialogRef.close({ email, role, action: 'reset_password' });
+    } catch (err: any) {
+      const errorMsg = err.message || 'Erro ao enviar e-mail de redefinição.';
       this.toast.error(errorMsg);
     } finally {
       this.isSubmitting.set(false);

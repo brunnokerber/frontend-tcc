@@ -1,3 +1,4 @@
+import { CommonModule } from '@angular/common';
 import { Component, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -16,12 +17,17 @@ import { FormErrorPipe } from '@shared/pipes/form-error.pipe';
   selector: 'app-login',
   standalone: true,
   imports: [
-    ReactiveFormsModule, MatCardModule, MatFormFieldModule,
-    MatInputModule, MatButtonModule, MatIconModule,
-    FormErrorPipe
+    CommonModule,
+    ReactiveFormsModule,
+    MatCardModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatButtonModule,
+    MatIconModule,
+    FormErrorPipe,
   ],
   templateUrl: './login.html',
-  styleUrls: ['./login.scss']
+  styleUrls: ['./login.scss'],
 })
 export default class Login {
   private fb = inject(FormBuilder);
@@ -31,21 +37,32 @@ export default class Login {
 
   readonly ongName = environment.ongName;
 
-  hidePassword = signal(true);
-  isLoading = signal(false);
-  errorMessage = signal('');
+  hidePassword = signal<boolean>(true);
+  isLoading = signal<boolean>(false);
+  errorMessage = signal<string>('');
+
+  // Controle do modo "Esqueci minha senha"
+  isForgotPasswordMode = signal<boolean>(false);
+  isForgotLoading = signal<boolean>(false);
+  forgotSuccess = signal<boolean>(false);
 
   loginForm = this.fb.nonNullable.group({
     email: ['', [Validators.required, Validators.email]],
-    password: ['', [Validators.required, Validators.minLength(8)]]
+    password: ['', [Validators.required, Validators.minLength(8)]],
   });
 
-  onSubmit() {
-    if (this.loginForm.invalid) { return; }
+  forgotForm = this.fb.nonNullable.group({
+    email: ['', [Validators.required, Validators.email]],
+  });
+
+  onSubmit(): void {
+    if (this.loginForm.invalid) {
+      this.loginForm.markAllAsTouched();
+      return;
+    }
 
     this.isLoading.set(true);
     this.errorMessage.set('');
-
     this.loginForm.disable();
 
     const formValue = this.loginForm.getRawValue();
@@ -62,11 +79,55 @@ export default class Login {
         const message = err.error?.message || 'E-mail ou Senha inválidos';
         this.errorMessage.set(message);
         this.toast.error(message);
-      }
+      },
     });
   }
 
-  togglePassword() {
-    this.hidePassword.update(prev => !prev);
+  onForgotSubmit(): void {
+    if (this.forgotForm.invalid) {
+      this.forgotForm.markAllAsTouched();
+      return;
+    }
+
+    const email = this.forgotForm.getRawValue().email.trim();
+    this.isForgotLoading.set(true);
+    this.forgotForm.disable();
+
+    this.authService
+      .requestPasswordReset(email)
+      .then(() => {
+        this.forgotSuccess.set(true);
+        this.toast.success('Solicitação enviada! Verifique sua caixa de entrada.');
+      })
+      .catch((err) => {
+        const msg = err.message || 'Erro ao solicitar recuperação de senha.';
+        this.toast.error(msg);
+      })
+      .finally(() => {
+        this.isForgotLoading.set(false);
+        this.forgotForm.enable();
+      });
+  }
+
+  showForgotPassword(): void {
+    const currentEmail = this.loginForm.get('email')?.value || '';
+    if (currentEmail) {
+      this.forgotForm.patchValue({ email: currentEmail });
+    }
+    this.forgotSuccess.set(false);
+    this.isForgotPasswordMode.set(true);
+  }
+
+  showLogin(): void {
+    const currentEmail = this.forgotForm.get('email')?.value || '';
+    if (currentEmail) {
+      this.loginForm.patchValue({ email: currentEmail });
+    }
+    this.isForgotPasswordMode.set(false);
+    this.forgotSuccess.set(false);
+  }
+
+  togglePassword(): void {
+    this.hidePassword.update((prev) => !prev);
   }
 }

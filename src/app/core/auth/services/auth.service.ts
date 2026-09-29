@@ -273,27 +273,35 @@ export class AuthService {
 
   /**
    * Dispara o convite de novo usuário na plataforma (Apenas Administradores).
-   * Aciona a Edge Function do Supabase que valida permissões e dispara o e-mail de convite.
+   * Aciona a Edge Function "invite-user" do Supabase.
    */
-  public async inviteUser(email: string, role: AppRole): Promise<{ success: boolean; message?: string }> {
+  public async inviteUser(
+    email: string,
+    role: AppRole = 'user',
+    redirectTo?: string
+  ): Promise<{ success: boolean; message?: string }> {
     const token = await this.getValidToken();
     if (!token) {
       throw new Error('Sessão inválida ou expirada. Faça login novamente.');
     }
 
+    const targetRedirect =
+      redirectTo || `${window.location.origin}/definir-senha`;
+
     const body = {
       email: email.trim().toLowerCase(),
       role: role,
+      redirectTo: targetRedirect,
     };
 
     return firstValueFrom(
-      this.http.post<any>(`${environment.apiUrl}/functions/v1/invite-user`, body, {
+      this.http.post<{ success: boolean; message?: string }>(`${environment.apiUrl}/functions/v1/invite-user`, body, {
         headers: {
           apikey: environment.apiKey,
           Authorization: `Bearer ${token}`,
         },
       }).pipe(
-        map(() => ({ success: true })),
+        map((resp) => resp || { success: true }),
         catchError((err) => {
           const msg =
             err.error?.error ||
@@ -304,6 +312,89 @@ export class AuthService {
           return throwError(() => new Error(msg));
         })
       )
+    );
+  }
+
+  /**
+   * Dispara o envio administrativo de e-mail de redefinição de senha para um usuário já cadastrado (Apenas Administradores).
+   * Aciona a Edge Function "admin-reset-password" do Supabase.
+   */
+  public async sendResetPassword(
+    email: string,
+    redirectTo?: string
+  ): Promise<{ success: boolean; message?: string }> {
+    const token = await this.getValidToken();
+    if (!token) {
+      throw new Error('Sessão inválida ou expirada. Faça login novamente.');
+    }
+
+    const targetRedirect =
+      redirectTo || `${window.location.origin}/definir-senha`;
+
+    const body = {
+      email: email.trim().toLowerCase(),
+      redirectTo: targetRedirect,
+    };
+
+    return firstValueFrom(
+      this.http.post<{ success: boolean; message?: string }>(`${environment.apiUrl}/functions/v1/admin-reset-password`, body, {
+        headers: {
+          apikey: environment.apiKey,
+          Authorization: `Bearer ${token}`,
+        },
+      }).pipe(
+        map((resp) => resp || { success: true }),
+        catchError((err) => {
+          const msg =
+            err.error?.error ||
+            err.error?.msg ||
+            err.error?.message ||
+            err.message ||
+            'Erro ao disparar e-mail de redefinição de senha.';
+          return throwError(() => new Error(msg));
+        })
+      )
+    );
+  }
+
+  /**
+   * Solicitação pública de redefinição de senha (Autoatendimento "Esqueci minha senha" na tela de Login).
+   * Aciona o endpoint público /auth/v1/recover do Supabase com rate limit e envio do link de recuperação.
+   */
+  public async requestPasswordReset(
+    email: string,
+    redirectTo?: string
+  ): Promise<{ success: boolean; message?: string }> {
+    const targetRedirect =
+      redirectTo || `${window.location.origin}/definir-senha`;
+    const cleanEmail = email.trim().toLowerCase();
+
+    return firstValueFrom(
+      this.http
+        .post<any>(
+          `${this.API_URL}/v1/recover`,
+          { email: cleanEmail },
+          {
+            headers: {
+              apikey: environment.apiKey,
+            },
+            params: {
+              redirect_to: targetRedirect,
+            },
+          }
+        )
+        .pipe(
+          map(() => ({ success: true })),
+          catchError((err) => {
+            const msg =
+              err.error?.msg ||
+              err.error?.message ||
+              err.error?.error_description ||
+              err.message ||
+              'Erro ao solicitar redefinição de senha.';
+            return throwError(() => new Error(msg));
+          })
+        )
     );
   }
 

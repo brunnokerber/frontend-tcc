@@ -163,9 +163,9 @@ export default class UsuarioListComponent implements OnInit {
       width: '460px',
       maxWidth: '94vw',
       data: {
-        title: 'Reenviar Convite de Acesso',
-        message: `Deseja gerar e reenviar um novo link de convite e definição de senha para o e-mail "${email}"?`,
-        confirmText: 'Reenviar Convite',
+        title: 'Enviar Link de Redefinição de Senha',
+        message: `Deseja enviar um link para definição / redefinição de senha para o e-mail "${email}"?`,
+        confirmText: 'Enviar Link de Senha',
         confirmColor: 'primary',
         icon: 'mark_email_read',
         isDestructive: false,
@@ -175,10 +175,10 @@ export default class UsuarioListComponent implements OnInit {
     dialogRef.afterClosed().subscribe(async (confirmed: boolean) => {
       if (confirmed) {
         try {
-          await this.authService.inviteUser(email, usuario.role);
-          this.toast.success(`Novo convite enviado com sucesso para "${email}"!`);
+          await this.authService.sendResetPassword(email);
+          this.toast.success(`E-mail com link de redefinição enviado com sucesso para "${email}"!`);
         } catch (err: any) {
-          const msg = err.message || 'Erro ao reenviar convite.';
+          const msg = err.message || 'Erro ao enviar e-mail de redefinição.';
           this.toast.error(msg);
         }
       }
