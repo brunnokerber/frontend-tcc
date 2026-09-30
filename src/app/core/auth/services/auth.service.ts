@@ -1,9 +1,10 @@
 import { HttpClient } from '@angular/common/http';
 import { computed, inject, Injectable, signal } from '@angular/core';
 import { Router } from '@angular/router';
-import { catchError, firstValueFrom, map, Observable, of, switchMap, tap, throwError } from 'rxjs';
+import { catchError, firstValueFrom, from, map, Observable, of, switchMap, tap, throwError } from 'rxjs';
 
 import { environment } from '@env/environment';
+import { parseFunctionError } from '@shared/utils/supabase-error.utils';
 
 import type { AppRole, LoginRequest, LoginResponse } from '../models/login.model';
 
@@ -303,13 +304,13 @@ export class AuthService {
       }).pipe(
         map((resp) => resp || { success: true }),
         catchError((err) => {
-          const msg =
-            err.error?.error ||
-            err.error?.msg ||
-            err.error?.message ||
-            err.message ||
-            'Erro ao enviar convite para o usuário.';
-          return throwError(() => new Error(msg));
+          return from(parseFunctionError(err, 'Erro ao enviar convite para o usuário.')).pipe(
+            switchMap((parsed) => {
+              const errorObj: any = new Error(parsed.message);
+              errorObj.code = parsed.code;
+              return throwError(() => errorObj);
+            })
+          );
         })
       )
     );
@@ -345,13 +346,13 @@ export class AuthService {
       }).pipe(
         map((resp) => resp || { success: true }),
         catchError((err) => {
-          const msg =
-            err.error?.error ||
-            err.error?.msg ||
-            err.error?.message ||
-            err.message ||
-            'Erro ao disparar e-mail de redefinição de senha.';
-          return throwError(() => new Error(msg));
+          return from(parseFunctionError(err, 'Erro ao disparar e-mail de redefinição de senha.')).pipe(
+            switchMap((parsed) => {
+              const errorObj: any = new Error(parsed.message);
+              errorObj.code = parsed.code;
+              return throwError(() => errorObj);
+            })
+          );
         })
       )
     );

@@ -3,6 +3,7 @@ import { AuthService } from '@core/auth/services/auth.service';
 import { AppRole, UserProfile } from '@core/auth/models/login.model';
 import { SupabaseService } from '@core/services/supabase';
 import { ToastService } from '@core/services/toast.service';
+import { extractFunctionErrorMessage } from '@shared/utils/supabase-error.utils';
 
 @Injectable({
   providedIn: 'root',
@@ -46,29 +47,42 @@ export class UsuariosService {
   }
 
   /**
-   * Desativa uma conta de usuário (Soft Delete lógico preservando integridade de auditoria).
+   * Altera o status (ativo/inativo) de uma conta via Edge Function "toggle-user-status".
+   * Atualiza a tabela profiles e aplica/remove banimento no Supabase Auth síncronamente.
    */
-  async deactivateUsuario(userId: string): Promise<boolean> {
+  async toggleStatus(userId: string, ativo: boolean): Promise<boolean> {
     this.loadingSignal.set(true);
     try {
-      const { error } = await this.supabase.client
-        .from('profiles')
-        .update({
-          ativo: false,
-          deleted_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-        })
-        .eq('id', userId);
+      const { data, error } = await this.supabase.client.functions.invoke('toggle-user-status', {
+        body: {
+          userId,
+          ativo,
+        },
+      });
 
       if (error) {
-        throw error;
+        const msg = await extractFunctionErrorMessage(
+          error,
+          `Erro ao ${ativo ? 'reativar' : 'desativar'} conta de usuário.`
+        );
+        throw new Error(msg);
       }
 
-      this.toast.success('Conta de usuário desativada com sucesso.');
+      if (data?.error) {
+        throw new Error(data.error);
+      }
+
+      this.toast.success(
+        ativo
+          ? 'Conta de usuário reativada com sucesso.'
+          : 'Conta de usuário desativada com sucesso.'
+      );
       await this.fetchUsuarios();
       return true;
     } catch (err: any) {
-      const msg = err.message || 'Erro ao desativar conta de usuário.';
+      const msg =
+        err.message ||
+        `Erro ao ${ativo ? 'reativar' : 'desativar'} conta de usuário.`;
       this.toast.error(msg);
       return false;
     } finally {
@@ -77,34 +91,17 @@ export class UsuariosService {
   }
 
   /**
-   * Reativa uma conta de usuário previamente desativada.
+   * Desativa uma conta de usuário (Aplica ban no Auth e soft delete lógico em profiles).
+   */
+  async deactivateUsuario(userId: string): Promise<boolean> {
+    return this.toggleStatus(userId, false);
+  }
+
+  /**
+   * Reativa uma conta de usuário previamente desativada (Remove ban no Auth e reativa em profiles).
    */
   async reactivateUsuario(userId: string): Promise<boolean> {
-    this.loadingSignal.set(true);
-    try {
-      const { error } = await this.supabase.client
-        .from('profiles')
-        .update({
-          ativo: true,
-          deleted_at: null,
-          updated_at: new Date().toISOString(),
-        })
-        .eq('id', userId);
-
-      if (error) {
-        throw error;
-      }
-
-      this.toast.success('Conta de usuário reativada com sucesso.');
-      await this.fetchUsuarios();
-      return true;
-    } catch (err: any) {
-      const msg = err.message || 'Erro ao reativar conta de usuário.';
-      this.toast.error(msg);
-      return false;
-    } finally {
-      this.loadingSignal.set(false);
-    }
+    return this.toggleStatus(userId, true);
   }
 
   /**
@@ -138,7 +135,7 @@ export class UsuariosService {
   }
 
   /**
-   * Realiza a auto-desativação (soft delete da própria conta do usuário logado) e encerra a sessão.
+   * Realiza a auto-desativação da própria conta via Edge Function e encerra a sessão.
    */
   async deactivateSelf(): Promise<boolean> {
     const currentUserId = this.authService.getUserId();
@@ -147,27 +144,12 @@ export class UsuariosService {
       return false;
     }
 
-    try {
-      const { error } = await this.supabase.client
-        .from('profiles')
-        .update({
-          ativo: false,
-          deleted_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-        })
-        .eq('id', currentUserId);
-
-      if (error) {
-        throw error;
-      }
-
+    const success = await this.toggleStatus(currentUserId, false);
+    if (success) {
       this.toast.info('Sua conta foi desativada com sucesso. Até logo!');
       this.authService.logout();
       return true;
-    } catch (err: any) {
-      const msg = err.message || 'Erro ao desativar sua conta.';
-      this.toast.error(msg);
-      return false;
     }
+    return false;
   }
 }
