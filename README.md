@@ -37,7 +37,7 @@ A plataforma foi desenvolvida para solucionar desafios operacionais de ONGs e ab
 Acesse os documentos de fundamentação metodológica e modelagem do projeto:
 
 * 📄 [**Elicitação e Especificação de Requisitos**](./docs/ELICITACAO_DE_REQUISITOS.md) — 24 Requisitos Funcionais (RF), 18 Regras de Negócio (RN), 10 Requisitos Não-Funcionais (RNF) e Matriz de Rastreabilidade (RTM).
-* 📊 [**Modelo Conceitual EER (brModelo)**](./docs/MODELO_EER_BRMODELO.md) — Diagrama Conceitual Estendido, cardinalidades $(min, max)$, dicionário de entidades e mapeamento EER $\leftrightarrow$ Relacional.
+* 🏛️ [**Arquitetura Geral da Solução**](./docs/ARQUITETURA_DO_SISTEMA.md) — Diagrama de arquitetura em 3 camadas (Frontend SPA, Supabase BaaS, DevOps) com script Draw.io nativo.
 
 ---
 

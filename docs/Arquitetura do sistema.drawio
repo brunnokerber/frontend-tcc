@@ -1,0 +1,128 @@
+<mxfile host="app.diagrams.net">
+  <diagram name="Página-1" id="o8dkAeIR80dmeWIDF6r9">
+    <mxGraphModel dx="1414" dy="751" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1350" pageHeight="980" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="box_frontend" parent="1" style="swimlane;whiteSpace=wrap;html=1;fillColor=#EBF5FB;strokeColor=#2980B9;fontSize=14;fontStyle=1;fontColor=#1B4F72;startSize=30;rounded=1;arcSize=4;" value="1. CAMADA DE APRESENTAÇÃO (Frontend SPA - Angular 20)" vertex="1">
+          <mxGeometry height="660" width="400" x="40" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="node_dispositivos" parent="box_frontend" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#3498DB;fontColor=#2C3E50;fontSize=11;shadow=1;" value="&lt;b&gt;Dispositivos dos Usuários&lt;/b&gt;&lt;br&gt;Smartphones, Tablets e Desktops (Voluntários e Gestores)" vertex="1">
+          <mxGeometry height="45" width="360" x="20" y="45" as="geometry" />
+        </mxCell>
+        <mxCell id="node_layout" parent="box_frontend" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#D4E6F1;strokeColor=#2980B9;fontColor=#1A5276;fontSize=11;" value="&lt;b&gt;Layout &amp;amp; Shell Responsivo (MainLayout)&lt;/b&gt;&lt;br&gt;Header, Sidenav Retrátil, Alternância de Tema (Light / Dark / Auto)" vertex="1">
+          <mxGeometry height="45" width="360" x="20" y="110" as="geometry" />
+        </mxCell>
+        <mxCell id="box_features" parent="box_frontend" style="swimlane;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#7FB3D5;fontSize=11;fontStyle=1;fontColor=#1B4F72;startSize=24;rounded=1;" value="Módulos de Negócio (Feature-Based &amp;amp; Lazy Loading)" vertex="1">
+          <mxGeometry height="230" width="360" x="20" y="175" as="geometry" />
+        </mxCell>
+        <mxCell id="feat_pets" parent="box_features" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F8F5;strokeColor=#1ABC9C;fontSize=10;fontColor=#0E6251;" value="&lt;b&gt;Pets &amp;amp; Triagem&lt;/b&gt;&lt;br&gt;Prontuário, Vacinas, Consultas, Estadias" vertex="1">
+          <mxGeometry height="50" width="155" x="15" y="35" as="geometry" />
+        </mxCell>
+        <mxCell id="feat_locais" parent="box_features" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F8F5;strokeColor=#1ABC9C;fontSize=10;fontColor=#0E6251;" value="&lt;b&gt;Locais &amp;amp; Lares&lt;/b&gt;&lt;br&gt;Acomodações e Endereçamento" vertex="1">
+          <mxGeometry height="50" width="155" x="190" y="35" as="geometry" />
+        </mxCell>
+        <mxCell id="feat_vets" parent="box_features" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F8F5;strokeColor=#1ABC9C;fontSize=10;fontColor=#0E6251;" value="&lt;b&gt;Veterinários&lt;/b&gt;&lt;br&gt;CRVET e Corpo Clínico" vertex="1">
+          <mxGeometry height="50" width="155" x="15" y="95" as="geometry" />
+        </mxCell>
+        <mxCell id="feat_users" parent="box_features" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FDEDEC;strokeColor=#E74C3C;fontSize=10;fontColor=#78281F;" value="&lt;b&gt;Usuários (Admin)&lt;/b&gt;&lt;br&gt;RBAC, Convites e Soft Delete" vertex="1">
+          <mxGeometry height="50" width="155" x="190" y="95" as="geometry" />
+        </mxCell>
+        <mxCell id="feat_auth" parent="box_features" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FEF9E7;strokeColor=#F39C12;fontSize=10;fontColor=#7E5109;" value="&lt;b&gt;Autenticação &amp;amp; Recuperação&lt;/b&gt;&lt;br&gt;Login e Definição de Senha Segura" vertex="1">
+          <mxGeometry height="40" width="330" x="15" y="155" as="geometry" />
+        </mxCell>
+        <mxCell id="node_core" parent="box_frontend" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#EAEDED;strokeColor=#95A5A6;fontSize=10;fontColor=#2C3E50;" value="&lt;b&gt;Módulo Core&lt;/b&gt;&lt;br&gt;AuthService, Supabase Client, AuthGuard, AdminGuard, Toast &amp;amp; Theme Services" vertex="1">
+          <mxGeometry height="45" width="360" x="20" y="420" as="geometry" />
+        </mxCell>
+        <mxCell id="node_shared" parent="box_frontend" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#EAEDED;strokeColor=#95A5A6;fontSize=10;fontColor=#2C3E50;" value="&lt;b&gt;Módulo Shared&lt;/b&gt;&lt;br&gt;FormErrorPipe, DateMaskDirective, ConfirmationDialog, ErrorUtils" vertex="1">
+          <mxGeometry height="45" width="360" x="20" y="480" as="geometry" />
+        </mxCell>
+        <mxCell id="node_design" parent="box_frontend" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F4ECF7;strokeColor=#8E44AD;fontSize=10;fontColor=#4A235A;" value="&lt;b&gt;Design System &amp;amp; Ergonomia&lt;/b&gt;&lt;br&gt;Angular Material 20 + Bootstrap 5 + SCSS Modular (Material Design 3)" vertex="1">
+          <mxGeometry height="45" width="360" x="20" y="540" as="geometry" />
+        </mxCell>
+        <mxCell id="node_signals" parent="box_frontend" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#D5F5E3;strokeColor=#2ECC71;fontSize=10;fontColor=#196F3D;fontStyle=1;" value="&lt;b&gt;Reatividade de Estado:&lt;/b&gt; Angular Signals &amp;amp; Computed Signals (Zoneless)" vertex="1">
+          <mxGeometry height="35" width="360" x="20" y="600" as="geometry" />
+        </mxCell>
+        <mxCell id="conn_https" edge="1" parent="1" source="box_frontend" style="shape=flexArrow;endArrow=classic;startArrow=classic;html=1;fillColor=#FAD7A0;strokeColor=#D68910;fontSize=10;fontColor=#7E5109;rounded=1;align=center;" target="box_backend" value="&lt;b&gt;HTTPS / TLS 1.3&lt;/b&gt;&lt;br&gt;Bearer Token JWT (RFC 7519)&lt;br&gt;Client SDK &amp;amp; REST PostgREST">
+          <mxGeometry height="100" relative="1" width="100" as="geometry">
+            <mxPoint x="450" y="370" as="sourcePoint" />
+            <mxPoint x="530" y="370" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="box_backend" parent="1" style="swimlane;whiteSpace=wrap;html=1;fillColor=#E8F8F5;strokeColor=#16A085;fontSize=14;fontStyle=1;fontColor=#0E6251;startSize=30;rounded=1;arcSize=4;" value="2. CAMADA DE SERVIÇOS E PERSISTÊNCIA (BaaS - Supabase)" vertex="1">
+          <mxGeometry height="660" width="410" x="540" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="node_auth_supabase" parent="box_backend" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#1ABC9C;fontSize=11;fontColor=#0E6251;shadow=1;" value="&lt;b&gt;Supabase Auth (GoTrue Engine)&lt;/b&gt;&lt;br&gt;Emissão e Validação de JWT, Criptografia de Senhas, Convites por E-mail" vertex="1">
+          <mxGeometry height="50" width="360" x="25" y="45" as="geometry" />
+        </mxCell>
+        <mxCell id="node_postgrest" parent="box_backend" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#1ABC9C;fontSize=11;fontColor=#0E6251;shadow=1;" value="&lt;b&gt;PostgREST API Engine&lt;/b&gt;&lt;br&gt;Endpoints RESTful Gerados Dinamicamente a partir do Esquema do Banco" vertex="1">
+          <mxGeometry height="50" width="360" x="25" y="110" as="geometry" />
+        </mxCell>
+        <mxCell id="node_edge_fn" parent="box_backend" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FEF9E7;strokeColor=#F39C12;fontSize=11;fontColor=#7E5109;shadow=1;" value="&lt;b&gt;Edge Functions (Deno / Serverless)&lt;/b&gt;&lt;br&gt;Função &lt;i&gt;toggle-user-status&lt;/i&gt; (Banimento Síncrono no Auth e Soft Delete)" vertex="1">
+          <mxGeometry height="50" width="360" x="25" y="175" as="geometry" />
+        </mxCell>
+        <mxCell id="box_postgres" parent="box_backend" style="swimlane;whiteSpace=wrap;html=1;fillColor=#D1F2EB;strokeColor=#117A65;fontSize=11;fontStyle=1;fontColor=#0B5345;startSize=24;rounded=1;" value="SGBDR PostgreSQL Relacional" vertex="1">
+          <mxGeometry height="390" width="360" x="25" y="245" as="geometry" />
+        </mxCell>
+        <mxCell id="node_rls" parent="box_postgres" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FADBD8;strokeColor=#E74C3C;fontSize=10;fontColor=#78281F;fontStyle=1;" value="&lt;b&gt;Row Level Security (RLS)&lt;/b&gt;&lt;br&gt;Políticas de Segurança em Nível de Linha (Admin vs Operador/User)" vertex="1">
+          <mxGeometry height="40" width="320" x="20" y="35" as="geometry" />
+        </mxCell>
+        <mxCell id="tab_pets" parent="box_postgres" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#16A085;fontSize=10;fontColor=#0E6251;" value="&lt;b&gt;pets &amp;amp; entradas&lt;/b&gt;&lt;br&gt;Dados Biológicos, Marcadores (Chip, Moura, RGA) e Histórico de Resgate" vertex="1">
+          <mxGeometry height="45" width="320" x="20" y="85" as="geometry" />
+        </mxCell>
+        <mxCell id="tab_clinica" parent="box_postgres" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#16A085;fontSize=10;fontColor=#0E6251;" value="&lt;b&gt;vacinas &amp;amp; consultas_exames&lt;/b&gt;&lt;br&gt;Prontuário Clínico, Imunização Preventiva e Custos Financeiros" vertex="1">
+          <mxGeometry height="45" width="320" x="20" y="140" as="geometry" />
+        </mxCell>
+        <mxCell id="tab_locais" parent="box_postgres" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#16A085;fontSize=10;fontColor=#0E6251;" value="&lt;b&gt;locais &amp;amp; pets_locais&lt;/b&gt;&lt;br&gt;Lares Temporários, Clínicas, Estadias e Valores de Auxílio" vertex="1">
+          <mxGeometry height="45" width="320" x="20" y="195" as="geometry" />
+        </mxCell>
+        <mxCell id="tab_vets" parent="box_postgres" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#16A085;fontSize=10;fontColor=#0E6251;" value="&lt;b&gt;veterinarios&lt;/b&gt;&lt;br&gt;Registro Profissional (CRVET) e Contato do Corpo Clínico" vertex="1">
+          <mxGeometry height="40" width="320" x="20" y="250" as="geometry" />
+        </mxCell>
+        <mxCell id="tab_profiles" parent="box_postgres" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#16A085;fontSize=10;fontColor=#0E6251;" value="&lt;b&gt;profiles&lt;/b&gt;&lt;br&gt;Perfis de Usuários com RBAC (role: admin | user) e Auditoria Temporal" vertex="1">
+          <mxGeometry height="40" width="320" x="20" y="300" as="geometry" />
+        </mxCell>
+        <mxCell id="node_audit" parent="box_postgres" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#EAEDED;strokeColor=#7F8C8D;fontSize=9;fontColor=#34495E;" value="&lt;b&gt;Auditoria Relacional:&lt;/b&gt; Timestamps &lt;i&gt;created_at&lt;/i&gt; e &lt;i&gt;updated_at&lt;/i&gt; em todas as tabelas" vertex="1">
+          <mxGeometry height="30" width="320" x="20" y="348" as="geometry" />
+        </mxCell>
+        <mxCell id="box_devops" parent="1" style="swimlane;whiteSpace=wrap;html=1;fillColor=#F4ECF7;strokeColor=#8E44AD;fontSize=14;fontStyle=1;fontColor=#4A235A;startSize=30;rounded=1;arcSize=4;" value="3. CAMADA DE AUTOMAÇÃO E INFRAESTRUTURA (DevOps)" vertex="1">
+          <mxGeometry height="660" width="320" x="990" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="node_github" parent="box_devops" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#8E44AD;fontSize=11;fontColor=#4A235A;shadow=1;" value="&lt;b&gt;Repositório Git (GitHub)&lt;/b&gt;&lt;br&gt;Controle de Versão Distribuído e Histórico" vertex="1">
+          <mxGeometry height="50" width="280" x="20" y="45" as="geometry" />
+        </mxCell>
+        <mxCell id="box_cicd" parent="box_devops" style="swimlane;whiteSpace=wrap;html=1;fillColor=#E8DAEF;strokeColor=#7D3C98;fontSize=11;fontStyle=1;fontColor=#4A235A;startSize=24;rounded=1;" value="Esteira CI/CD (GitHub Actions)" vertex="1">
+          <mxGeometry height="290" width="280" x="20" y="115" as="geometry" />
+        </mxCell>
+        <mxCell id="step_lint" parent="box_cicd" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#9B59B6;fontSize=10;fontColor=#4A235A;" value="&lt;b&gt;1. Lint &amp;amp; Validação Sintática&lt;/b&gt;&lt;br&gt;Verificação estática de tipos e estilos" vertex="1">
+          <mxGeometry height="45" width="250" x="15" y="35" as="geometry" />
+        </mxCell>
+        <mxCell id="step_build" parent="box_cicd" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#9B59B6;fontSize=10;fontColor=#4A235A;" value="&lt;b&gt;2. Build de Produção&lt;/b&gt;&lt;br&gt;Otimização e compilação do bundle" vertex="1">
+          <mxGeometry height="45" width="250" x="15" y="90" as="geometry" />
+        </mxCell>
+        <mxCell id="step_test" parent="box_cicd" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#9B59B6;fontSize=10;fontColor=#4A235A;" value="&lt;b&gt;3. Testes Unitários &amp;amp; Cobertura&lt;/b&gt;&lt;br&gt;Karma + Jasmine (Code Coverage)" vertex="1">
+          <mxGeometry height="45" width="250" x="15" y="145" as="geometry" />
+        </mxCell>
+        <mxCell id="step_deploy" parent="box_cicd" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#D5F5E3;strokeColor=#27AE60;fontSize=10;fontColor=#145A32;fontStyle=1;" value="&lt;b&gt;4. Deploy Automatizado&lt;/b&gt;&lt;br&gt;Publicação contínua pós-aprovação" vertex="1">
+          <mxGeometry height="45" width="250" x="15" y="200" as="geometry" />
+        </mxCell>
+        <mxCell id="node_hosting" parent="box_devops" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#D4EFDF;strokeColor=#27AE60;fontSize=11;fontColor=#145A32;shadow=1;" value="&lt;b&gt;Hospedagem em Nuvem (Vercel)&lt;/b&gt;&lt;br&gt;Distribuição Global via CDN (Zero Downtime)" vertex="1">
+          <mxGeometry height="55" width="280" x="20" y="430" as="geometry" />
+        </mxCell>
+        <mxCell id="conn_deploy" edge="1" parent="box_devops" source="step_deploy" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;strokeColor=#27AE60;strokeWidth=2;" target="node_hosting">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="conn_dist" edge="1" parent="1" source="node_hosting" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;strokeColor=#2980B9;strokeWidth=2;dashed=1;fontSize=10;fontColor=#1B4F72;" target="node_dispositivos" value="Distribuição da SPA">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="970" y="498" />
+              <mxPoint x="970" y="10" />
+              <mxPoint x="480" y="10" />
+              <mxPoint x="480" y="108" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
