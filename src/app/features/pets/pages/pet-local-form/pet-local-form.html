@@ -80,7 +80,7 @@
             <div class="d-flex align-items-start gap-2">
               <mat-form-field appearance="outline" class="flex-grow-1">
                 <mat-label>Local / Estabelecimento Parceiro *</mat-label>
-                <mat-select formControlName="id_local">
+                <mat-select id="id_local" formControlName="id_local" aria-label="Local ou Estabelecimento Parceiro">
                   <mat-option [value]="null">-- Selecione um local cadastrado --</mat-option>
                   @for (loc of locais(); track loc.id) {
                     <mat-option [value]="loc.id">
@@ -105,6 +105,7 @@
                 class="btn-new-local"
                 (click)="openNewLocalDialog()"
                 matTooltip="Cadastrar novo local parceiro sem sair da tela"
+                aria-label="Cadastrar novo local parceiro"
               >
                 <mat-icon>add_location_alt</mat-icon>
                 <span class="d-none d-sm-inline">Novo</span>
@@ -117,9 +118,12 @@
             <mat-form-field appearance="outline" class="w-100">
               <mat-label>Data de Início / Saída *</mat-label>
               <input
+                id="data_saida"
                 matInput
                 appDateMask
                 maxlength="10"
+                [max]="today"
+                [min]="pet()?.data_nascimento"
                 [matDatepicker]="pickerSaida"
                 formControlName="data_saida"
                 placeholder="dd/mm/aaaa"
@@ -131,23 +135,32 @@
                 petLocalForm.controls.data_saida.touched &&
                 petLocalForm.controls.data_saida.errors
               ) {
-                <mat-error>{{ petLocalForm.controls.data_saida | formError }}</mat-error>
+                <mat-error>{{
+                  petLocalForm.controls.data_saida
+                    | formError: { matDatepickerMin: 'A data de início não pode ser anterior ao nascimento do pet' }
+                }}</mat-error>
               }
             </mat-form-field>
           </div>
+
 
           <!-- Data de Retorno / Reentrada (Opcional) -->
           <div class="col-12 col-md-6">
             <mat-form-field appearance="outline" class="w-100">
               <mat-label>Data de Término / Reentrada</mat-label>
               <input
+                id="data_reentrada"
                 matInput
                 appDateMask
                 maxlength="10"
+                [max]="today"
+                [min]="petLocalForm.controls.data_saida.value || pet()?.data_nascimento"
                 [matDatepicker]="pickerReentrada"
                 formControlName="data_reentrada"
                 placeholder="dd/mm/aaaa"
+                aria-label="Data de Término ou Reentrada"
               />
+
               <mat-datepicker-toggle matIconSuffix [for]="pickerReentrada"></mat-datepicker-toggle>
               <mat-datepicker #pickerReentrada></mat-datepicker>
               <mat-hint>Preencha quando o animal retornar ou for transferido novamente</mat-hint>
@@ -155,7 +168,10 @@
                 petLocalForm.controls.data_reentrada.touched &&
                 petLocalForm.controls.data_reentrada.errors
               ) {
-                <mat-error>{{ petLocalForm.controls.data_reentrada | formError }}</mat-error>
+                <mat-error>{{
+                  petLocalForm.controls.data_reentrada
+                    | formError: { matDatepickerMin: 'A data de retorno não pode ser anterior à data de início' }
+                }}</mat-error>
               }
             </mat-form-field>
           </div>
@@ -165,11 +181,13 @@
             <mat-form-field appearance="outline" class="w-100">
               <mat-label>Motivo da Passagem / Encaminhamento</mat-label>
               <input
+                id="motivo_saida"
                 matInput
                 formControlName="motivo_saida"
                 [matAutocomplete]="autoMotivo"
                 placeholder="Ex: Lar Temporário, Internação Clínica..."
                 maxlength="100"
+                aria-label="Motivo da Passagem ou Encaminhamento"
               />
               <mat-icon matPrefix class="me-2">info</mat-icon>
               <mat-autocomplete #autoMotivo="matAutocomplete">
@@ -192,12 +210,14 @@
             <mat-form-field appearance="outline" class="w-100">
               <mat-label>Valor de Auxílio (R$)</mat-label>
               <input
+                id="valor_auxilio"
                 matInput
                 type="number"
                 step="0.01"
                 min="0"
                 formControlName="valor_auxilio"
                 placeholder="0,00"
+                aria-label="Valor de Auxílio em Reais"
               />
               <span matTextPrefix class="me-1">R$&nbsp;</span>
               <mat-icon matSuffix>payments</mat-icon>
@@ -216,11 +236,13 @@
             <mat-form-field appearance="outline" class="w-100">
               <mat-label>Observações Adicionais</mat-label>
               <textarea
+                id="obs"
                 matInput
                 rows="3"
                 formControlName="obs"
                 placeholder="Orientações sobre cuidados, alimentação especial, medicações a administrar no local, etc."
                 maxlength="500"
+                aria-label="Observações Adicionais"
               ></textarea>
               <mat-hint align="end">
                 {{ petLocalForm.controls.obs.value?.length || 0 }}/500 caracteres

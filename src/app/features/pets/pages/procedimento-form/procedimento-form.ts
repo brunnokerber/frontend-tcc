@@ -19,6 +19,10 @@ import { Veterinario } from '@features/veterinarios/models/veterinario.model';
 import { VeterinariosService } from '@features/veterinarios/services/veterinarios.service';
 import { DateMaskDirective } from '@shared/directives/date-mask.directive';
 import { FormErrorPipe } from '@shared/pipes/form-error.pipe';
+import {
+  dateNotBeforeDateValidator,
+  maxDateTodayValidator,
+} from '@shared/validators/date.validators';
 import { dateToIsoString, parseIsoToDate, sanitize } from '@shared/utils/string-utils';
 import {
   ConsultaExame,
@@ -81,11 +85,23 @@ export default class ProcedimentoFormComponent implements OnInit {
 
   public veterinarios = signal<Veterinario[]>([]);
   public tipoOperacaoOptions = TIPO_OPERACAO_OPTIONS;
+  public today = new Date();
 
   public procedimentoForm = this.fb.group({
     tipo_operacao: ['', [Validators.required, Validators.maxLength(30)]],
     operacao_medicamento: ['', [Validators.required, Validators.maxLength(300)]],
-    data_realizacao: [null as Date | null, [Validators.required]],
+    data_realizacao: [
+      null as Date | null,
+      [
+        Validators.required,
+        maxDateTodayValidator(),
+        dateNotBeforeDateValidator(
+          () => this.pet()?.data_nascimento,
+          'dataAntesNascimento',
+          'A data de realização não pode ser anterior ao nascimento do pet'
+        ),
+      ],
+    ],
     custo: [null as number | null, [Validators.min(0)]],
     id_veterinario: [null as number | null],
   });
@@ -132,6 +148,7 @@ export default class ProcedimentoFormComponent implements OnInit {
     const statePet = history.state?.pet as Pet | undefined;
     if (statePet && statePet.id === id) {
       this.pet.set(statePet);
+      this.procedimentoForm.controls.data_realizacao.updateValueAndValidity({ emitEvent: false });
       return;
     }
 
@@ -142,6 +159,7 @@ export default class ProcedimentoFormComponent implements OnInit {
       return;
     }
     this.pet.set(pet);
+    this.procedimentoForm.controls.data_realizacao.updateValueAndValidity({ emitEvent: false });
   }
 
   async loadVeterinarios(): Promise<void> {

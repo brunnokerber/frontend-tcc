@@ -12,8 +12,9 @@ import { MatSelectModule } from '@angular/material/select';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NavigationService } from '@core/services/navigation.service';
 import { ToastService } from '@core/services/toast.service';
-import { FormErrorPipe } from '@shared/pipes/form-error.pipe';
 import { DateMaskDirective } from '@shared/directives/date-mask.directive';
+import { FormErrorPipe } from '@shared/pipes/form-error.pipe';
+import { dateSequenceValidator, maxDateTodayValidator } from '@shared/validators/date.validators';
 import { dateToIsoString, parseIsoToDate, sanitize } from '@shared/utils/string-utils';
 import {
   calculateSenioridade,
@@ -70,36 +71,59 @@ export default class PetFormComponent implements OnInit {
   public porteOptions = PORTE_OPTIONS;
   public senioridadeOptions = SENIORIDADE_OPTIONS;
 
-  // Formulário Reativo
-  public petForm = this.fb.group({
-    nome: ['', [Validators.required, Validators.maxLength(30)]],
-    tipo_pet: ['Cachorro', [Validators.required, Validators.maxLength(10)]],
-    sexo: ['Macho', [Validators.required, Validators.maxLength(10)]],
-    status: ['Disponível', [Validators.required, Validators.maxLength(30)]],
-    senioridade: ['Filhote', [Validators.required, Validators.maxLength(30)]],
-    raca: ['', [Validators.required, Validators.maxLength(30)]],
-    porte: ['Médio', [Validators.maxLength(30)]],
-    cor_majoritaria: ['', [Validators.maxLength(30)]],
-    moura: ['', [Validators.maxLength(30)]],
-    chip: ['', [Validators.maxLength(30)]],
-    rga: ['', [Validators.maxLength(30)]],
-    data_nascimento: [null as Date | null],
-    data_castracao: [null as Date | null],
-    link_documentos: ['', [Validators.maxLength(200)]],
-    // Campos da tabela 'entradas' (obrigatórios na criação)
-    local_origem: ['', [Validators.required, Validators.maxLength(50)]],
-    data_entrada: [new Date(), [Validators.required]],
-    resgatante: ['', [Validators.required, Validators.maxLength(50)]],
-    observacoes: ['', [Validators.maxLength(200)]],
-  });
+  public today = new Date();
+
+  // Formulário Reativo com Validadores Cronológicos
+  public petForm = this.fb.group(
+    {
+      nome: ['', [Validators.required, Validators.maxLength(30)]],
+      tipo_pet: ['Cachorro', [Validators.required, Validators.maxLength(10)]],
+      sexo: ['Macho', [Validators.required, Validators.maxLength(10)]],
+      status: ['Disponível', [Validators.required, Validators.maxLength(30)]],
+      senioridade: ['Filhote', [Validators.required, Validators.maxLength(30)]],
+      raca: ['', [Validators.required, Validators.maxLength(30)]],
+      porte: ['Médio', [Validators.maxLength(30)]],
+      cor_majoritaria: ['', [Validators.maxLength(30)]],
+      moura: ['', [Validators.maxLength(30)]],
+      chip: ['', [Validators.maxLength(30)]],
+      rga: ['', [Validators.maxLength(30)]],
+      data_nascimento: [null as Date | null, [maxDateTodayValidator()]],
+      data_castracao: [null as Date | null, [maxDateTodayValidator()]],
+      link_documentos: ['', [Validators.maxLength(200)]],
+      // Campos da tabela 'entradas' (obrigatórios na criação)
+      local_origem: ['', [Validators.required, Validators.maxLength(50)]],
+      data_entrada: [new Date(), [Validators.required, maxDateTodayValidator()]],
+      resgatante: ['', [Validators.required, Validators.maxLength(50)]],
+      observacoes: ['', [Validators.maxLength(200)]],
+    },
+    {
+      validators: [
+        dateSequenceValidator(
+          'data_nascimento',
+          'data_castracao',
+          'dataCastracaoAntesNascimento',
+          'A castração não pode ser anterior ao nascimento do pet'
+        ),
+        dateSequenceValidator(
+          'data_nascimento',
+          'data_entrada',
+          'dataEntradaAntesNascimento',
+          'A entrada não pode ser anterior ao nascimento do pet'
+        ),
+      ],
+    }
+
+  );
 
   ngOnInit() {
-    // Atualização dinâmica da fase da vida / senioridade ao alterar data de nascimento
+    // Atualização dinâmica da fase da vida / senioridade e revalidação ao alterar data de nascimento
     this.petForm.controls.data_nascimento.valueChanges.subscribe((birthDate) => {
       const calculatedSenioridade = calculateSenioridade(birthDate);
       if (calculatedSenioridade) {
         this.petForm.controls.senioridade.setValue(calculatedSenioridade);
       }
+      this.petForm.controls.data_castracao.updateValueAndValidity({ emitEvent: false });
+      this.petForm.controls.data_entrada.updateValueAndValidity({ emitEvent: false });
     });
 
     const idParam = this.route.snapshot.paramMap.get('id');

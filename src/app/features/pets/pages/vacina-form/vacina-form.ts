@@ -20,6 +20,10 @@ import { Veterinario } from '@features/veterinarios/models/veterinario.model';
 import { VeterinariosService } from '@features/veterinarios/services/veterinarios.service';
 import { DateMaskDirective } from '@shared/directives/date-mask.directive';
 import { FormErrorPipe } from '@shared/pipes/form-error.pipe';
+import {
+  dateNotBeforeDateValidator,
+  maxDateTodayValidator,
+} from '@shared/validators/date.validators';
 import { dateToIsoString, parseIsoToDate, sanitize } from '@shared/utils/string-utils';
 import {
   getSexoIcon,
@@ -84,6 +88,7 @@ export default class VacinaFormComponent implements OnInit {
   public veterinarios = signal<Veterinario[]>([]);
   public vacinasSugestoes = VACINAS_SUGESTOES;
   public vacinaSearchText = signal<string>('');
+  public today = new Date();
 
   // Filtro inteligente e insensível a maiúsculas/acentos
   public filteredVacinas = computed(() => {
@@ -108,8 +113,28 @@ export default class VacinaFormComponent implements OnInit {
 
   public vacinaForm = this.fb.group({
     nome_vacina: ['', [Validators.required, Validators.maxLength(30)]],
-    data_prevista: [null as Date | null, [Validators.required]],
-    data_aplicacao: [null as Date | null],
+    data_prevista: [
+      null as Date | null,
+      [
+        Validators.required,
+        dateNotBeforeDateValidator(
+          () => this.pet()?.data_nascimento,
+          'dataAntesNascimento',
+          'A data prevista não pode ser anterior ao nascimento do pet'
+        ),
+      ],
+    ],
+    data_aplicacao: [
+      null as Date | null,
+      [
+        maxDateTodayValidator(),
+        dateNotBeforeDateValidator(
+          () => this.pet()?.data_nascimento,
+          'dataAntesNascimento',
+          'A data de aplicação não pode ser anterior ao nascimento do pet'
+        ),
+      ],
+    ],
     custo: [null as number | null, [Validators.min(0)]],
     id_veterinario: [null as number | null],
   });
@@ -172,6 +197,8 @@ export default class VacinaFormComponent implements OnInit {
       return;
     }
     this.pet.set(pet);
+    this.vacinaForm.controls.data_prevista.updateValueAndValidity({ emitEvent: false });
+    this.vacinaForm.controls.data_aplicacao.updateValueAndValidity({ emitEvent: false });
   }
 
   async loadVeterinarios(): Promise<void> {

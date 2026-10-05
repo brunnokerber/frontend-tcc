@@ -38,7 +38,7 @@
           <div class="col-12 col-md-5">
             <mat-form-field appearance="outline" class="w-100">
               <mat-label>Tipo de Local *</mat-label>
-              <mat-select formControlName="tipo_local">
+              <mat-select id="tipo_local" formControlName="tipo_local" aria-label="Tipo de Local">
                 @for (tipo of tipoLocalOptions; track tipo.value) {
                   <mat-option [value]="tipo.value">
                     {{ tipo.label }}
@@ -57,6 +57,7 @@
             <mat-form-field appearance="outline" class="w-100">
               <mat-label>Nome do Local / Estabelecimento *</mat-label>
               <input
+                id="nome_local"
                 matInput
                 formControlName="local"
                 placeholder="Ex: Lar da Dona Maria, Clínica VetSul"
@@ -75,6 +76,7 @@
             <mat-form-field appearance="outline" class="w-100">
               <mat-label>Pessoa de Contato / Responsável *</mat-label>
               <input
+                id="contato_responsavel"
                 matInput
                 formControlName="contato"
                 placeholder="Ex: Maria da Silva"
@@ -92,6 +94,7 @@
             <mat-form-field appearance="outline" class="w-100">
               <mat-label>Telefone / WhatsApp *</mat-label>
               <input
+                id="telefone_local"
                 matInput
                 appPhoneMask
                 formControlName="telefone"
@@ -125,6 +128,7 @@
             <mat-form-field appearance="outline" class="w-100">
               <mat-label>CEP *</mat-label>
               <input
+                id="cep_local"
                 matInput
                 appCepMask
                 formControlName="cep"
@@ -142,6 +146,7 @@
                   matSuffix
                   (click)="onSearchCep()"
                   matTooltip="Buscar CEP via ViaCEP"
+                  aria-label="Buscar CEP via ViaCEP"
                 >
                   <mat-icon style="font-size: 18px; width: 18px; height: 18px">search</mat-icon>
                 </button>
@@ -157,6 +162,7 @@
             <mat-form-field appearance="outline" class="w-100">
               <mat-label>Rua / Logradouro *</mat-label>
               <input
+                id="rua_local"
                 matInput
                 formControlName="rua"
                 placeholder="Ex: Av. Maurício Cardoso"
@@ -174,6 +180,7 @@
             <mat-form-field appearance="outline" class="w-100">
               <mat-label>Número *</mat-label>
               <input
+                id="numero_local"
                 matInput
                 type="number"
                 min="0"
@@ -192,6 +199,7 @@
             <mat-form-field appearance="outline" class="w-100">
               <mat-label>Complemento (Opcional)</mat-label>
               <input
+                id="complemento_local"
                 matInput
                 formControlName="complemento"
                 placeholder="Ex: Apto 302, Bloco B, Casa dos fundos"
@@ -209,6 +217,7 @@
             <mat-form-field appearance="outline" class="w-100">
               <mat-label>Bairro *</mat-label>
               <input
+                id="bairro_local"
                 matInput
                 formControlName="bairro"
                 placeholder="Ex: Centro"
@@ -226,6 +235,7 @@
             <mat-form-field appearance="outline" class="w-100">
               <mat-label>Cidade *</mat-label>
               <input
+                id="cidade_local"
                 matInput
                 formControlName="cidade"
                 placeholder="Ex: Novo Hamburgo"
@@ -242,7 +252,7 @@
           <div class="col-12 col-md-4">
             <mat-form-field appearance="outline" class="w-100">
               <mat-label>UF *</mat-label>
-              <mat-select formControlName="estado">
+              <mat-select id="uf_local" formControlName="estado" aria-label="UF ou Estado">
                 @for (uf of estadosBrasil; track uf) {
                   <mat-option [value]="uf">{{ uf }}</mat-option>
                 }
@@ -254,6 +264,7 @@
             </mat-form-field>
           </div>
         </div>
+
       </div>
     </div>
 

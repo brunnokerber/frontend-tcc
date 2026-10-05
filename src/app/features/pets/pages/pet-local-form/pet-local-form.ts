@@ -20,6 +20,11 @@ import { Local } from '@features/locais/models/local.model';
 import { LocaisService } from '@features/locais/services/locais.service';
 import { DateMaskDirective } from '@shared/directives/date-mask.directive';
 import { FormErrorPipe } from '@shared/pipes/form-error.pipe';
+import {
+  dateNotBeforeDateValidator,
+  dateSequenceValidator,
+  maxDateTodayValidator,
+} from '@shared/validators/date.validators';
 import { dateToIsoString, parseIsoToDate, sanitize } from '@shared/utils/string-utils';
 import {
   getSexoIcon,
@@ -78,6 +83,7 @@ export default class PetLocalFormComponent implements OnInit {
   private dialog = inject(MatDialog);
   private toast = inject(ToastService);
 
+  public today = new Date();
   public petId = signal<number | null>(null);
   public petLocalId = signal<number | null>(null);
   public pet = signal<Pet | null>(null);
@@ -113,14 +119,48 @@ export default class PetLocalFormComponent implements OnInit {
     });
   });
 
-  public petLocalForm = this.fb.group({
-    id_local: [null as number | null, [Validators.required]],
-    data_saida: [null as Date | null, [Validators.required]],
-    data_reentrada: [null as Date | null],
-    motivo_saida: ['', [Validators.maxLength(100)]],
-    valor_auxilio: [null as number | null, [Validators.min(0)]],
-    obs: ['', [Validators.maxLength(500)]],
-  });
+  public petLocalForm = this.fb.group(
+    {
+      id_local: [null as number | null, [Validators.required]],
+      data_saida: [
+        null as Date | null,
+        [
+          Validators.required,
+          maxDateTodayValidator('A data de início/saída não pode ser posterior a hoje'),
+          dateNotBeforeDateValidator(
+            () => this.pet()?.data_nascimento,
+            'dataAntesNascimento',
+            'A data de início/saída não pode ser anterior ao nascimento do pet'
+          ),
+        ],
+      ],
+      data_reentrada: [
+        null as Date | null,
+        [
+          maxDateTodayValidator('A data de término/reentrada não pode ser posterior a hoje'),
+          dateNotBeforeDateValidator(
+            () => this.pet()?.data_nascimento,
+            'dataAntesNascimento',
+            'A data de término/reentrada não pode ser anterior ao nascimento do pet'
+          ),
+        ],
+      ],
+      motivo_saida: ['', [Validators.maxLength(100)]],
+      valor_auxilio: [null as number | null, [Validators.min(0)]],
+      obs: ['', [Validators.maxLength(500)]],
+    },
+    {
+      validators: [
+        dateSequenceValidator(
+          'data_saida',
+          'data_reentrada',
+          'dataReentradaAntesSaida',
+          'A data de retorno não pode ser anterior à data de início'
+        ),
+      ],
+    }
+  );
+
 
   // Helpers de visualização do Pet
   public getTipoBadgeClass = getTipoBadgeClass;
@@ -146,10 +186,17 @@ export default class PetLocalFormComponent implements OnInit {
       this.motivoSearchText.set(val || '');
     });
 
+    // Revalidação dinâmica da data_reentrada ao alterar data_saida
+    this.petLocalForm.controls.data_saida.valueChanges.subscribe(() => {
+      this.petLocalForm.controls.data_reentrada.updateValueAndValidity({ emitEvent: false });
+    });
+
     // Carrega dados do Pet do state da rota ou via API
     const statePet = history.state?.pet as Pet | undefined;
     if (statePet && statePet.id === this.petId()) {
       this.pet.set(statePet);
+      this.petLocalForm.controls.data_saida.updateValueAndValidity({ emitEvent: false });
+      this.petLocalForm.controls.data_reentrada.updateValueAndValidity({ emitEvent: false });
     } else if (this.petId()) {
       this.loadPet(this.petId()!);
     }
@@ -168,6 +215,8 @@ export default class PetLocalFormComponent implements OnInit {
       const p = await this.petsService.getPetById(id);
       if (p) {
         this.pet.set(p);
+        this.petLocalForm.controls.data_saida.updateValueAndValidity({ emitEvent: false });
+        this.petLocalForm.controls.data_reentrada.updateValueAndValidity({ emitEvent: false });
       }
     } catch (err: any) {
       this.toast.error(err.message || 'Erro ao carregar dados do pet.');

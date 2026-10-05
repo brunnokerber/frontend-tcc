@@ -50,6 +50,8 @@ export default class VeterinarioListComponent implements OnInit {
 
   public totalVeterinarios = computed(() => this.veterinariosService.veterinarios().length);
 
+  private lastAppliedFilterJson: string | null = null;
+
   ngOnInit(): void {
     const qp = this.route.snapshot.queryParams;
     if (qp['field']) {
@@ -58,7 +60,7 @@ export default class VeterinarioListComponent implements OnInit {
     if (qp['value']) {
       this.searchValue.set(qp['value']);
     }
-    this.applyFilters();
+    this.applyFilters(true);
   }
 
   onSearchFieldChange(newField: string): void {
@@ -71,7 +73,11 @@ export default class VeterinarioListComponent implements OnInit {
     return found?.placeholder || 'Digite o termo de busca...';
   }
 
-  applyFilters(): void {
+  applyFilters(force = false): void {
+    if (this.veterinariosService.loading()) {
+      return;
+    }
+
     const val = this.searchValue().trim();
     const field = this.searchField();
 
@@ -79,6 +85,13 @@ export default class VeterinarioListComponent implements OnInit {
       searchField: val ? field : undefined,
       searchValue: val || undefined,
     };
+
+    const currentFilterJson = JSON.stringify(filterParams);
+    if (!force && this.lastAppliedFilterJson === currentFilterJson) {
+      return;
+    }
+
+    this.lastAppliedFilterJson = currentFilterJson;
 
     this.router.navigate([], {
       relativeTo: this.route,
@@ -93,10 +106,12 @@ export default class VeterinarioListComponent implements OnInit {
   }
 
   clearFilters(): void {
+    if (this.veterinariosService.loading()) return;
     this.searchValue.set('');
     this.searchField.set('nome');
-    this.applyFilters();
+    this.applyFilters(true);
   }
+
 
   openVeterinarioDialog(vet?: Veterinario): void {
     const dialogRef = this.dialog.open(VeterinarioDialogComponent, {

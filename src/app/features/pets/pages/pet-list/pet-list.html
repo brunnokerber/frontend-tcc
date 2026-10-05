@@ -92,30 +92,31 @@
     </div>
   </div>
 
-  <!-- Painel de Filtros e Busca -->
-  <div class="filter-panel p-3 p-md-4 rounded-3 shadow-xs mb-4">
+  <!-- Painel de Filtros e Busca com Formulário Explícito de Submit -->
+  <form (ngSubmit)="applyFilters()" class="filter-panel p-3 p-md-4 rounded-3 shadow-xs mb-4">
     <div class="row g-3">
       <!-- Busca por Nome do Pet -->
       <div class="col-12 col-lg-3 col-xl-3">
-        <label class="form-label small fw-semibold text-surface-muted mb-1">Buscar por Nome do Pet</label>
+        <label for="pet-filter-search" class="form-label small fw-semibold text-surface-muted mb-1">Buscar por Nome do Pet</label>
         <div class="input-group">
           <span class="input-group-text bg-surface-subtle border-end-0 border-surface">
             <i class="bi bi-search"></i>
           </span>
           <input
+            id="pet-filter-search"
             type="text"
             class="form-control border-start-0 border-surface bg-surface-card text-surface-main"
             placeholder="Ex: Rex, Mel, Thor..."
             [ngModel]="search()"
             (ngModelChange)="search.set($event)"
-            (keyup.enter)="applyFilters()"
+            name="search"
           />
           @if (search()) {
             <button
               class="btn btn-outline-secondary border-start-0 border-surface"
               type="button"
-              (click)="search.set(''); applyFilters()"
-              matTooltip="Limpar busca"
+              (click)="search.set('')"
+              matTooltip="Limpar busca digitada"
             >
               <mat-icon style="font-size: 18px; width: 18px; height: 18px">clear</mat-icon>
             </button>
@@ -125,77 +126,125 @@
 
       <!-- Filtro Tipo de Pet -->
       <div class="col-6 col-md-4 col-lg-2">
-        <label class="form-label small fw-semibold text-surface-muted mb-1">Espécie</label>
-        <select class="form-select bg-surface-card text-surface-main border-surface" [ngModel]="tipoFilter()"
-          (ngModelChange)="tipoFilter.set($event); applyFilters()">
+        <label for="pet-filter-tipo" class="form-label small fw-semibold text-surface-muted mb-1">Espécie</label>
+        <select
+          id="pet-filter-tipo"
+          class="form-select bg-surface-card text-surface-main border-surface"
+          [ngModel]="tipoFilter()"
+          (ngModelChange)="tipoFilter.set($event)"
+          name="tipoFilter"
+        >
           <option value="">Todas</option>
           @for (tipo of tipoOptions; track tipo.value) {
-          <option [value]="tipo.value">{{ tipo.label }}</option>
+            <option [value]="tipo.value">{{ tipo.label }}</option>
           }
         </select>
       </div>
 
       <!-- Filtro Sexo -->
       <div class="col-6 col-md-4 col-lg-1">
-        <label class="form-label small fw-semibold text-surface-muted mb-1">Sexo</label>
-        <select class="form-select bg-surface-card text-surface-main border-surface" [ngModel]="sexoFilter()"
-          (ngModelChange)="sexoFilter.set($event); applyFilters()">
+        <label for="pet-filter-sexo" class="form-label small fw-semibold text-surface-muted mb-1">Sexo</label>
+        <select
+          id="pet-filter-sexo"
+          class="form-select bg-surface-card text-surface-main border-surface"
+          [ngModel]="sexoFilter()"
+          (ngModelChange)="sexoFilter.set($event)"
+          name="sexoFilter"
+        >
           <option value="">Todos</option>
           @for (sex of sexoOptions; track sex.value) {
-          <option [value]="sex.value">{{ sex.label }}</option>
+            <option [value]="sex.value">{{ sex.label }}</option>
           }
         </select>
       </div>
 
       <!-- Filtro Status -->
       <div class="col-6 col-md-4 col-lg-2">
-        <label class="form-label small fw-semibold text-surface-muted mb-1">Status</label>
-        <select class="form-select bg-surface-card text-surface-main border-surface" [ngModel]="statusFilter()"
-          (ngModelChange)="statusFilter.set($event); applyFilters()">
+        <label for="pet-filter-status" class="form-label small fw-semibold text-surface-muted mb-1">Status</label>
+        <select
+          id="pet-filter-status"
+          class="form-select bg-surface-card text-surface-main border-surface"
+          [ngModel]="statusFilter()"
+          (ngModelChange)="statusFilter.set($event)"
+          name="statusFilter"
+        >
           <option value="">Todos</option>
           @for (st of statusOptions; track st.value) {
-          <option [value]="st.value">{{ st.label }}</option>
+            <option [value]="st.value">{{ st.label }}</option>
           }
         </select>
       </div>
 
       <!-- Filtro Senioridade -->
       <div class="col-6 col-md-4 col-lg-2">
-        <label class="form-label small fw-semibold text-surface-muted mb-1">Senioridade</label>
-        <select class="form-select bg-surface-card text-surface-main border-surface" [ngModel]="senioridadeFilter()"
-          (ngModelChange)="senioridadeFilter.set($event); applyFilters()">
+        <label for="pet-filter-senioridade" class="form-label small fw-semibold text-surface-muted mb-1">Senioridade</label>
+        <select
+          id="pet-filter-senioridade"
+          class="form-select bg-surface-card text-surface-main border-surface"
+          [ngModel]="senioridadeFilter()"
+          (ngModelChange)="senioridadeFilter.set($event)"
+          name="senioridadeFilter"
+        >
           <option value="">Todas</option>
           @for (sen of senioridadeOptions; track sen.value) {
-          <option [value]="sen.value">{{ sen.label }}</option>
+            <option [value]="sen.value">{{ sen.label }}</option>
           }
         </select>
       </div>
 
       <!-- Filtro Porte -->
       <div class="col-6 col-md-4 col-lg-2">
-        <label class="form-label small fw-semibold text-surface-muted mb-1">Porte</label>
-        <select class="form-select bg-surface-card text-surface-main border-surface" [ngModel]="porteFilter()"
-          (ngModelChange)="porteFilter.set($event); applyFilters()">
+        <label for="pet-filter-porte" class="form-label small fw-semibold text-surface-muted mb-1">Porte</label>
+        <select
+          id="pet-filter-porte"
+          class="form-select bg-surface-card text-surface-main border-surface"
+          [ngModel]="porteFilter()"
+          (ngModelChange)="porteFilter.set($event)"
+          name="porteFilter"
+        >
           <option value="">Todos</option>
           @for (porte of porteOptions; track porte.value) {
-          <option [value]="porte.value">{{ porte.label }}</option>
+            <option [value]="porte.value">{{ porte.label }}</option>
           }
         </select>
       </div>
 
+
       <!-- Botões de Ação de Filtro -->
       <div class="col-12 d-flex justify-content-end gap-2 mt-2">
-        <button mat-stroked-button (click)="clearFilters()" class="btn-clear">
+        <button
+          mat-stroked-button
+          type="button"
+          (click)="clearFilters()"
+          class="btn-clear"
+          [disabled]="petsService.loading() || (!search() && !tipoFilter() && !sexoFilter() && !statusFilter() && !porteFilter() && !senioridadeFilter())"
+        >
           <mat-icon>filter_alt_off</mat-icon>
           <span>Limpar Filtros</span>
         </button>
-        <button mat-flat-button color="primary" (click)="applyFilters()">
-          <mat-icon>search</mat-icon>
-          <span>Filtrar</span>
+        <button
+          mat-flat-button
+          color="primary"
+          type="submit"
+          [disabled]="petsService.loading()"
+          class="btn-submit-filter px-3"
+        >
+          @if (petsService.loading()) {
+            <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+            <span>Filtrando...</span>
+          } @else {
+            <span class="d-inline-flex align-items-center gap-1">
+              <mat-icon>search</mat-icon>
+              <span>Filtrar</span>
+            </span>
+          }
         </button>
+
       </div>
     </div>
-  </div>
+  </form>
+
+
 
   <!-- Loading State -->
   @if (petsService.loading()) {

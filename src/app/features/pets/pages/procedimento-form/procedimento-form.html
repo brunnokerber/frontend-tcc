@@ -70,7 +70,11 @@
           <div class="col-12 col-md-6">
             <mat-form-field appearance="outline" class="w-100">
               <mat-label>Tipo de Operação / Procedimento *</mat-label>
-              <mat-select formControlName="tipo_operacao">
+              <mat-select
+                id="tipo_operacao"
+                formControlName="tipo_operacao"
+                aria-label="Tipo de Operação ou Procedimento"
+              >
                 @for (tipo of tipoOperacaoOptions; track tipo) {
                   <mat-option [value]="tipo">{{ tipo }}</mat-option>
                 }
@@ -87,9 +91,12 @@
             <mat-form-field appearance="outline" class="w-100">
               <mat-label>Data de Realização *</mat-label>
               <input
+                id="data_realizacao"
                 matInput
                 appDateMask
                 maxlength="10"
+                [max]="today"
+                [min]="pet()?.data_nascimento"
                 [matDatepicker]="pickerRealizacao"
                 formControlName="data_realizacao"
                 placeholder="dd/mm/aaaa"
@@ -98,7 +105,10 @@
               <mat-datepicker #pickerRealizacao></mat-datepicker>
               <mat-hint>Data em que o procedimento foi realizado</mat-hint>
               @if (procedimentoForm.controls.data_realizacao.touched && procedimentoForm.controls.data_realizacao.errors) {
-                <mat-error>{{ procedimentoForm.controls.data_realizacao | formError }}</mat-error>
+                <mat-error>{{
+                  procedimentoForm.controls.data_realizacao
+                    | formError: { matDatepickerMin: 'A data do procedimento não pode ser anterior ao nascimento do pet' }
+                }}</mat-error>
               }
             </mat-form-field>
           </div>
@@ -108,6 +118,7 @@
             <mat-form-field appearance="outline" class="w-100">
               <mat-label>Descrição da Operação, Exame ou Medicamento *</mat-label>
               <input
+                id="operacao_medicamento"
                 matInput
                 formControlName="operacao_medicamento"
                 placeholder="Ex: Hemograma completo, Castração eletiva, Antibiótico Amoxicilina 250mg, Limpeza de tártaro..."
@@ -128,6 +139,7 @@
             <mat-form-field appearance="outline" class="w-100">
               <mat-label>Custo do Procedimento (R$)</mat-label>
               <input
+                id="custo_procedimento"
                 matInput
                 type="number"
                 step="0.01"
@@ -148,7 +160,11 @@
             <div class="d-flex align-items-start gap-2">
               <mat-form-field appearance="outline" class="flex-grow-1">
                 <mat-label>Veterinário(a) Responsável</mat-label>
-                <mat-select formControlName="id_veterinario">
+                <mat-select
+                  id="id_veterinario"
+                  formControlName="id_veterinario"
+                  aria-label="Veterinário(a) Responsável"
+                >
                   <mat-option [value]="null">-- Nenhum selecionado --</mat-option>
                   @for (vet of veterinarios(); track vet.id) {
                     <mat-option [value]="vet.id">
@@ -157,6 +173,12 @@
                   }
                 </mat-select>
                 <mat-icon matPrefix class="me-2">medical_services</mat-icon>
+                @if (
+                  procedimentoForm.controls.id_veterinario.touched &&
+                  procedimentoForm.controls.id_veterinario.errors
+                ) {
+                  <mat-error>{{ procedimentoForm.controls.id_veterinario | formError }}</mat-error>
+                }
               </mat-form-field>
 
               <button
@@ -166,12 +188,14 @@
                 class="btn-new-vet"
                 (click)="openNewVeterinarioDialog()"
                 matTooltip="Cadastrar novo veterinário sem sair da tela"
+                aria-label="Cadastrar novo veterinário"
               >
                 <mat-icon>person_add</mat-icon>
                 <span class="d-none d-sm-inline">Novo</span>
               </button>
             </div>
           </div>
+
         </div>
       </div>
 

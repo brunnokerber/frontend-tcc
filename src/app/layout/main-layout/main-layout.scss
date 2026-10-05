@@ -1,19 +1,43 @@
 .layout-sidenav-container {
-  min-height: 100vh;
+  height: 100vh;
+  height: 100dvh;
+  width: 100%;
   background-color: var(--mat-sys-surface);
   color: var(--mat-sys-on-surface);
 }
 
+.layout-sidenav-content {
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
 .user-sidenav {
+  height: 100vh;
+  height: 100dvh;
+  max-height: 100dvh;
   width: 420px;
   max-width: 92vw;
   background-color: var(--mat-sys-surface-container-lowest);
   border-left: 1px solid var(--mat-sys-outline-variant);
   color: var(--mat-sys-on-surface);
+  overflow: hidden;
 }
 
 .user-sidenav-inner {
+  height: 100%;
+  max-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.user-sidenav-body {
   overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: thin;
 }
 
 .user-drawer-card {

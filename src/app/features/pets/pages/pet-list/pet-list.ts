@@ -80,6 +80,8 @@ export default class PetListComponent implements OnInit {
     () => this.petsService.pets().filter((p) => p.status === 'Óbito').length,
   );
 
+  private lastAppliedFilterJson: string | null = null;
+
   ngOnInit() {
     const qp = this.route.snapshot.queryParams;
     if (qp['search']) this.search.set(qp['search']);
@@ -89,10 +91,15 @@ export default class PetListComponent implements OnInit {
     if (qp['senioridade']) this.senioridadeFilter.set(qp['senioridade']);
     if (qp['porte']) this.porteFilter.set(qp['porte']);
 
-    this.applyFilters();
+    this.applyFilters(true);
   }
 
-  applyFilters() {
+  applyFilters(force = false) {
+    // Evita flood se uma requisição já estiver em andamento
+    if (this.petsService.loading()) {
+      return;
+    }
+
     const filterParams = {
       search: this.search() || undefined,
       tipo_pet: this.tipoFilter() || undefined,
@@ -101,6 +108,15 @@ export default class PetListComponent implements OnInit {
       senioridade: this.senioridadeFilter() || undefined,
       porte: this.porteFilter() || undefined,
     };
+
+    const currentFilterJson = JSON.stringify(filterParams);
+
+    // Economia de cotas: Não refaz a consulta se os filtros forem idênticos ao já carregado
+    if (!force && this.lastAppliedFilterJson === currentFilterJson) {
+      return;
+    }
+
+    this.lastAppliedFilterJson = currentFilterJson;
 
     this.router.navigate([], {
       relativeTo: this.route,
@@ -112,14 +128,17 @@ export default class PetListComponent implements OnInit {
   }
 
   clearFilters() {
+    if (this.petsService.loading()) return;
+
     this.search.set('');
     this.tipoFilter.set('');
     this.sexoFilter.set('');
     this.statusFilter.set('');
     this.porteFilter.set('');
     this.senioridadeFilter.set('');
-    this.applyFilters();
+    this.applyFilters(true);
   }
+
 
   readonly getStatusBadgeClass = getStatusBadgeClass;
   readonly getTipoBadgeClass = getTipoBadgeClass;

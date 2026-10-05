@@ -88,40 +88,114 @@
     </div>
   </div>
 
-  <!-- Painel de Filtros e Busca -->
-  <div class="filter-panel p-3 rounded-3 shadow-xs mb-4">
-    <div class="row g-2 align-items-center">
-      <!-- Busca por Texto -->
-      <div class="col-12 col-md-8">
-        <mat-form-field appearance="outline" class="w-100 search-field" subscriptSizing="dynamic">
-          <mat-icon matPrefix class="me-2 text-surface-muted">search</mat-icon>
-          <input
-            matInput
-            [(ngModel)]="searchTerm"
-            placeholder="Pesquisar por e-mail, perfil ou ID do usuário..."
-          />
-          @if (searchTerm()) {
-            <button mat-icon-button matSuffix (click)="searchTerm.set('')" type="button">
-              <mat-icon>clear</mat-icon>
-            </button>
+  <!-- Painel de Busca com Formulário Explícito de Submit -->
+  <form (ngSubmit)="applyFilters()" class="filter-panel p-3 p-md-4 rounded-3 shadow-xs mb-4">
+    <div class="row g-3 align-items-end">
+      <!-- Seleção da Coluna -->
+      <div class="col-12 col-md-4 col-lg-3">
+        <label for="usuario-filter-field" class="form-label small fw-semibold text-surface-muted mb-1">
+          Filtrar por Coluna
+        </label>
+        <select
+          id="usuario-filter-field"
+          class="form-select bg-surface-card text-surface-main border-surface"
+          [ngModel]="searchField()"
+          (ngModelChange)="onSearchFieldChange($event)"
+          name="searchField"
+        >
+          @for (field of searchFields; track field.value) {
+            <option [value]="field.value">{{ field.label }}</option>
           }
-        </mat-form-field>
+        </select>
       </div>
 
-      <!-- Filtro de Status -->
-      <div class="col-12 col-md-4">
-        <mat-form-field appearance="outline" class="w-100" subscriptSizing="dynamic">
-          <mat-label>Status da Conta</mat-label>
-          <mat-select [(ngModel)]="statusFilter">
-            <mat-option value="todos">Todos os Usuários</mat-option>
-            <mat-option value="ativos">Apenas Contas Ativas</mat-option>
-            <mat-option value="desativados">Apenas Contas Desativadas</mat-option>
-          </mat-select>
-          <mat-icon matPrefix class="me-2">filter_list</mat-icon>
-        </mat-form-field>
+      <!-- Termo de Busca / Campo de Valor -->
+      <div class="col-12 col-md-5 col-lg-6">
+        <label for="usuario-filter-value" class="form-label small fw-semibold text-surface-muted mb-1">
+          Termo de Busca / Valor
+        </label>
+
+        @if (searchField() === 'role') {
+          <select
+            id="usuario-filter-value"
+            class="form-select bg-surface-card text-surface-main border-surface"
+            [ngModel]="searchValue()"
+            (ngModelChange)="searchValue.set($event)"
+            name="roleFilter"
+          >
+            <option value="">-- Todos os Perfis --</option>
+            <option value="admin">Administrador</option>
+            <option value="user">Operador</option>
+          </select>
+        } @else if (searchField() === 'status') {
+          <select
+            id="usuario-filter-value"
+            class="form-select bg-surface-card text-surface-main border-surface"
+            [ngModel]="searchValue()"
+            (ngModelChange)="searchValue.set($event)"
+            name="statusFilter"
+          >
+            <option value="">-- Todos os Status --</option>
+            <option value="ativo">Apenas Contas Ativas</option>
+            <option value="desativado">Apenas Contas Desativadas</option>
+          </select>
+        } @else {
+          <div class="input-group">
+            <span class="input-group-text bg-surface-subtle border-end-0 border-surface">
+              <i class="bi bi-search"></i>
+            </span>
+            <input
+              id="usuario-filter-value"
+              type="text"
+              class="form-control border-start-0 border-surface bg-surface-card text-surface-main"
+              [placeholder]="getSearchPlaceholder()"
+              [ngModel]="searchValue()"
+              (ngModelChange)="searchValue.set($event)"
+              name="searchValue"
+            />
+            @if (searchValue()) {
+              <button
+                class="btn btn-outline-secondary border-start-0 border-surface"
+                type="button"
+                (click)="searchValue.set('')"
+                matTooltip="Limpar texto digitado"
+              >
+                <mat-icon style="font-size: 18px; width: 18px; height: 18px">clear</mat-icon>
+              </button>
+            }
+          </div>
+        }
+      </div>
+
+
+      <!-- Botões de Ação de Filtro -->
+      <div class="col-12 col-md-3 col-lg-3 d-flex justify-content-end gap-2">
+        <button
+          mat-stroked-button
+          type="button"
+          (click)="clearFilters()"
+          class="btn-clear flex-grow-1 flex-md-grow-0"
+          [disabled]="!searchValue() && !appliedSearchValue()"
+        >
+          <mat-icon>filter_alt_off</mat-icon>
+          <span>Limpar</span>
+        </button>
+        <button
+          mat-flat-button
+          color="primary"
+          type="submit"
+          [disabled]="usuariosService.loading()"
+          class="flex-grow-1 flex-md-grow-0 px-3"
+        >
+          <mat-icon>filter_list</mat-icon>
+          <span>Filtrar</span>
+        </button>
+
       </div>
     </div>
-  </div>
+  </form>
+
+
 
   <!-- Estado de Carregamento -->
   @if (usuariosService.loading()) {

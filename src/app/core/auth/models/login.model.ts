@@ -30,3 +30,17 @@ export interface LoginResponse {
     user_metadata?: { [key: string]: any; role?: AppRole };
   };
 }
+
+export interface UserSearchFieldOption {
+  value: string;
+  label: string;
+  placeholder: string;
+}
+
+export const USER_SEARCH_FIELDS_OPTIONS: UserSearchFieldOption[] = [
+  { value: 'email', label: 'E-mail do Usuário', placeholder: 'Ex: usuario@ong.com.br...' },
+  { value: 'role', label: 'Perfil de Acesso (Role)', placeholder: 'Administrador ou Operador...' },
+  { value: 'status', label: 'Status da Conta', placeholder: 'Ativo ou Desativado...' },
+  { value: 'id', label: 'ID do Usuário', placeholder: 'Ex: a1b2c3...' },
+];
+

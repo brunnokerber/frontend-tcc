@@ -63,12 +63,14 @@
       <mat-form-field appearance="outline" class="w-100">
         <mat-label>E-mail do Colaborador *</mat-label>
         <input
+          id="email_convite"
           matInput
           type="email"
           formControlName="email"
           placeholder="exemplo@ong.org.br"
           maxlength="100"
           autocomplete="off"
+          aria-label="E-mail do Colaborador"
         />
         <mat-icon matPrefix class="me-2">mail</mat-icon>
         <mat-hint>Endereço eletrônico para onde o convite será enviado</mat-hint>
@@ -80,11 +82,16 @@
 
     <!-- Campo: Perfil de Acesso (Role) -->
     <div class="mb-4">
-      <label class="form-label fw-semibold small mb-2 text-surface-main">
+      <label id="role-group-label" class="form-label fw-semibold small mb-2 text-surface-main">
         Perfil de Acesso (Permissões) *
       </label>
 
-      <mat-radio-group formControlName="role" class="d-flex flex-column gap-2">
+      <mat-radio-group
+        aria-labelledby="role-group-label"
+        formControlName="role"
+        class="d-flex flex-column gap-2"
+      >
+
         @for (opt of roleOptions; track opt.value) {
           <div
             class="role-card p-3 rounded-3 border transition-all cursor-pointer"

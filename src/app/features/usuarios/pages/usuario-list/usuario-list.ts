@@ -11,9 +11,14 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSelectModule } from '@angular/material/select';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { UsuarioDialogComponent } from '@core/auth/components/usuario-dialog/usuario-dialog';
-import { AppRole, UserProfile } from '@core/auth/models/login.model';
+import {
+  AppRole,
+  UserProfile,
+  USER_SEARCH_FIELDS_OPTIONS,
+  UserSearchFieldOption,
+} from '@core/auth/models/login.model';
 import { AuthService } from '@core/auth/services/auth.service';
 import { ToastService } from '@core/services/toast.service';
 import { ConfirmationDialogComponent } from '@shared/components/confirmation-dialog/confirmation-dialog';
@@ -42,11 +47,18 @@ import { UsuariosService } from '../../services/usuarios.service';
 export default class UsuarioListComponent implements OnInit {
   public usuariosService = inject(UsuariosService);
   public authService = inject(AuthService);
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
   private dialog = inject(MatDialog);
   private toast = inject(ToastService);
 
-  public searchTerm = signal<string>('');
-  public statusFilter = signal<'todos' | 'ativos' | 'desativados'>('todos');
+  public searchField = signal<string>('email');
+  public searchValue = signal<string>('');
+  public searchFields: UserSearchFieldOption[] = USER_SEARCH_FIELDS_OPTIONS;
+
+  // Estado efetivamente aplicado após submissão explícita
+  public appliedSearchField = signal<string>('email');
+  public appliedSearchValue = signal<string>('');
 
   public currentUserId = computed(() => this.authService.getUserId());
 
@@ -56,32 +68,100 @@ export default class UsuarioListComponent implements OnInit {
   public totalAdmins = computed(() => this.usuariosService.usuarios().filter((u) => u.role === 'admin' && u.ativo !== false).length);
   public totalOperadores = computed(() => this.usuariosService.usuarios().filter((u) => u.role === 'user' && u.ativo !== false).length);
 
-  // Lista Filtrada
+  // Lista Filtrada com base apenas nos filtros APLICADOS via Submit
   public filteredUsuarios = computed(() => {
     const list = this.usuariosService.usuarios();
-    const query = this.searchTerm().toLowerCase().trim();
-    const status = this.statusFilter();
+    const field = this.appliedSearchField();
+    const val = this.appliedSearchValue().toLowerCase().trim();
+
+    if (!val) {
+      return list;
+    }
 
     return list.filter((u) => {
-      // Filtro de Status
-      if (status === 'ativos' && u.ativo === false) return false;
-      if (status === 'desativados' && u.ativo !== false) return false;
-
-      // Filtro de Busca
-      if (query) {
-        const emailMatch = (u.email || '').toLowerCase().includes(query);
-        const roleMatch = u.role.toLowerCase().includes(query);
-        const idMatch = u.id.toLowerCase().includes(query);
-        return emailMatch || roleMatch || idMatch;
+      if (field === 'email') {
+        return (u.email || '').toLowerCase().includes(val);
       }
-
+      if (field === 'role') {
+        const isAdminQuery = val.includes('adm') || val.includes('admin');
+        const isUserQuery = val.includes('oper') || val.includes('user');
+        if (isAdminQuery) return u.role === 'admin';
+        if (isUserQuery) return u.role === 'user';
+        return u.role.toLowerCase().includes(val);
+      }
+      if (field === 'status') {
+        const isAtivoQuery = val.startsWith('at') || val === 'ativo' || val === 'ativa';
+        const isInativoQuery =
+          val.startsWith('in') ||
+          val.startsWith('des') ||
+          val === 'inativo' ||
+          val === 'desativado' ||
+          val === 'desativada';
+        if (isAtivoQuery) return u.ativo !== false;
+        if (isInativoQuery) return u.ativo === false;
+        return true;
+      }
+      if (field === 'id') {
+        return u.id.toLowerCase().includes(val);
+      }
       return true;
     });
   });
 
   async ngOnInit(): Promise<void> {
+    const qp = this.route.snapshot.queryParams;
+    if (qp['field']) {
+      this.searchField.set(qp['field']);
+      this.appliedSearchField.set(qp['field']);
+    }
+    if (qp['value']) {
+      this.searchValue.set(qp['value']);
+      this.appliedSearchValue.set(qp['value']);
+    }
     await this.usuariosService.fetchUsuarios();
   }
+
+  onSearchFieldChange(newField: string): void {
+    this.searchField.set(newField);
+    this.searchValue.set('');
+  }
+
+  getSearchPlaceholder(): string {
+    const found = this.searchFields.find((f) => f.value === this.searchField());
+    return found?.placeholder || 'Digite o termo de busca...';
+  }
+
+  applyFilters(): void {
+    const field = this.searchField();
+    const val = this.searchValue().trim();
+
+    this.appliedSearchField.set(field);
+    this.appliedSearchValue.set(val);
+
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: {
+        field: val ? field : undefined,
+        value: val || undefined,
+      },
+      replaceUrl: true,
+    });
+  }
+
+  clearFilters(): void {
+    this.searchValue.set('');
+    this.searchField.set('email');
+    this.appliedSearchValue.set('');
+    this.appliedSearchField.set('email');
+
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: {},
+      replaceUrl: true,
+    });
+  }
+
+
 
   openInviteUserDialog(): void {
     const dialogRef = this.dialog.open(UsuarioDialogComponent, {

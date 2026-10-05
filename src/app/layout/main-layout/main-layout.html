@@ -9,8 +9,8 @@
     (openedChange)="userSidenavOpen.set($event)"
   >
     <div class="user-sidenav-inner d-flex flex-column h-100 p-3">
-      <!-- Topo do Sidenav -->
-      <div class="d-flex align-items-center justify-content-between pb-2 mb-3 border-bottom">
+      <!-- Topo Fixo do Sidenav -->
+      <div class="user-sidenav-header flex-shrink-0 d-flex align-items-center justify-content-between pb-2 mb-3 border-bottom">
         <div class="d-flex align-items-center gap-2">
           <mat-icon class="text-primary">manage_accounts</mat-icon>
           <span class="fw-bold fs-6">Painel do Usuário</span>
@@ -25,151 +25,154 @@
         </button>
       </div>
 
-      <!-- Card do Perfil Logado -->
-      <div class="user-drawer-card p-3 rounded-3 mb-3 d-flex align-items-center gap-3">
-        <div
-          class="user-avatar-large rounded-circle d-flex align-items-center justify-content-center text-white"
-        >
-          <mat-icon>person</mat-icon>
+      <!-- Corpo Rolável Internamente do Sidenav (Evita scroll desnecessário na tela inteira) -->
+      <div class="user-sidenav-body flex-grow-1 overflow-y-auto pe-1 mb-2">
+        <!-- Card do Perfil Logado -->
+        <div class="user-drawer-card p-3 rounded-3 mb-3 d-flex align-items-center gap-3">
+          <div
+            class="user-avatar-large rounded-circle d-flex align-items-center justify-content-center text-white"
+          >
+            <mat-icon>person</mat-icon>
+          </div>
+          <div class="d-flex flex-column overflow-hidden">
+            <span class="fw-bold text-truncate user-email-label" [title]="user?.email">{{
+              user?.email || 'Usuário'
+            }}</span>
+            <div class="d-flex align-items-center gap-2 mt-1">
+              <span
+                class="badge small"
+                [class.bg-primary]="user?.role === 'admin'"
+                [class.bg-secondary]="user?.role !== 'admin'"
+              >
+                {{ user?.role === 'admin' ? 'Administrador' : 'Operador' }}
+              </span>
+            </div>
+          </div>
         </div>
-        <div class="d-flex flex-column overflow-hidden">
-          <span class="fw-bold text-truncate user-email-label" [title]="user?.email">{{
-            user?.email || 'Usuário'
-          }}</span>
-          <div class="d-flex align-items-center gap-2 mt-1">
-            <span
-              class="badge small"
-              [class.bg-primary]="user?.role === 'admin'"
-              [class.bg-secondary]="user?.role !== 'admin'"
-            >
-              {{ user?.role === 'admin' ? 'Administrador' : 'Operador' }}
+
+        <!-- Seção: Aparência e Tema (Claro / Escuro / Navegador) -->
+        <div class="theme-card p-3 rounded-3 mb-3 border">
+          <div class="d-flex align-items-center justify-content-between mb-1">
+            <div class="d-flex align-items-center gap-2">
+              <mat-icon class="text-primary fs-5">palette</mat-icon>
+              <span class="fw-semibold small">Tema e Aparência</span>
+            </div>
+            <span class="badge bg-surface-subtle text-surface-muted border border-surface small">
+              {{ themeMode() === 'system' ? 'Automático' : themeMode() === 'dark' ? 'Escuro' : 'Claro' }}
             </span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Seção: Aparência e Tema (Claro / Escuro / Navegador) -->
-      <div class="theme-card p-3 rounded-3 mb-3 border">
-        <div class="d-flex align-items-center justify-content-between mb-1">
-          <div class="d-flex align-items-center gap-2">
-            <mat-icon class="text-primary fs-5">palette</mat-icon>
-            <span class="fw-semibold small">Tema e Aparência</span>
-          </div>
-          <span class="badge bg-surface-subtle text-surface-muted border border-surface small">
-            {{ themeMode() === 'system' ? 'Automático' : themeMode() === 'dark' ? 'Escuro' : 'Claro' }}
-          </span>
-        </div>
-        <p class="text-surface-muted small mb-2" style="font-size: 0.8rem">
-          Alterne entre o modo claro, escuro ou sincronizado com o navegador.
-        </p>
-
-        <!-- Seletor de Tema Segmentado -->
-        <div class="theme-switch-group d-flex gap-1 p-1 rounded-3">
-          <button
-            type="button"
-            class="theme-switch-btn flex-fill d-inline-flex align-items-center justify-content-center gap-1 py-2 px-1 rounded-2 border-0"
-            [class.active]="themeMode() === 'light'"
-            (click)="setTheme('light')"
-            matTooltip="Ativar modo claro"
-          >
-            <mat-icon>light_mode</mat-icon>
-            <span class="small fw-medium">Claro</span>
-          </button>
-
-          <button
-            type="button"
-            class="theme-switch-btn flex-fill d-inline-flex align-items-center justify-content-center gap-1 py-2 px-1 rounded-2 border-0"
-            [class.active]="themeMode() === 'dark'"
-            (click)="setTheme('dark')"
-            matTooltip="Ativar modo escuro"
-          >
-            <mat-icon>dark_mode</mat-icon>
-            <span class="small fw-medium">Escuro</span>
-          </button>
-
-          <button
-            type="button"
-            class="theme-switch-btn flex-fill d-inline-flex align-items-center justify-content-center gap-1 py-2 px-1 rounded-2 border-0"
-            [class.active]="themeMode() === 'system'"
-            (click)="setTheme('system')"
-            matTooltip="Sincronizar com o sistema / navegador"
-          >
-            <mat-icon>settings_brightness</mat-icon>
-            <span class="small fw-medium">Auto</span>
-          </button>
-        </div>
-      </div>
-
-      <!-- Seção: Gerenciamento (Apenas Administradores) -->
-      @if (isAdmin()) {
-        <div class="admin-card p-3 rounded-3 mb-3 border">
-          <div class="d-flex align-items-center gap-2 mb-1">
-            <mat-icon class="text-warning fs-5">admin_panel_settings</mat-icon>
-            <span class="fw-semibold small">Administração</span>
           </div>
           <p class="text-surface-muted small mb-2" style="font-size: 0.8rem">
-            Gerencie o acesso de colaboradores e envie novos convites.
+            Alterne entre o modo claro, escuro ou sincronizado com o navegador.
           </p>
-          <div class="d-flex flex-column flex-sm-row gap-2">
-            <a
-              mat-stroked-button
-              routerLink="/usuarios"
-              (click)="closeUserSidenav()"
-              class="flex-fill py-1 d-flex align-items-center justify-content-center gap-1 rounded-3 text-decoration-none"
+
+          <!-- Seletor de Tema Segmentado -->
+          <div class="theme-switch-group d-flex gap-1 p-1 rounded-3">
+            <button
+              type="button"
+              class="theme-switch-btn flex-fill d-inline-flex align-items-center justify-content-center gap-1 py-2 px-1 rounded-2 border-0"
+              [class.active]="themeMode() === 'light'"
+              (click)="setTheme('light')"
+              matTooltip="Ativar modo claro"
             >
-              <mat-icon>people</mat-icon>
-              <span>Gerenciar</span>
-            </a>
+              <mat-icon>light_mode</mat-icon>
+              <span class="small fw-medium">Claro</span>
+            </button>
 
             <button
-              mat-flat-button
-              color="primary"
-              class="flex-fill py-1 d-flex align-items-center justify-content-center gap-1 rounded-3"
-              (click)="openInviteUserDialog()"
               type="button"
+              class="theme-switch-btn flex-fill d-inline-flex align-items-center justify-content-center gap-1 py-2 px-1 rounded-2 border-0"
+              [class.active]="themeMode() === 'dark'"
+              (click)="setTheme('dark')"
+              matTooltip="Ativar modo escuro"
             >
-              <mat-icon>person_add</mat-icon>
-              <span>Convidar</span>
+              <mat-icon>dark_mode</mat-icon>
+              <span class="small fw-medium">Escuro</span>
+            </button>
+
+            <button
+              type="button"
+              class="theme-switch-btn flex-fill d-inline-flex align-items-center justify-content-center gap-1 py-2 px-1 rounded-2 border-0"
+              [class.active]="themeMode() === 'system'"
+              (click)="setTheme('system')"
+              matTooltip="Sincronizar com o sistema / navegador"
+            >
+              <mat-icon>settings_brightness</mat-icon>
+              <span class="small fw-medium">Auto</span>
             </button>
           </div>
         </div>
-      }
 
-      <!-- Seção: Conta e Segurança (Opções Avançadas) -->
-      <div class="account-card p-3 rounded-3 mb-3 border">
-        <div class="d-flex align-items-center gap-2 mb-2">
-          <mat-icon class="text-surface-muted fs-5">security</mat-icon>
-          <span class="fw-semibold small">Conta e Segurança</span>
-        </div>
-
-        <details class="account-advanced-details">
-          <summary class="text-surface-muted small cursor-pointer user-select-none d-flex align-items-center justify-content-between p-2 rounded-2 bg-surface-subtle">
-            <span class="d-inline-flex align-items-center gap-1">
-              <mat-icon style="font-size: 16px; width: 16px; height: 16px">tune</mat-icon>
-              <span>Opções avançadas</span>
-            </span>
-            <mat-icon class="expand-icon" style="font-size: 16px; width: 16px; height: 16px">expand_more</mat-icon>
-          </summary>
-          <div class="pt-2">
-            <p class="text-surface-muted small mb-2" style="font-size: 0.75rem">
-              Você pode desativar seu acesso à plataforma mantendo seus dados históricos.
+        <!-- Seção: Gerenciamento (Apenas Administradores) -->
+        @if (isAdmin()) {
+          <div class="admin-card p-3 rounded-3 mb-3 border">
+            <div class="d-flex align-items-center gap-2 mb-1">
+              <mat-icon class="text-warning fs-5">admin_panel_settings</mat-icon>
+              <span class="fw-semibold small">Administração</span>
+            </div>
+            <p class="text-surface-muted small mb-2" style="font-size: 0.8rem">
+              Gerencie o acesso de colaboradores e envie novos convites.
             </p>
-            <button
-              type="button"
-              mat-stroked-button
-              color="warn"
-              class="w-100 btn-sm"
-              (click)="confirmDeactivateOwnAccount()"
-            >
-              <mat-icon>person_off</mat-icon>
-              <span>Desativar Minha Conta</span>
-            </button>
+            <div class="d-flex flex-column flex-sm-row gap-2">
+              <a
+                mat-stroked-button
+                routerLink="/usuarios"
+                (click)="closeUserSidenav()"
+                class="flex-fill py-1 d-flex align-items-center justify-content-center gap-1 rounded-3 text-decoration-none"
+              >
+                <mat-icon>people</mat-icon>
+                <span>Gerenciar</span>
+              </a>
+
+              <button
+                mat-flat-button
+                color="primary"
+                class="flex-fill py-1 d-flex align-items-center justify-content-center gap-1 rounded-3"
+                (click)="openInviteUserDialog()"
+                type="button"
+              >
+                <mat-icon>person_add</mat-icon>
+                <span>Convidar</span>
+              </button>
+            </div>
           </div>
-        </details>
+        }
+
+        <!-- Seção: Conta e Segurança (Opções Avançadas) -->
+        <div class="account-card p-3 rounded-3 border">
+          <div class="d-flex align-items-center gap-2 mb-2">
+            <mat-icon class="text-surface-muted fs-5">security</mat-icon>
+            <span class="fw-semibold small">Conta e Segurança</span>
+          </div>
+
+          <details class="account-advanced-details">
+            <summary class="text-surface-muted small cursor-pointer user-select-none d-flex align-items-center justify-content-between p-2 rounded-2 bg-surface-subtle">
+              <span class="d-inline-flex align-items-center gap-1">
+                <mat-icon style="font-size: 16px; width: 16px; height: 16px">tune</mat-icon>
+                <span>Opções avançadas</span>
+              </span>
+              <mat-icon class="expand-icon" style="font-size: 16px; width: 16px; height: 16px">expand_more</mat-icon>
+            </summary>
+            <div class="pt-2">
+              <p class="text-surface-muted small mb-2" style="font-size: 0.75rem">
+                Você pode desativar seu acesso à plataforma mantendo seus dados históricos.
+              </p>
+              <button
+                type="button"
+                mat-stroked-button
+                color="warn"
+                class="w-100 btn-sm"
+                (click)="confirmDeactivateOwnAccount()"
+              >
+                <mat-icon>person_off</mat-icon>
+                <span>Desativar Minha Conta</span>
+              </button>
+            </div>
+          </details>
+        </div>
       </div>
 
-      <!-- Rodapé do Drawer: Logout -->
-      <div class="mt-auto pt-2 border-top">
+      <!-- Rodapé Fixo do Drawer: Logout Sempre Visível sem Necessidade de Rolagem -->
+      <div class="user-sidenav-footer flex-shrink-0 mt-auto pt-2 border-top">
         <button
           mat-stroked-button
           color="warn"

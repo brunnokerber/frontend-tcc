@@ -93,17 +93,19 @@
   </div>
 
   <!-- PAINEL DE FILTRO E BUSCA -->
-  <div class="filter-panel p-3 p-md-4 rounded-3 shadow-xs mb-4">
+  <form (ngSubmit)="applyFilters()" class="filter-panel p-3 p-md-4 rounded-3 shadow-xs mb-4">
     <div class="row g-3 align-items-end">
       <!-- Campo a Filtrar -->
       <div class="col-12 col-md-4 col-lg-3">
-        <label class="form-label small fw-semibold text-surface-muted mb-1">
+        <label for="local-filter-field" class="form-label small fw-semibold text-surface-muted mb-1">
           Filtrar por Coluna
         </label>
         <select
+          id="local-filter-field"
           class="form-select bg-surface-card text-surface-main border-surface"
           [ngModel]="searchField()"
           (ngModelChange)="onSearchFieldChange($event)"
+          name="searchField"
         >
           @for (field of searchFields; track field.value) {
             <option [value]="field.value">{{ field.label }}</option>
@@ -113,16 +115,17 @@
 
       <!-- Termo ou Seleção de Valor -->
       <div class="col-12 col-md-5 col-lg-6">
-        <label class="form-label small fw-semibold text-surface-muted mb-1">
+        <label for="local-filter-value" class="form-label small fw-semibold text-surface-muted mb-1">
           Termo de Busca / Valor
         </label>
 
         @if (searchField() === 'tipo_local') {
           <select
+            id="local-filter-value"
             class="form-select bg-surface-card text-surface-main border-surface"
             [ngModel]="searchValue()"
             (ngModelChange)="searchValue.set($event)"
-            (keyup.enter)="applyFilters()"
+            name="tipoLocalSelect"
           >
             <option value="">Selecione o tipo de local...</option>
             @for (tipo of tipoLocalOptions; track tipo.value) {
@@ -135,12 +138,13 @@
               <i class="bi bi-search"></i>
             </span>
             <input
+              id="local-filter-value"
               type="text"
               class="form-control border-start-0 border-surface bg-surface-card text-surface-main"
               [placeholder]="getSearchPlaceholder()"
               [ngModel]="searchValue()"
               (ngModelChange)="searchValue.set($event)"
-              (keyup.enter)="applyFilters()"
+              name="searchValue"
             />
             @if (searchValue()) {
               <button
@@ -156,6 +160,7 @@
         }
       </div>
 
+
       <!-- Botões de Ação de Filtro -->
       <div class="col-12 col-md-3 col-lg-3 d-flex justify-content-end gap-2">
         <button
@@ -163,7 +168,7 @@
           type="button"
           (click)="clearFilters()"
           class="btn-clear flex-grow-1 flex-md-grow-0"
-          [disabled]="!searchValue()"
+          [disabled]="locaisService.loading() || !searchValue()"
         >
           <mat-icon>filter_alt_off</mat-icon>
           <span>Limpar</span>
@@ -171,16 +176,25 @@
         <button
           mat-flat-button
           color="primary"
-          type="button"
-          (click)="applyFilters()"
+          type="submit"
+          [disabled]="locaisService.loading()"
           class="flex-grow-1 flex-md-grow-0 px-3"
         >
-          <mat-icon>filter_list</mat-icon>
-          <span>Filtrar</span>
+          @if (locaisService.loading()) {
+            <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+            <span>Filtrando...</span>
+          } @else {
+            <span class="d-inline-flex align-items-center gap-1">
+              <mat-icon>filter_list</mat-icon>
+              <span>Filtrar</span>
+            </span>
+          }
         </button>
+
       </div>
     </div>
-  </div>
+  </form>
+
 
   <!-- FEEDBACK DE CARREGAMENTO -->
   @if (locaisService.loading()) {

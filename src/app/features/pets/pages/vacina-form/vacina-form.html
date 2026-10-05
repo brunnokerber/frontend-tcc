@@ -79,6 +79,7 @@
             <mat-form-field appearance="outline" class="w-100">
               <mat-label>Nome da Vacina / Antígeno *</mat-label>
               <input
+                id="nome_vacina"
                 matInput
                 formControlName="nome_vacina"
                 [matAutocomplete]="autoVacina"
@@ -104,9 +105,11 @@
             <mat-form-field appearance="outline" class="w-100">
               <mat-label>Data Prevista (Agendamento) *</mat-label>
               <input
+                id="data_prevista"
                 matInput
                 appDateMask
                 maxlength="10"
+                [min]="pet()?.data_nascimento"
                 [matDatepicker]="pickerPrevista"
                 formControlName="data_prevista"
                 placeholder="dd/mm/aaaa"
@@ -118,7 +121,10 @@
                 vacinaForm.controls.data_prevista.touched &&
                 vacinaForm.controls.data_prevista.errors
               ) {
-                <mat-error>{{ vacinaForm.controls.data_prevista | formError }}</mat-error>
+                <mat-error>{{
+                  vacinaForm.controls.data_prevista
+                    | formError: { matDatepickerMin: 'A data prevista não pode ser anterior ao nascimento do pet' }
+                }}</mat-error>
               }
             </mat-form-field>
           </div>
@@ -128,9 +134,12 @@
             <mat-form-field appearance="outline" class="w-100">
               <mat-label>Data de Aplicação Efetiva</mat-label>
               <input
+                id="data_aplicacao"
                 matInput
                 appDateMask
                 maxlength="10"
+                [max]="today"
+                [min]="pet()?.data_nascimento"
                 [matDatepicker]="pickerAplicacao"
                 formControlName="data_aplicacao"
                 placeholder="dd/mm/aaaa"
@@ -142,7 +151,10 @@
                 vacinaForm.controls.data_aplicacao.touched &&
                 vacinaForm.controls.data_aplicacao.errors
               ) {
-                <mat-error>{{ vacinaForm.controls.data_aplicacao | formError }}</mat-error>
+                <mat-error>{{
+                  vacinaForm.controls.data_aplicacao
+                    | formError: { matDatepickerMin: 'A data de aplicação não pode ser anterior ao nascimento do pet' }
+                }}</mat-error>
               }
             </mat-form-field>
           </div>
@@ -152,6 +164,7 @@
             <mat-form-field appearance="outline" class="w-100">
               <mat-label>Custo da Dose (R$)</mat-label>
               <input
+                id="custo_vacina"
                 matInput
                 type="number"
                 step="0.01"
@@ -172,7 +185,7 @@
             <div class="d-flex align-items-start gap-2">
               <mat-form-field appearance="outline" class="flex-grow-1">
                 <mat-label>Veterinário(a) Aplicador</mat-label>
-                <mat-select formControlName="id_veterinario">
+                <mat-select id="id_veterinario" formControlName="id_veterinario" aria-label="Veterinário(a) Aplicador">
                   <mat-option [value]="null">-- Nenhum selecionado --</mat-option>
                   @for (vet of veterinarios(); track vet.id) {
                     <mat-option [value]="vet.id">
@@ -181,6 +194,12 @@
                   }
                 </mat-select>
                 <mat-icon matPrefix class="me-2">medical_services</mat-icon>
+                @if (
+                  vacinaForm.controls.id_veterinario.touched &&
+                  vacinaForm.controls.id_veterinario.errors
+                ) {
+                  <mat-error>{{ vacinaForm.controls.id_veterinario | formError }}</mat-error>
+                }
               </mat-form-field>
 
               <button
@@ -190,12 +209,14 @@
                 class="btn-new-vet"
                 (click)="openNewVeterinarioDialog()"
                 matTooltip="Cadastrar novo veterinário sem sair da tela"
+                aria-label="Cadastrar novo veterinário"
               >
                 <mat-icon>person_add</mat-icon>
                 <span class="d-none d-sm-inline">Novo</span>
               </button>
             </div>
           </div>
+
         </div>
       </div>
 

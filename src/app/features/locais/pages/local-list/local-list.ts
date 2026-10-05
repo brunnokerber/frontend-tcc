@@ -59,6 +59,8 @@ export default class LocalListComponent implements OnInit {
     () => this.locaisService.locais().filter((l) => l.tipo_local === 'Exposição').length
   );
 
+  private lastAppliedFilterJson: string | null = null;
+
   ngOnInit(): void {
     const qp = this.route.snapshot.queryParams;
     if (qp['field']) {
@@ -67,7 +69,7 @@ export default class LocalListComponent implements OnInit {
     if (qp['value']) {
       this.searchValue.set(qp['value']);
     }
-    this.applyFilters();
+    this.applyFilters(true);
   }
 
   onSearchFieldChange(newField: string): void {
@@ -80,7 +82,11 @@ export default class LocalListComponent implements OnInit {
     return found?.placeholder || 'Digite o termo de busca...';
   }
 
-  applyFilters(): void {
+  applyFilters(force = false): void {
+    if (this.locaisService.loading()) {
+      return;
+    }
+
     const val = this.searchValue().trim();
     const field = this.searchField();
 
@@ -88,6 +94,13 @@ export default class LocalListComponent implements OnInit {
       searchField: val ? field : undefined,
       searchValue: val || undefined,
     };
+
+    const currentFilterJson = JSON.stringify(filterParams);
+    if (!force && this.lastAppliedFilterJson === currentFilterJson) {
+      return;
+    }
+
+    this.lastAppliedFilterJson = currentFilterJson;
 
     this.router.navigate([], {
       relativeTo: this.route,
@@ -102,10 +115,12 @@ export default class LocalListComponent implements OnInit {
   }
 
   clearFilters(): void {
+    if (this.locaisService.loading()) return;
     this.searchValue.set('');
     this.searchField.set('local');
-    this.applyFilters();
+    this.applyFilters(true);
   }
+
 
   openLocalDialog(local?: Local): void {
     const dialogRef = this.dialog.open(LocalDialogComponent, {
