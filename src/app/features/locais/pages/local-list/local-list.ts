@@ -7,6 +7,7 @@ import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
+import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSelectModule } from '@angular/material/select';
 import { MatTooltipModule } from '@angular/material/tooltip';
@@ -29,6 +30,7 @@ import { LocaisService } from '../../services/locais.service';
     MatInputModule,
     MatFormFieldModule,
     MatSelectModule,
+    MatPaginatorModule,
     MatProgressSpinnerModule,
     MatTooltipModule,
     MatDialogModule,
@@ -48,6 +50,11 @@ export default class LocalListComponent implements OnInit {
   public searchFields = SEARCH_FIELDS_OPTIONS;
   public tipoLocalOptions = TIPO_LOCAL_OPTIONS;
 
+  // Paginação
+  public pageIndex = signal<number>(0);
+  public pageSize = signal<number>(10);
+  public readonly pageSizeOptions = [10, 25, 50, 100];
+
   public totalLocais = computed(() => this.locaisService.locais().length);
   public totalLares = computed(
     () => this.locaisService.locais().filter((l) => l.tipo_local === 'Lar Temporário').length
@@ -58,6 +65,13 @@ export default class LocalListComponent implements OnInit {
   public totalExposicoes = computed(
     () => this.locaisService.locais().filter((l) => l.tipo_local === 'Exposição').length
   );
+
+  // Lista Paginada
+  public pagedLocais = computed(() => {
+    const list = this.locaisService.locais();
+    const start = this.pageIndex() * this.pageSize();
+    return list.slice(start, start + this.pageSize());
+  });
 
   private lastAppliedFilterJson: string | null = null;
 
@@ -70,6 +84,11 @@ export default class LocalListComponent implements OnInit {
       this.searchValue.set(qp['value']);
     }
     this.applyFilters(true);
+  }
+
+  onPageChange(event: PageEvent): void {
+    this.pageIndex.set(event.pageIndex);
+    this.pageSize.set(event.pageSize);
   }
 
   onSearchFieldChange(newField: string): void {
@@ -101,6 +120,7 @@ export default class LocalListComponent implements OnInit {
     }
 
     this.lastAppliedFilterJson = currentFilterJson;
+    this.pageIndex.set(0);
 
     this.router.navigate([], {
       relativeTo: this.route,
@@ -118,6 +138,7 @@ export default class LocalListComponent implements OnInit {
     if (this.locaisService.loading()) return;
     this.searchValue.set('');
     this.searchField.set('local');
+    this.pageIndex.set(0);
     this.applyFilters(true);
   }
 

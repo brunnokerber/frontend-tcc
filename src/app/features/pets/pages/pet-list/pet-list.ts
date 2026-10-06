@@ -7,6 +7,7 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
+import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSelectModule } from '@angular/material/select';
 import { MatTooltipModule } from '@angular/material/tooltip';
@@ -17,6 +18,8 @@ import {
   getTipoBadgeClass,
   getTipoFaIcon,
   Pet,
+  PET_SEARCH_FIELDS_OPTIONS,
+  PetSearchField,
   PORTE_OPTIONS,
   SENIORIDADE_OPTIONS,
   SEXO_OPTIONS,
@@ -39,6 +42,7 @@ import { PetsService } from '../../services/pets.service';
     MatFormFieldModule,
     MatSelectModule,
     MatChipsModule,
+    MatPaginatorModule,
     MatProgressSpinnerModule,
     MatTooltipModule,
   ],
@@ -50,13 +54,22 @@ export default class PetListComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
 
-  // Filtros em Signals
-  public search = signal<string>('');
+  // Busca Dinâmica por Campo de Identificação / Registro
+  public searchField = signal<PetSearchField>('nome');
+  public searchValue = signal<string>('');
+  public searchFields = PET_SEARCH_FIELDS_OPTIONS;
+
+  // Filtros Categóricos em Signals
   public tipoFilter = signal<string>('');
   public sexoFilter = signal<string>('');
   public statusFilter = signal<string>('');
   public porteFilter = signal<string>('');
   public senioridadeFilter = signal<string>('');
+
+  // Paginação
+  public pageIndex = signal<number>(0);
+  public pageSize = signal<number>(12);
+  public readonly pageSizeOptions = [12, 24, 48, 96];
 
   // Opções para os selects
   public tipoOptions = TIPO_PET_OPTIONS;
@@ -80,11 +93,27 @@ export default class PetListComponent implements OnInit {
     () => this.petsService.pets().filter((p) => p.status === 'Óbito').length,
   );
 
+  // Lista Paginada
+  public pagedPets = computed(() => {
+    const list = this.petsService.pets();
+    const start = this.pageIndex() * this.pageSize();
+    return list.slice(start, start + this.pageSize());
+  });
+
   private lastAppliedFilterJson: string | null = null;
 
   ngOnInit() {
     const qp = this.route.snapshot.queryParams;
-    if (qp['search']) this.search.set(qp['search']);
+    if (qp['field']) {
+      this.searchField.set(qp['field']);
+    }
+    if (qp['value']) {
+      this.searchValue.set(qp['value']);
+    } else if (qp['search']) {
+      this.searchValue.set(qp['search']);
+      this.searchField.set('nome');
+    }
+
     if (qp['tipo_pet']) this.tipoFilter.set(qp['tipo_pet']);
     if (qp['sexo']) this.sexoFilter.set(qp['sexo']);
     if (qp['status']) this.statusFilter.set(qp['status']);
@@ -94,14 +123,33 @@ export default class PetListComponent implements OnInit {
     this.applyFilters(true);
   }
 
+  onSearchFieldChange(newField: PetSearchField): void {
+    this.searchField.set(newField);
+    this.searchValue.set('');
+  }
+
+  getSearchPlaceholder(): string {
+    const found = this.searchFields.find((f) => f.value === this.searchField());
+    return found?.placeholder || 'Digite o termo de busca...';
+  }
+
+  onPageChange(event: PageEvent): void {
+    this.pageIndex.set(event.pageIndex);
+    this.pageSize.set(event.pageSize);
+  }
+
   applyFilters(force = false) {
     // Evita flood se uma requisição já estiver em andamento
     if (this.petsService.loading()) {
       return;
     }
 
+    const val = this.searchValue().trim();
+    const field = this.searchField();
+
     const filterParams = {
-      search: this.search() || undefined,
+      searchField: val ? field : undefined,
+      searchValue: val || undefined,
       tipo_pet: this.tipoFilter() || undefined,
       sexo: this.sexoFilter() || undefined,
       status: this.statusFilter() || undefined,
@@ -117,10 +165,19 @@ export default class PetListComponent implements OnInit {
     }
 
     this.lastAppliedFilterJson = currentFilterJson;
+    this.pageIndex.set(0);
 
     this.router.navigate([], {
       relativeTo: this.route,
-      queryParams: filterParams,
+      queryParams: {
+        field: val ? field : undefined,
+        value: val || undefined,
+        tipo_pet: filterParams.tipo_pet,
+        sexo: filterParams.sexo,
+        status: filterParams.status,
+        senioridade: filterParams.senioridade,
+        porte: filterParams.porte,
+      },
       replaceUrl: true,
     });
 
@@ -130,12 +187,14 @@ export default class PetListComponent implements OnInit {
   clearFilters() {
     if (this.petsService.loading()) return;
 
-    this.search.set('');
+    this.searchValue.set('');
+    this.searchField.set('nome');
     this.tipoFilter.set('');
     this.sexoFilter.set('');
     this.statusFilter.set('');
     this.porteFilter.set('');
     this.senioridadeFilter.set('');
+    this.pageIndex.set(0);
     this.applyFilters(true);
   }
 

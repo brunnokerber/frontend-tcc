@@ -237,7 +237,7 @@
           </tr>
         </thead>
         <tbody>
-          @for (usr of filteredUsuarios(); track usr.id) {
+          @for (usr of pagedUsuarios(); track usr.id) {
             <tr [class.opacity-50]="usr.ativo === false">
               <!-- Colaborador -->
               <td class="ps-4">
@@ -380,7 +380,7 @@
 
     <!-- VISÃO MOBILE & TABLET: CARDS -->
     <div class="row g-3 d-lg-none">
-      @for (usr of filteredUsuarios(); track usr.id) {
+      @for (usr of pagedUsuarios(); track usr.id) {
         <div class="col-12 col-sm-6">
           <div
             class="card user-mobile-card shadow-sm h-100 rounded-3 overflow-hidden"
@@ -458,6 +458,19 @@
           </div>
         </div>
       }
+    </div>
+
+    <!-- Paginação -->
+    <div class="mt-4">
+      <mat-paginator
+        [length]="filteredUsuarios().length"
+        [pageSize]="pageSize()"
+        [pageSizeOptions]="pageSizeOptions"
+        [pageIndex]="pageIndex()"
+        (page)="onPageChange($event)"
+        class="rounded-3 shadow-xs border bg-surface-card"
+        aria-label="Paginação da lista de usuários"
+      ></mat-paginator>
     </div>
   }
 </div>

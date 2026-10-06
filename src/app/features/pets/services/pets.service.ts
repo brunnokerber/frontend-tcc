@@ -38,7 +38,10 @@ export class PetsService {
         .order('id', { ascending: false });
 
       if (filter) {
-        if (filter.search && filter.search.trim()) {
+        if (filter.searchValue && filter.searchValue.trim()) {
+          const field = filter.searchField || 'nome';
+          query = query.ilike(field, `%${filter.searchValue.trim()}%`);
+        } else if (filter.search && filter.search.trim()) {
           query = query.ilike('nome', `%${filter.search.trim()}%`);
         }
         if (filter.tipo_pet) {

@@ -8,6 +8,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatMenuModule } from '@angular/material/menu';
+import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSelectModule } from '@angular/material/select';
 import { MatTooltipModule } from '@angular/material/tooltip';
@@ -37,6 +38,7 @@ import { UsuariosService } from '../../services/usuarios.service';
     MatInputModule,
     MatSelectModule,
     MatMenuModule,
+    MatPaginatorModule,
     MatProgressSpinnerModule,
     MatTooltipModule,
     MatDialogModule,
@@ -59,6 +61,11 @@ export default class UsuarioListComponent implements OnInit {
   // Estado efetivamente aplicado após submissão explícita
   public appliedSearchField = signal<string>('email');
   public appliedSearchValue = signal<string>('');
+
+  // Paginação
+  public pageIndex = signal<number>(0);
+  public pageSize = signal<number>(10);
+  public readonly pageSizeOptions = [10, 25, 50, 100];
 
   public currentUserId = computed(() => this.authService.getUserId());
 
@@ -108,6 +115,13 @@ export default class UsuarioListComponent implements OnInit {
     });
   });
 
+  // Lista Paginada
+  public pagedUsuarios = computed(() => {
+    const list = this.filteredUsuarios();
+    const start = this.pageIndex() * this.pageSize();
+    return list.slice(start, start + this.pageSize());
+  });
+
   async ngOnInit(): Promise<void> {
     const qp = this.route.snapshot.queryParams;
     if (qp['field']) {
@@ -119,6 +133,11 @@ export default class UsuarioListComponent implements OnInit {
       this.appliedSearchValue.set(qp['value']);
     }
     await this.usuariosService.fetchUsuarios();
+  }
+
+  onPageChange(event: PageEvent): void {
+    this.pageIndex.set(event.pageIndex);
+    this.pageSize.set(event.pageSize);
   }
 
   onSearchFieldChange(newField: string): void {
@@ -137,6 +156,7 @@ export default class UsuarioListComponent implements OnInit {
 
     this.appliedSearchField.set(field);
     this.appliedSearchValue.set(val);
+    this.pageIndex.set(0);
 
     this.router.navigate([], {
       relativeTo: this.route,
@@ -153,6 +173,7 @@ export default class UsuarioListComponent implements OnInit {
     this.searchField.set('email');
     this.appliedSearchValue.set('');
     this.appliedSearchField.set('email');
+    this.pageIndex.set(0);
 
     this.router.navigate([], {
       relativeTo: this.route,

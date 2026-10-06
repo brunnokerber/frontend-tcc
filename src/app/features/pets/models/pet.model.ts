@@ -65,7 +65,25 @@ interface entradaDto {
 
 export type PetUpdateDto = Partial<Omit<Pet, 'id' | 'created_at' | 'updated_at' | 'entradas'>>;
 
+export type PetSearchField = 'nome' | 'chip' | 'rga' | 'moura' | 'raca';
+
+export interface PetSearchFieldOption {
+  label: string;
+  value: PetSearchField;
+  placeholder: string;
+}
+
+export const PET_SEARCH_FIELDS_OPTIONS: readonly PetSearchFieldOption[] = [
+  { label: 'Nome do Pet', value: 'nome', placeholder: 'Ex: Rex, Mel, Thor...' },
+  { label: 'Número do Chip', value: 'chip', placeholder: 'Ex: 981098108102938...' },
+  { label: 'RGA', value: 'rga', placeholder: 'Ex: RGA-2024-0012...' },
+  { label: 'Cód. Moura / Terceirizada', value: 'moura', placeholder: 'Ex: MOURA-12345...' },
+  { label: 'Raça', value: 'raca', placeholder: 'Ex: SRD, Labrador, Siamês...' },
+] as const;
+
 export interface PetFilter {
+  searchField?: PetSearchField;
+  searchValue?: string;
   search?: string;
   tipo_pet?: string;
   sexo?: string;

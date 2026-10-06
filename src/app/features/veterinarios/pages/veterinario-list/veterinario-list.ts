@@ -7,6 +7,7 @@ import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
+import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -30,6 +31,7 @@ import { VeterinariosService } from '../../services/veterinarios.service';
     MatIconModule,
     MatInputModule,
     MatFormFieldModule,
+    MatPaginatorModule,
     MatProgressSpinnerModule,
     MatTooltipModule,
     MatDialogModule,
@@ -48,7 +50,19 @@ export default class VeterinarioListComponent implements OnInit {
   public searchValue = signal<string>('');
   public searchFields = VET_SEARCH_FIELDS_OPTIONS;
 
+  // Paginação
+  public pageIndex = signal<number>(0);
+  public pageSize = signal<number>(10);
+  public readonly pageSizeOptions = [10, 25, 50, 100];
+
   public totalVeterinarios = computed(() => this.veterinariosService.veterinarios().length);
+
+  // Lista Paginada
+  public pagedVeterinarios = computed(() => {
+    const list = this.veterinariosService.veterinarios();
+    const start = this.pageIndex() * this.pageSize();
+    return list.slice(start, start + this.pageSize());
+  });
 
   private lastAppliedFilterJson: string | null = null;
 
@@ -61,6 +75,11 @@ export default class VeterinarioListComponent implements OnInit {
       this.searchValue.set(qp['value']);
     }
     this.applyFilters(true);
+  }
+
+  onPageChange(event: PageEvent): void {
+    this.pageIndex.set(event.pageIndex);
+    this.pageSize.set(event.pageSize);
   }
 
   onSearchFieldChange(newField: string): void {
@@ -92,6 +111,7 @@ export default class VeterinarioListComponent implements OnInit {
     }
 
     this.lastAppliedFilterJson = currentFilterJson;
+    this.pageIndex.set(0);
 
     this.router.navigate([], {
       relativeTo: this.route,
@@ -109,6 +129,7 @@ export default class VeterinarioListComponent implements OnInit {
     if (this.veterinariosService.loading()) return;
     this.searchValue.set('');
     this.searchField.set('nome');
+    this.pageIndex.set(0);
     this.applyFilters(true);
   }
 
