@@ -34,8 +34,8 @@ O processo metodológico de Engenharia de Requisitos adotado no presente TCC bas
 
 | Ator / Papel | Descrição | Escopo de Permissões |
 | :--- | :--- | :--- |
-| **Administrador (`admin`)** | Gestor responsável pela governança da ONG e administração do sistema. | Acesso irrestrito a todos os módulos, convite de novos usuários, alteração de níveis de acesso (`role`), ativação/desativação de contas e auditoria global. |
-| **Operador (`user`)** | Voluntário, médico veterinário parceiro ou colaborador operacional da ONG. | Cadastro e edição de pets, registro de entradas, prontuários clínicos (vacinas/consultas), gestão de lares temporários e parceiros veterinários. Não possui acesso à gestão de usuários do sistema. |
+| **Administrador (`admin`)** | Gestor responsável pela governança da ONG e administração do sistema. | Acesso irrestrito a todos os módulos, convite de novos usuários, alteração de níveis de acesso (`role`), ativação/desativação de contas, gestão do quadro de voluntários e escalas, retificação de dados de entrada/resgate do pet e auditoria global. |
+| **Operador (`user`)** | Voluntário, médico veterinário parceiro ou colaborador operacional da ONG. | Cadastro e edição cadastral de pets (com dados de entrada em modo somente-leitura), registro de entradas iniciais no cadastro, prontuários clínicos (vacinas/consultas), gestão de lares temporários e parceiros veterinários. Bloqueado nas rotas `/usuarios` e `/voluntarios` via `adminGuard` e políticas RLS. |
 | **Sistema / Backend (Supabase + Edge Functions)** | Processamento assíncrono de segurança e integridade referencial. | Aplicação síncrona de banimentos no `auth.users`, disparo de e-mails transacionais (convite/redefinição de senha) e auditoria de timestamps (`created_at`, `updated_at`). |
 
 ---
@@ -93,10 +93,10 @@ O processo metodológico de Engenharia de Requisitos adotado no presente TCC bas
   * **Prioridade:** Must Have (Essencial)
   * **Regras Associadas:** RN09
 
-* **[RF10] Edição Cadastral do Pet**
-  * **Descrição:** Permitir a edição e retificação dos dados cadastrais do animal a qualquer momento por usuários autorizados.
+* **[RF10] Edição Cadastral do Pet e Dados de Entrada**
+  * **Descrição:** Permitir a edição e retificação dos dados cadastrais do animal a qualquer momento por usuários autorizados. Caso o usuário autenticado possua perfil de **Administrador (`admin`)**, o sistema deve permitir adicionalmente a atualização (PUT/UPDATE) dos dados da entrada inicial (local de origem, data de entrada, resgatante e observações).
   * **Prioridade:** Must Have (Essencial)
-  * **Regras Associadas:** RN07, RN17
+  * **Regras Associadas:** RN07, RN10, RN17
 
 * **[RF11] Listagem Filtrada e Busca Multicritério de Pets**
   * **Descrição:** O sistema deve prover listagem em cards visuais com filtros simultâneos por: Nome (busca textual com debounce e ignore case), Espécie/Tipo, Sexo, Status Operacional, Senioridade e Porte.
@@ -113,7 +113,7 @@ O processo metodológico de Engenharia de Requisitos adotado no presente TCC bas
 ### Módulo 3: Prontuário Clínico (Vacinas e Procedimentos/Consultas)
 
 * **[RF13] Registro e Acompanhamento de Vacinação**
-  * **Descrição:** Cadastro de vacinas contendo: Nome da Vacina (com sugestões pré-configuradas: V8, V10, Antirrábica, Giárdiase, Tosse dos Canis, Leishmaniose, V3, V4, V5), Data Prevista, Data de Efetiva Aplicação, Custo Financeiro e Médico Veterinário Responsável.
+  * **Descrição:** Cadastro de vacinas contendo: Nome da Vacina (com sugestões pré-configuradas: V8, V10, DHPPI, Antirrábica, Giárdiase, Tosse dos Canis, Leishmaniose, V3, V4, V5), Data Prevista, Data de Efetiva Aplicação, Custo Financeiro e Médico Veterinário Responsável.
   * **Prioridade:** Must Have (Essencial)
   * **Regras Associadas:** RN11, RN12, RN14
 
@@ -156,12 +156,12 @@ O processo metodológico de Engenharia de Requisitos adotado no presente TCC bas
 ### Módulo 5: Gestão de Médicos Veterinários e Clínicas
 
 * **[RF20] Cadastro de Médicos Veterinários**
-  * **Descrição:** Registro de profissionais parceiros contendo: Nome Completo, Número de Registro no Conselho (CRVET) e Telefone/WhatsApp.
+  * **Descrição:** Registro de profissionais parceiros contendo: Nome Completo, Número de Registro no Conselho Regional de Medicina Veterinária (CRMV) e Telefone/WhatsApp.
   * **Prioridade:** Must Have (Essencial)
   * **Regras Associadas:** RN14
 
 * **[RF21] Listagem e Filtro de Veterinários**
-  * **Descrição:** Busca rápida por Nome, CRVET ou Telefone/WhatsApp.
+  * **Descrição:** Busca rápida por Nome, CRMV ou Telefone/WhatsApp.
   * **Prioridade:** Must Have (Essencial)
   * **Regras Associadas:** RN14
 
@@ -183,6 +183,25 @@ O processo metodológico de Engenharia de Requisitos adotado no presente TCC bas
   * **Descrição:** O sistema deve preservar a rota anterior do usuário ao navegar para formulários de criação/edição e retornar para a tela de origem após a conclusão da ação.
   * **Prioridade:** Should Have (Importante)
   * **Regras Associadas:** RNF01
+
+---
+
+### Módulo 7: Gestão de Voluntários e Escalas de Apoio (Apenas Administradores)
+
+* **[RF25] Cadastro Completo de Voluntários com Disponibilidade**
+  * **Descrição:** O sistema deve permitir o registro de colaboradores voluntários da ONG contendo: Nome Completo (obrigatório, máx. 50 caracteres), Telefone com DDD (obrigatório), E-mail de Contato (opcional), Dias da Semana Disponíveis (múltipla seleção: Segunda a Domingo), Turnos Disponíveis (múltipla seleção: Manhã, Tarde, Noite) e Observações/Preferências de atividades (máx. 500 caracteres).
+  * **Prioridade:** Must Have (Essencial)
+  * **Regras Associadas:** RN19, RN17
+
+* **[RF26] Listagem e Consulta de Disponibilidade por Dias e Turnos**
+  * **Descrição:** A interface administrativa deve prover busca textual por Nome, Telefone ou E-mail, além de filtros combinados por Dia da Semana e Turno, facilitando a montagem rápida de escalas de resgate, feiras de adoção e cuidados operacionais.
+  * **Prioridade:** Must Have (Essencial)
+  * **Regras Associadas:** RN19
+
+* **[RF27] Edição e Remoção de Voluntários**
+  * **Descrição:** Permitir a atualização dos dados cadastrais e de disponibilidade do voluntário, bem como sua exclusão do quadro mediante diálogo de confirmação.
+  * **Prioridade:** Must Have (Essencial)
+  * **Regras Associadas:** RN19, RN17
 
 ---
 
@@ -223,8 +242,8 @@ O processo metodológico de Engenharia de Requisitos adotado no presente TCC bas
   $$1 \text{ ano} \le \text{Idade} < 7 \text{ anos} \implies \text{Adulto}$$
   $$\text{Idade} \ge 7 \text{ anos} \implies \text{Sênior}$$
 
-* **[RN10] Atomicidade e Obrigatoriedade do Resgate no Cadastro do Pet:**  
-  Ao criar um novo pet, é mandatório registrar a primeira entrada (`local_origem`, `data_entrada`, `resgatante` e `id_usuario` logado). Em caso de edição cadastral posterior do animal, os dados de entrada permanecem imutáveis ou vinculados ao histórico inicial.
+* **[RN10] Governança, Atomicidade Transacional e Edição de Dados de Entrada / Histórico de Resgate (RBAC):**  
+  Ao criar um novo pet, é mandatório registrar a primeira entrada (`local_origem`, `data_entrada`, `resgatante` e `id_usuario` logado). Essa operação é executada de forma estritamente atômica (transação ACID no PostgreSQL) por meio da *Stored Procedure* `create_pet_com_entrada`, garantindo rollback automático caso ocorra qualquer inconsistência e associando automaticamente o `id_usuario` a partir da sessão ativa (`auth.uid()`). Em caso de edição cadastral posterior do animal, a alteração conjunta é processada pela procedure `update_pet_com_entrada`, sendo a retificação dos dados de entrada (`local_origem`, `data_entrada`, `resgatante`, `observacoes`) restrita exclusivamente a usuários autenticados com papel de **Administrador (`admin`)**. Usuários operadores (`user`) visualizam esses campos em modo somente-leitura (`readonly`), prevenindo adulterações acidentais ou não autorizadas no registro histórico inicial do resgate.
 
 * **[RN11] Totalização Financeira e Não-Negatividade de Custos:**  
   Valores de custo de vacinas, procedimentos clínicos e auxílios de hospedagem não podem ser negativos. O cálculo do total investido deve tratar valores nulos como zero ($0.00$) e refletir reativamente a soma no prontuário.
@@ -250,6 +269,9 @@ O processo metodológico de Engenharia de Requisitos adotado no presente TCC bas
 * **[RN18] Feedback e Não-Bloqueio de Experiência:**  
   Toda operação assíncrona com o banco de dados deve fornecer feedback visual imediato ao usuário (spinners de carregamento e notificações do tipo *Toast* com estados de sucesso, alerta ou erro claro em língua portuguesa).
 
+* **[RN19] Acesso Exclusivo e Governança do Quadro de Voluntários (RBAC):**  
+  Apenas usuários autenticados com o papel de Administrador (`admin`) possuem permissão para acessar a rota `/voluntarios`, visualizar a lista de contatos, consultar disponibilidades por dia/turno e realizar o cadastro, alteração ou exclusão de voluntários. O acesso direto ao banco de dados PostgreSQL é protegido por políticas de Row Level Security (RLS) baseadas na função `public.is_admin()`, e no frontend o acesso à rota é bloqueado por `adminGuard`.
+
 ---
 
 ## 5. Requisitos Não-Funcionais (RNF)
@@ -258,10 +280,10 @@ O processo metodológico de Engenharia de Requisitos adotado no presente TCC bas
 | :--- | :--- | :--- | :--- |
 | **[RNF01]** | **Usabilidade & UX** | A interface deve ser projetada segundo os padrões do Google Material Design 3, com layout responsivo para desktops, tablets e smartphones. | 100% dos componentes adaptáveis em resoluções de 360px a 4K; conformidade com Material Guidelines. |
 | **[RNF02]** | **Acessibilidade** | A interface deve prover contraste adequado entre texto e fundo, suporte a leitor de telas e rótulos semânticos (`aria-label`, ícones intuitivos). | WCAG 2.1 Nível AA para contraste e navegação por teclado. |
-| **[RNF03]** | **Desempenho** | O carregamento inicial e as transições de rota devem ser otimizados utilizando Lazy Loading de módulos e rotas standalone do Angular. | First Contentful Paint (FCP) < 1.5s e Largest Contentful Paint (LCP) < 2.5s em conexões de banda larga padrão. |
+| **[RNF03]** | **Desempenho de Carga e Banco** | O carregamento inicial e transições devem utilizar Lazy Loading no Angular, e as consultas no PostgreSQL devem ser aceleradas por índices GIN trigram, GIN para arrays e B-Tree compostos para eliminar table scans. | FCP < 1.5s, LCP < 2.5s; tempo de execução de queries de prontuário < 1ms via Index Scan (aferido em 0.109ms via EXPLAIN ANALYZE). |
 | **[RNF04]** | **Reatividade de Estado** | O gerenciamento de estado do frontend deve utilizar o novo paradigma de **Signals** e **Computed Signals** do Angular 20, evitando renderizações desnecessárias. | Zero subscrições manuais não gerenciadas em componentes principais; reatividade fina de signals. |
 | **[RNF05]** | **Segurança & Autenticação** | Todas as requisições autenticadas devem trafegar via HTTPS com Bearer Tokens JWT emitidos pelo Supabase Auth, com validação de expiração e refresh automático. | Criptografia em trânsito (TLS 1.3) e armazenamento seguro de tokens. |
-| **[RNF06]** | **Segurança em Nível de Banco (RLS)** | O banco de dados PostgreSQL deve implementar Row Level Security (RLS) para impedir acesso ou mutação não autorizada de dados diretamente via client SDK. | Políticas RLS ativas para todas as tabelas do schema público. |
+| **[RNF06]** | **Segurança em Nível de Banco (RLS) e Integridade Referencial** | O banco de dados PostgreSQL deve implementar Row Level Security (RLS) protegendo mutações não autorizadas. Tabelas primárias (`pets`, `locais`, `veterinarios`, `entradas`, `profiles`) possuem exclusão física (`DELETE`) bloqueada para prevenção de órfãos e perda de histórico; exclusões são restritas a itens de prontuário/estadias (`vacinas`, `consultas_exames`, `pets_locais`) exclusivas para administradores (`is_admin()`). | Políticas RLS ativas para todas as tabelas do schema público com matriz de DELETE auditada. |
 | **[RNF07]** | **Persistência de Preferências** | As preferências visuais do usuário (Tema Claro / Escuro) devem ser persistidas localmente no navegador (`LocalStorage`). | Retenção da preferência visual em novas sessões sem flicker de tela. |
 | **[RNF08]** | **Confiabilidade & Tratamento de Erros** | Erros de rede, validação de formulário ou falhas de Edge Function devem ser interceptados por utilitários centralizados e convertidos em mensagens amigáveis em português. | Ausência de stacktraces expostos ao usuário final; toasts informativos. |
 | **[RNF09]** | **Arquitetura de Software** | O frontend deve adotar arquitetura modular organizada em camadas: `Core` (serviços globais, auth, guards, interceptors), `Features` (módulos de negócio autocontidos), `Layout` e `Shared` (componentes, diretivas, pipes reutilizáveis). | Separação estrita de responsabilidades e alto desacoplamento. |
@@ -297,6 +319,9 @@ O processo metodológico de Engenharia de Requisitos adotado no presente TCC bas
 | **RF22** | Totalizador financeiro reativo | RN11, RN15 | RNF04 | `vacinas`, `consultas_exames`, `pets_locais` | `PetDetailComponent (Computed Signals)` |
 | **RF23** | Alternância de tema Light/Dark | RNF01, RNF07 | RNF07 | `LocalStorage` | `ThemeService`, `MainLayoutComponent` |
 | **RF24** | Navegação inteligente com retorno | RNF01 | RNF01 | Memória de Roteamento | `NavigationService` |
+| **RF25** | Cadastro de voluntários e disponibilidades | RN17, RN19 | RNF01, RNF04, RNF08 | `voluntarios` | `VoluntarioDialogComponent`, `VoluntariosService` |
+| **RF26** | Listagem e filtros de voluntários | RN19 | RNF01, RNF03, RNF04 | `voluntarios` | `VoluntarioListComponent`, `VoluntariosService` |
+| **RF27** | Edição e exclusão de voluntários | RN17, RN19 | RNF01, RNF08 | `voluntarios` | `VoluntarioDialogComponent`, `VoluntarioListComponent` |
 
 ---
 
@@ -411,8 +436,20 @@ erDiagram
     VETERINARIOS {
         bigint id PK
         string nome
-        string crvet
+        string crmv
         string telefone
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    VOLUNTARIOS {
+        bigint id PK
+        string nome
+        string email
+        string telefone
+        text_array dias_semana
+        text_array turnos
+        string observacoes
         timestamp created_at
         timestamp updated_at
     }

@@ -12,6 +12,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { ToastService } from '@core/services/toast.service';
 import { FormErrorPipe } from '@shared/pipes/form-error.pipe';
+import { emailValidator } from '@shared/validators/email.validators';
 import { AppRole } from '../../models/login.model';
 import { AuthService } from '../../services/auth.service';
 
@@ -71,7 +72,7 @@ export class UsuarioDialogComponent {
   ];
 
   public inviteForm = this.fb.group({
-    email: ['', [Validators.required, Validators.email, Validators.maxLength(100)]],
+    email: ['', [Validators.required, emailValidator(), Validators.maxLength(100)]],
     role: ['user' as AppRole, [Validators.required]],
   });
 

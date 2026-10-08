@@ -1,0 +1,517 @@
+<div class="container-fluid px-3 px-md-4">
+  <!-- Cabeçalho da Página -->
+  <div class="row align-items-center mb-4 g-3">
+    <div class="col-12 col-md-7">
+      <div class="d-flex align-items-center gap-3">
+        <div class="header-icon-box d-flex align-items-center justify-content-center">
+          <mat-icon>volunteer_activism</mat-icon>
+        </div>
+        <div>
+          <h1 class="h3 fw-bold mb-1">Quadro de Voluntários</h1>
+          <p class="text-surface-muted small mb-0">
+            Consulte, cadastre e gerencie as escalas e disponibilidades dos colaboradores da ONG.
+          </p>
+        </div>
+      </div>
+    </div>
+    <div class="col-12 col-md-5 d-flex justify-content-md-end gap-2">
+      <button
+        mat-flat-button
+        color="primary"
+        type="button"
+        (click)="openVoluntarioDialog()"
+        class="btn-create d-flex align-items-center gap-2 py-2 px-3 rounded-3 shadow-sm"
+      >
+        <mat-icon>add</mat-icon>
+        <span class="fw-semibold">Cadastrar Novo Voluntário</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Cards de Estatísticas Rápidas -->
+  <div class="row g-3 mb-4">
+    <!-- Total Voluntários -->
+    <div class="col-6 col-md-3">
+      <div class="stat-card p-3 rounded-3 shadow-xs">
+        <div class="d-flex align-items-center justify-content-between">
+          <div>
+            <span class="text-surface-muted small d-block mb-1">Total de Voluntários</span>
+            <span class="fs-4 fw-bold">{{ totalVoluntarios() }}</span>
+          </div>
+          <div class="stat-icon-wrapper bg-status-primary">
+            <mat-icon>volunteer_activism</mat-icon>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Finais de Semana -->
+    <div class="col-6 col-md-3">
+      <div class="stat-card p-3 rounded-3 shadow-xs">
+        <div class="d-flex align-items-center justify-content-between">
+          <div>
+            <span class="text-surface-muted small d-block mb-1">Finais de Semana</span>
+            <span class="fs-4 fw-bold text-status-success">{{ totalFimDeSemana() }}</span>
+          </div>
+          <div class="stat-icon-wrapper bg-status-success">
+            <mat-icon>event_available</mat-icon>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Turno Manhã -->
+    <div class="col-6 col-md-3">
+      <div class="stat-card p-3 rounded-3 shadow-xs">
+        <div class="d-flex align-items-center justify-content-between">
+          <div>
+            <span class="text-surface-muted small d-block mb-1">Turno Manhã</span>
+            <span class="fs-4 fw-bold text-status-warning">{{ totalManha() }}</span>
+          </div>
+          <div class="stat-icon-wrapper bg-status-warning">
+            <mat-icon>wb_sunny</mat-icon>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Turno Tarde / Noite -->
+    <div class="col-6 col-md-3">
+      <div class="stat-card p-3 rounded-3 shadow-xs">
+        <div class="d-flex align-items-center justify-content-between">
+          <div>
+            <span class="text-surface-muted small d-block mb-1">Tarde / Noite</span>
+            <span class="fs-4 fw-bold text-status-info">{{ totalTardeNoite() }}</span>
+          </div>
+          <div class="stat-icon-wrapper bg-status-info">
+            <mat-icon>nights_stay</mat-icon>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Painel de Busca com Formulário Explícito de Submit -->
+  <form (ngSubmit)="applyFilters()" class="filter-panel p-3 p-md-4 rounded-3 shadow-xs mb-4">
+    <div class="row g-3 align-items-end">
+      <!-- Coluna 1: Filtrar por Coluna -->
+      <div class="col-12 col-sm-6 col-lg-2">
+        <label for="vol-filter-field" class="form-label small fw-semibold text-surface-muted mb-1 text-truncate d-block">
+          Filtrar por Coluna
+        </label>
+        <select
+          id="vol-filter-field"
+          class="form-select bg-surface-card text-surface-main border-surface"
+          [ngModel]="searchField()"
+          (ngModelChange)="onSearchFieldChange($event)"
+          name="searchField"
+        >
+          @for (field of searchFields; track field.value) {
+            <option [value]="field.value">{{ field.label }}</option>
+          }
+        </select>
+      </div>
+
+      <!-- Coluna 2: Termo de Busca -->
+      <div class="col-12 col-sm-6 col-lg-3">
+        <label for="vol-filter-value" class="form-label small fw-semibold text-surface-muted mb-1 text-truncate d-block">
+          Termo de Busca / Valor
+        </label>
+        <div class="input-group">
+          <span class="input-group-text bg-surface-subtle border-end-0 border-surface">
+            <i class="bi bi-search"></i>
+          </span>
+          <input
+            id="vol-filter-value"
+            type="text"
+            class="form-control border-start-0 border-surface bg-surface-card text-surface-main"
+            [placeholder]="getSearchPlaceholder()"
+            [ngModel]="searchValue()"
+            (ngModelChange)="searchValue.set($event)"
+            name="searchValue"
+          />
+          @if (searchValue()) {
+            <button
+              class="btn btn-outline-secondary border-start-0 border-surface"
+              type="button"
+              (click)="searchValue.set('')"
+              matTooltip="Limpar busca"
+            >
+              <mat-icon style="font-size: 18px; width: 18px; height: 18px">clear</mat-icon>
+            </button>
+          }
+        </div>
+      </div>
+
+      <!-- Coluna 3: Dia da Semana -->
+      <div class="col-6 col-sm-6 col-lg-2">
+        <label for="vol-filter-dia" class="form-label small fw-semibold text-surface-muted mb-1 text-truncate d-block">
+          Dia da Semana
+        </label>
+        <select
+          id="vol-filter-dia"
+          class="form-select bg-surface-card text-surface-main border-surface"
+          [ngModel]="selectedDia()"
+          (ngModelChange)="selectedDia.set($event)"
+          name="selectedDia"
+        >
+          <option value="">-- Todos os Dias --</option>
+          @for (dia of diasOptions; track dia) {
+            <option [value]="dia">{{ dia }}</option>
+          }
+        </select>
+      </div>
+
+      <!-- Coluna 4: Turno -->
+      <div class="col-6 col-sm-6 col-lg-2">
+        <label for="vol-filter-turno" class="form-label small fw-semibold text-surface-muted mb-1 text-truncate d-block">
+          Turno
+        </label>
+        <select
+          id="vol-filter-turno"
+          class="form-select bg-surface-card text-surface-main border-surface"
+          [ngModel]="selectedTurno()"
+          (ngModelChange)="selectedTurno.set($event)"
+          name="selectedTurno"
+        >
+          <option value="">-- Todos os Turnos --</option>
+          @for (turno of turnosOptions; track turno) {
+            <option [value]="turno">{{ turno }}</option>
+          }
+        </select>
+      </div>
+
+      <!-- Coluna 5: Botões de Ação de Filtro -->
+      <div class="col-12 col-lg-3 d-flex justify-content-end gap-2">
+        <button
+          mat-stroked-button
+          type="button"
+          (click)="clearFilters()"
+          class="btn-clear flex-grow-1 flex-lg-grow-0"
+          [disabled]="voluntariosService.loading() || (!searchValue() && !selectedDia() && !selectedTurno())"
+        >
+          <mat-icon>filter_alt_off</mat-icon>
+          <span>Limpar</span>
+        </button>
+        <button
+          mat-flat-button
+          color="primary"
+          type="submit"
+          [disabled]="voluntariosService.loading()"
+          class="flex-grow-1 flex-lg-grow-0 px-3"
+        >
+          @if (voluntariosService.loading()) {
+            <span class="spinner-border spinner-border-sm me-1" role="status"></span>
+            <span>Filtrando...</span>
+          } @else {
+            <span class="d-inline-flex align-items-center gap-1">
+              <mat-icon>filter_list</mat-icon>
+              <span>Filtrar</span>
+            </span>
+          }
+        </button>
+      </div>
+    </div>
+  </form>
+
+  <!-- Loading State -->
+  @if (voluntariosService.loading()) {
+    <div class="d-flex flex-column align-items-center justify-content-center py-5">
+      <mat-spinner diameter="44"></mat-spinner>
+      <span class="text-surface-muted mt-3 small">Carregando voluntários...</span>
+    </div>
+  } @else {
+    <!-- Empty State -->
+    @if (voluntariosService.voluntarios().length === 0) {
+      <div class="empty-state rounded-3 p-5 text-center my-4">
+        <div class="empty-icon-circle mx-auto mb-3">
+          <mat-icon>volunteer_activism</mat-icon>
+        </div>
+        <h4 class="fw-semibold mb-1">Nenhum voluntário encontrado</h4>
+        <p class="text-surface-muted small mb-4" style="max-width: 420px; margin: 0 auto">
+          @if (searchValue() || selectedDia() || selectedTurno()) {
+            Nenhum voluntário corresponde aos critérios informados. Tente ajustar os parâmetros ou limpar os filtros.
+          } @else {
+            Nenhum colaborador voluntário foi cadastrado na base ainda. Cadastre o primeiro para montar escalas.
+          }
+        </p>
+        <button
+          mat-flat-button
+          color="primary"
+          type="button"
+          (click)="openVoluntarioDialog()"
+          class="rounded-pill px-4"
+        >
+          <mat-icon>add</mat-icon>
+          <span>Cadastrar Primeiro Voluntário</span>
+        </button>
+      </div>
+    } @else {
+      <!-- VISÃO DESKTOP: TABELA ELEGANTE -->
+      <div class="table-responsive-desktop d-none d-lg-block rounded-3 shadow-xs overflow-hidden">
+        <table class="table table-hover align-middle mb-0 custom-vol-table">
+          <thead class="small fw-semibold">
+            <tr>
+              <th scope="col" class="ps-4">Voluntário(a)</th>
+              <th scope="col">Contato / WhatsApp</th>
+              <th scope="col">Dias Disponíveis</th>
+              <th scope="col">Turnos</th>
+              <th scope="col">Data de Cadastro</th>
+              <th scope="col" class="text-end pe-4" style="width: 120px">Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (vol of pagedVoluntarios(); track vol.id) {
+              <tr>
+                <!-- Nome e ID -->
+                <td class="ps-4">
+                  <div class="d-flex align-items-center gap-3">
+                    <div class="vol-avatar rounded-circle d-flex align-items-center justify-content-center">
+                      <mat-icon>volunteer_activism</mat-icon>
+                    </div>
+                    <div>
+                      <div class="fw-bold">{{ vol.nome }}</div>
+                      <span class="text-surface-muted" style="font-size: 0.75rem">
+                        ID: #{{ vol.id }}
+                      </span>
+                    </div>
+                  </div>
+                </td>
+
+                <!-- Contato / WhatsApp e E-mail -->
+                <td>
+                  <div class="d-flex flex-column gap-1">
+                    <div class="d-flex align-items-center gap-1">
+                      <a
+                        [href]="getWhatsAppLink(vol.telefone)"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="d-inline-flex align-items-center gap-1 text-decoration-none fw-medium text-success"
+                        matTooltip="Conversar no WhatsApp"
+                      >
+                        <i class="bi bi-whatsapp"></i>
+                        <span>{{ formatPhone(vol.telefone) }}</span>
+                      </a>
+                      <button
+                        mat-icon-button
+                        class="btn-copy-phone"
+                        (click)="copyPhone(vol.telefone, $event)"
+                        matTooltip="Copiar telefone"
+                        aria-label="Copiar telefone"
+                        type="button"
+                      >
+                        <mat-icon>content_copy</mat-icon>
+                      </button>
+                    </div>
+
+                    @if (vol.email) {
+                      <span class="text-surface-muted small d-inline-flex align-items-center gap-1">
+                        <i class="bi bi-envelope"></i>
+                        <span>{{ vol.email }}</span>
+                      </span>
+                    }
+                  </div>
+                </td>
+
+                <!-- Dias da Semana -->
+                <td>
+                  @if (vol.dias_semana && vol.dias_semana.length > 0) {
+                    <div class="d-flex flex-wrap gap-1" style="max-width: 240px">
+                      @for (dia of vol.dias_semana; track dia) {
+                        <span class="badge bg-surface-subtle text-surface-main border border-surface small">
+                          {{ dia }}
+                        </span>
+                      }
+                    </div>
+                  } @else {
+                    <span class="text-surface-muted small fst-italic">A combinar</span>
+                  }
+                </td>
+
+                <!-- Turnos -->
+                <td>
+                  @if (vol.turnos && vol.turnos.length > 0) {
+                    <div class="d-flex flex-wrap gap-1">
+                      @for (turno of vol.turnos; track turno) {
+                        <span
+                          class="badge small"
+                          [class.bg-primary-subtle]="turno === 'Manhã'"
+                          [class.text-primary]="turno === 'Manhã'"
+                          [class.bg-warning-subtle]="turno === 'Tarde'"
+                          [class.text-warning]="turno === 'Tarde'"
+                          [class.bg-info-subtle]="turno === 'Noite'"
+                          [class.text-info]="turno === 'Noite'"
+                        >
+                          {{ turno }}
+                        </span>
+                      }
+                    </div>
+                  } @else {
+                    <span class="text-surface-muted small fst-italic">Flexível</span>
+                  }
+                </td>
+
+                <!-- Data de Cadastro -->
+                <td>
+                  <span class="text-surface-muted small">
+                    <i class="bi bi-calendar3 me-1"></i>{{ vol.created_at | date: 'dd/MM/yyyy' }}
+                  </span>
+                </td>
+
+                <!-- Ações -->
+                <td class="text-end pe-4">
+                  <div class="d-flex align-items-center justify-content-end gap-1">
+                    <button
+                      matIconButton
+                      color="primary"
+                      (click)="openVoluntarioDialog(vol)"
+                      matTooltip="Editar dados do Voluntário"
+                      type="button"
+                    >
+                      <mat-icon>edit</mat-icon>
+                    </button>
+                    <button
+                      matIconButton
+                      color="warn"
+                      (click)="confirmDelete(vol)"
+                      matTooltip="Excluir Voluntário"
+                      type="button"
+                    >
+                      <mat-icon>delete</mat-icon>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <!-- VISÃO MOBILE: CARDS RESPONSIVOS -->
+      <div class="d-lg-none d-flex flex-column gap-3 mb-4">
+        @for (vol of pagedVoluntarios(); track vol.id) {
+          <div class="vol-mobile-card p-3 rounded-3 shadow-xs">
+            <!-- Cabeçalho do Card -->
+            <div class="d-flex align-items-center justify-content-between mb-2">
+              <div class="d-flex align-items-center gap-2">
+                <div class="vol-avatar rounded-circle d-flex align-items-center justify-content-center">
+                  <mat-icon>volunteer_activism</mat-icon>
+                </div>
+                <div>
+                  <div class="fw-bold">{{ vol.nome }}</div>
+                  <span class="text-surface-muted small">ID: #{{ vol.id }}</span>
+                </div>
+              </div>
+
+              <!-- Ações Rápidas -->
+              <div class="d-flex align-items-center gap-1">
+                <button
+                  mat-icon-button
+                  color="primary"
+                  (click)="openVoluntarioDialog(vol)"
+                  matTooltip="Editar"
+                  type="button"
+                >
+                  <mat-icon>edit</mat-icon>
+                </button>
+                <button
+                  mat-icon-button
+                  color="warn"
+                  (click)="confirmDelete(vol)"
+                  matTooltip="Excluir"
+                  type="button"
+                >
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </div>
+            </div>
+
+            <!-- Contatos (WhatsApp + Email) -->
+            <div class="d-flex flex-column gap-1 mb-2">
+              <div class="d-flex align-items-center justify-content-between">
+                <a
+                  [href]="getWhatsAppLink(vol.telefone)"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="d-inline-flex align-items-center gap-1 text-decoration-none fw-semibold text-success small"
+                >
+                  <i class="bi bi-whatsapp"></i>
+                  <span>{{ formatPhone(vol.telefone) }}</span>
+                </a>
+                <button
+                  mat-icon-button
+                  class="btn-copy-phone"
+                  (click)="copyPhone(vol.telefone, $event)"
+                  matTooltip="Copiar telefone"
+                  type="button"
+                >
+                  <mat-icon>content_copy</mat-icon>
+                </button>
+              </div>
+
+              @if (vol.email) {
+                <div class="text-surface-muted small d-inline-flex align-items-center gap-1">
+                  <i class="bi bi-envelope"></i>
+                  <span>{{ vol.email }}</span>
+                </div>
+              }
+            </div>
+
+            <!-- Badges de Dias e Turnos -->
+            <div class="d-flex flex-column gap-1 pt-2 border-top border-surface">
+              <div class="small fw-semibold text-surface-muted">Disponibilidade:</div>
+              <div class="d-flex flex-wrap gap-1 mb-1">
+                @for (dia of vol.dias_semana; track dia) {
+                  <span class="badge bg-surface-subtle text-surface-main border border-surface small">
+                    {{ dia }}
+                  </span>
+                }
+              </div>
+              <div class="d-flex flex-wrap gap-1">
+                @for (turno of vol.turnos; track turno) {
+                  <span
+                    class="badge small"
+                    [class.bg-primary-subtle]="turno === 'Manhã'"
+                    [class.text-primary]="turno === 'Manhã'"
+                    [class.bg-warning-subtle]="turno === 'Tarde'"
+                    [class.text-warning]="turno === 'Tarde'"
+                    [class.bg-info-subtle]="turno === 'Noite'"
+                    [class.text-info]="turno === 'Noite'"
+                  >
+                    {{ turno }}
+                  </span>
+                }
+              </div>
+            </div>
+
+            <!-- Observações (se houver) -->
+            @if (vol.observacoes) {
+              <div class="vol-card-details p-2 rounded-2 mt-2 small text-surface-muted">
+                <i class="bi bi-info-circle me-1"></i>{{ vol.observacoes }}
+              </div>
+            }
+
+            <!-- Rodapé do Card -->
+            <div class="d-flex align-items-center justify-content-between pt-2 mt-2 border-top border-surface small text-surface-muted">
+              <span>Cadastrado em:</span>
+              <span>{{ vol.created_at | date: 'dd/MM/yyyy' }}</span>
+            </div>
+          </div>
+        }
+      </div>
+
+      <!-- Paginação -->
+      <div class="mt-4">
+        <mat-paginator
+          [length]="totalVoluntarios()"
+          [pageSize]="pageSize()"
+          [pageSizeOptions]="pageSizeOptions"
+          [pageIndex]="pageIndex()"
+          (page)="onPageChange($event)"
+          class="rounded-3 shadow-xs border bg-surface-card"
+          aria-label="Paginação da lista de voluntários"
+        ></mat-paginator>
+      </div>
+    }
+  }
+</div>

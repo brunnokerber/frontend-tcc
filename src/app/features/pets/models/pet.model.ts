@@ -39,7 +39,7 @@ export interface Entrada extends Audit {
   observacoes?: string | null;
 }
 
-export interface PetCreateDto extends entradaDto {
+export interface PetCreateDto extends EntradaDto {
   tipo_pet: string;
   sexo: string;
   status: string;
@@ -56,12 +56,14 @@ export interface PetCreateDto extends entradaDto {
   rga?: string | null;
 }
 
-interface entradaDto {
+export interface EntradaDto {
   local_origem: string;
   data_entrada: string;
   resgatante: string;
   observacoes?: string | null;
 }
+
+export type EntradaUpdateDto = Partial<EntradaDto>;
 
 export type PetUpdateDto = Partial<Omit<Pet, 'id' | 'created_at' | 'updated_at' | 'entradas'>>;
 

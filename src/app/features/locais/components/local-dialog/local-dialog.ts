@@ -13,6 +13,7 @@ import { CepMaskDirective } from '@shared/directives/cep-mask.directive';
 import { PhoneMaskDirective } from '@shared/directives/phone-mask.directive';
 import { FormErrorPipe } from '@shared/pipes/form-error.pipe';
 import { formatCep, formatPhone, onlyDigits, sanitize } from '@shared/utils/string-utils';
+import { phoneValidator } from '@shared/validators/phone.validators';
 import {
   Local,
   LocalCreateDto,
@@ -69,7 +70,7 @@ export class LocalDialogComponent implements OnInit {
     tipo_local: ['Lar Temporário', [Validators.required, Validators.maxLength(30)]],
     local: ['', [Validators.required, Validators.maxLength(50)]],
     contato: ['', [Validators.required, Validators.maxLength(50)]],
-    telefone: ['', [Validators.required, Validators.minLength(10)]],
+    telefone: ['', [Validators.required, phoneValidator()]],
     cep: ['', [Validators.required, Validators.minLength(8)]],
     rua: ['', [Validators.required, Validators.maxLength(50)]],
     numero: [null as number | null, [Validators.required, Validators.min(0)]],

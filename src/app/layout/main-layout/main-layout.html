@@ -102,36 +102,36 @@
           </div>
         </div>
 
-        <!-- Seção: Gerenciamento (Apenas Administradores) -->
+        <!-- Seção: Gerenciamento de Acesso (Apenas Administradores) -->
         @if (isAdmin()) {
           <div class="admin-card p-3 rounded-3 mb-3 border">
             <div class="d-flex align-items-center gap-2 mb-1">
               <mat-icon class="text-warning fs-5">admin_panel_settings</mat-icon>
-              <span class="fw-semibold small">Administração</span>
+              <span class="fw-semibold small">Administração de Acesso</span>
             </div>
             <p class="text-surface-muted small mb-2" style="font-size: 0.8rem">
               Gerencie o acesso de colaboradores e envie novos convites.
             </p>
-            <div class="d-flex flex-column flex-sm-row gap-2">
+            <div class="d-flex flex-column gap-2">
               <a
                 mat-stroked-button
                 routerLink="/usuarios"
                 (click)="closeUserSidenav()"
-                class="flex-fill py-1 d-flex align-items-center justify-content-center gap-1 rounded-3 text-decoration-none"
+                class="w-100 py-1 d-flex align-items-center justify-content-center gap-1 rounded-3 text-decoration-none"
               >
-                <mat-icon>people</mat-icon>
-                <span>Gerenciar</span>
+                <mat-icon>manage_accounts</mat-icon>
+                <span>Gerenciar Usuários</span>
               </a>
 
               <button
                 mat-flat-button
                 color="primary"
-                class="flex-fill py-1 d-flex align-items-center justify-content-center gap-1 rounded-3"
+                class="w-100 py-1 d-flex align-items-center justify-content-center gap-1 rounded-3"
                 (click)="openInviteUserDialog()"
                 type="button"
               >
                 <mat-icon>person_add</mat-icon>
-                <span>Convidar</span>
+                <span>Convidar Usuário</span>
               </button>
             </div>
           </div>
@@ -237,12 +237,12 @@
 
             @if (isAdmin()) {
               <a
-                routerLink="/usuarios"
+                routerLink="/voluntarios"
                 routerLinkActive="active"
                 class="nav-btn d-flex align-items-center gap-2 text-decoration-none px-3 py-2 rounded-3"
               >
-                <mat-icon class="fs-5">manage_accounts</mat-icon>
-                <span>Usuários</span>
+                <mat-icon class="fs-5">volunteer_activism</mat-icon>
+                <span>Voluntários</span>
               </a>
             }
           </nav>
@@ -319,13 +319,13 @@
 
             @if (isAdmin()) {
               <a
-                routerLink="/usuarios"
+                routerLink="/voluntarios"
                 routerLinkActive="active"
                 class="mobile-nav-link d-flex align-items-center gap-3 p-2 rounded-3 text-decoration-none"
                 (click)="closeMobileMenu()"
               >
-                <mat-icon>manage_accounts</mat-icon>
-                <span class="fw-medium">Gerenciar Usuários</span>
+                <mat-icon>volunteer_activism</mat-icon>
+                <span class="fw-medium">Quadro de Voluntários</span>
               </a>
             }
           </div>

@@ -10,6 +10,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSelectModule } from '@angular/material/select';
 import { ActivatedRoute, Router } from '@angular/router';
+import { AuthService } from '@core/auth/services/auth.service';
 import { NavigationService } from '@core/services/navigation.service';
 import { ToastService } from '@core/services/toast.service';
 import { DateMaskDirective } from '@shared/directives/date-mask.directive';
@@ -18,6 +19,7 @@ import { dateSequenceValidator, maxDateTodayValidator } from '@shared/validators
 import { dateToIsoString, parseIsoToDate, sanitize } from '@shared/utils/string-utils';
 import {
   calculateSenioridade,
+  EntradaUpdateDto,
   PORTE_OPTIONS,
   Pet,
   PetCreateDto,
@@ -55,7 +57,11 @@ export default class PetFormComponent implements OnInit {
   private router = inject(Router);
   private nav = inject(NavigationService);
   private petsService = inject(PetsService);
+  private authService = inject(AuthService);
   private toast = inject(ToastService);
+
+  // Permissões
+  public isAdmin = this.authService.isAdmin;
 
   // Estados com Signals
   public isEditing = signal(false);
@@ -90,7 +96,7 @@ export default class PetFormComponent implements OnInit {
       data_nascimento: [null as Date | null, [maxDateTodayValidator()]],
       data_castracao: [null as Date | null, [maxDateTodayValidator()]],
       link_documentos: ['', [Validators.maxLength(200)]],
-      // Campos da tabela 'entradas' (obrigatórios na criação)
+      // Campos da tabela 'entradas'
       local_origem: ['', [Validators.required, Validators.maxLength(50)]],
       data_entrada: [new Date(), [Validators.required, maxDateTodayValidator()]],
       resgatante: ['', [Validators.required, Validators.maxLength(50)]],
@@ -112,7 +118,6 @@ export default class PetFormComponent implements OnInit {
         ),
       ],
     }
-
   );
 
   ngOnInit() {
@@ -150,13 +155,15 @@ export default class PetFormComponent implements OnInit {
 
     this.existingPet.set(pet);
 
-    // Desabilitar validação de entrada na edição se não for necessária
-    this.petForm.controls.local_origem.clearValidators();
-    this.petForm.controls.data_entrada.clearValidators();
-    this.petForm.controls.resgatante.clearValidators();
-    this.petForm.controls.local_origem.updateValueAndValidity();
-    this.petForm.controls.data_entrada.updateValueAndValidity();
-    this.petForm.controls.resgatante.updateValueAndValidity();
+    // Se o usuário não for administrador na edição, desabilita validação ativa dos campos de entrada
+    if (!this.isAdmin()) {
+      this.petForm.controls.local_origem.clearValidators();
+      this.petForm.controls.data_entrada.clearValidators();
+      this.petForm.controls.resgatante.clearValidators();
+      this.petForm.controls.local_origem.updateValueAndValidity();
+      this.petForm.controls.data_entrada.updateValueAndValidity();
+      this.petForm.controls.resgatante.updateValueAndValidity();
+    }
 
     // Preencher dados do formulário
     const firstEntrada = pet.entradas && pet.entradas.length > 0 ? pet.entradas[0] : null;
@@ -214,7 +221,27 @@ export default class PetFormComponent implements OnInit {
           link_documentos: sanitize(formValues.link_documentos),
         };
 
-        const updated = await this.petsService.updatePet(this.petId()!, updateDto);
+        let entradaUpdateDto: EntradaUpdateDto | undefined;
+        const firstEntrada = this.existingPet()?.entradas?.[0];
+
+        // Apenas atualiza a entrada se for administrador
+        if (this.isAdmin()) {
+          entradaUpdateDto = {
+            local_origem: formValues.local_origem?.trim() || 'Não informado',
+            data_entrada:
+              dateToIsoString(formValues.data_entrada) || new Date().toISOString().split('T')[0],
+            resgatante: formValues.resgatante?.trim() || 'Não informado',
+            observacoes: sanitize(formValues.observacoes),
+          };
+        }
+
+        const updated = await this.petsService.updatePet(
+          this.petId()!,
+          updateDto,
+          entradaUpdateDto,
+          firstEntrada?.id
+        );
+
         if (updated) {
           this.goBack();
         }

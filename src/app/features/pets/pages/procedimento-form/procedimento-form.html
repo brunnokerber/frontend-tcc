@@ -168,7 +168,7 @@
                   <mat-option [value]="null">-- Nenhum selecionado --</mat-option>
                   @for (vet of veterinarios(); track vet.id) {
                     <mat-option [value]="vet.id">
-                      {{ vet.nome }} (CRVET: {{ vet.crvet }})
+                      {{ vet.nome }} (CRMV: {{ vet.crmv }})
                     </mat-option>
                   }
                 </mat-select>

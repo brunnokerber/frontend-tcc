@@ -12,6 +12,7 @@ import { AuthService } from '@core/auth/services/auth.service';
 import { ToastService } from '@core/services/toast.service';
 import { environment } from '@env/environment';
 import { FormErrorPipe } from '@shared/pipes/form-error.pipe';
+import { emailValidator } from '@shared/validators/email.validators';
 
 @Component({
   selector: 'app-login',
@@ -47,12 +48,12 @@ export default class Login {
   forgotSuccess = signal<boolean>(false);
 
   loginForm = this.fb.nonNullable.group({
-    email: ['', [Validators.required, Validators.email]],
+    email: ['', [Validators.required, emailValidator()]],
     password: ['', [Validators.required, Validators.minLength(8)]],
   });
 
   forgotForm = this.fb.nonNullable.group({
-    email: ['', [Validators.required, Validators.email]],
+    email: ['', [Validators.required, emailValidator()]],
   });
 
   onSubmit(): void {

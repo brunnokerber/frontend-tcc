@@ -1,0 +1,165 @@
+<div class="dialog-container p-4">
+  <!-- Cabeçalho -->
+  <div class="d-flex align-items-center justify-content-between pb-3 mb-3 border-bottom border-surface">
+    <div class="d-flex align-items-center gap-2">
+      <div class="dialog-icon-badge rounded-circle d-flex align-items-center justify-content-center">
+        <mat-icon>{{ isEditing() ? 'edit' : 'volunteer_activism' }}</mat-icon>
+      </div>
+      <div>
+        <h2 class="h5 fw-bold mb-0 text-surface-main">
+          {{ isEditing() ? 'Editar Voluntário(a)' : 'Novo Voluntário(a)' }}
+        </h2>
+        <span class="text-surface-muted small">
+          {{ isEditing() ? 'Atualize as informações cadastrais e disponibilidade' : 'Cadastre um novo colaborador voluntário na ONG' }}
+        </span>
+      </div>
+    </div>
+    <button mat-icon-button type="button" (click)="onCancel()" [disabled]="isSaving()" aria-label="Fechar modal">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <!-- Formulário -->
+  <form [formGroup]="voluntarioForm" (ngSubmit)="onSave()" novalidate>
+    <div class="row g-3">
+      <!-- Nome -->
+      <div class="col-12">
+        <mat-form-field appearance="outline" class="w-100">
+          <mat-label>Nome Completo *</mat-label>
+          <input
+            id="nome_voluntario"
+            matInput
+            formControlName="nome"
+            placeholder="Ex: Ana Maria Silva"
+            maxlength="50"
+            cdkFocusInitial
+          />
+          <mat-icon matPrefix class="me-2">person</mat-icon>
+          @if (voluntarioForm.controls.nome.touched && voluntarioForm.controls.nome.errors) {
+            <mat-error>{{ voluntarioForm.controls.nome | formError }}</mat-error>
+          }
+        </mat-form-field>
+      </div>
+
+      <!-- Telefone / WhatsApp -->
+      <div class="col-12 col-md-6">
+        <mat-form-field appearance="outline" class="w-100">
+          <mat-label>Telefone / WhatsApp *</mat-label>
+          <input
+            id="telefone_voluntario"
+            matInput
+            appPhoneMask
+            formControlName="telefone"
+            placeholder="(51) 99999-9999"
+            maxlength="15"
+          />
+          <mat-icon matPrefix class="me-2">call</mat-icon>
+          @if (voluntarioForm.controls.telefone.touched && voluntarioForm.controls.telefone.errors) {
+            <mat-error>{{ voluntarioForm.controls.telefone | formError }}</mat-error>
+          }
+        </mat-form-field>
+      </div>
+
+      <!-- E-mail -->
+      <div class="col-12 col-md-6">
+        <mat-form-field appearance="outline" class="w-100">
+          <mat-label>E-mail (opcional)</mat-label>
+          <input
+            id="email_voluntario"
+            matInput
+            type="email"
+            formControlName="email"
+            placeholder="voluntario@exemplo.com"
+            maxlength="300"
+          />
+          <mat-icon matPrefix class="me-2">mail</mat-icon>
+          @if (voluntarioForm.controls.email.touched && voluntarioForm.controls.email.errors) {
+            <mat-error>{{ voluntarioForm.controls.email | formError }}</mat-error>
+          }
+        </mat-form-field>
+      </div>
+
+      <!-- Dias da Semana Disponíveis -->
+      <div class="col-12">
+        <label class="form-label fw-semibold text-surface-main small mb-2 d-flex align-items-center gap-1">
+          <mat-icon class="small text-primary" style="font-size: 16px; width: 16px; height: 16px;">calendar_month</mat-icon>
+          Dias da Semana Disponíveis
+        </label>
+        <div class="d-flex flex-wrap gap-2 p-2 rounded-2 border border-surface bg-surface-subtle">
+          @for (dia of diasOptions; track dia) {
+            <button
+              type="button"
+              class="btn btn-sm rounded-pill tag-toggle-btn"
+              [ngClass]="isDiaSelected(dia) ? 'btn-primary active-tag' : 'btn-outline-secondary'"
+              (click)="toggleDia(dia)"
+            >
+              @if (isDiaSelected(dia)) {
+                <mat-icon class="align-middle me-1" style="font-size: 14px; width: 14px; height: 14px;">check</mat-icon>
+              }
+              {{ dia }}
+            </button>
+          }
+        </div>
+      </div>
+
+      <!-- Turnos Disponíveis -->
+      <div class="col-12">
+        <label class="form-label fw-semibold text-surface-main small mb-2 d-flex align-items-center gap-1">
+          <mat-icon class="small text-primary" style="font-size: 16px; width: 16px; height: 16px;">schedule</mat-icon>
+          Turnos Disponíveis
+        </label>
+        <div class="d-flex flex-wrap gap-2 p-2 rounded-2 border border-surface bg-surface-subtle">
+          @for (turno of turnosOptions; track turno) {
+            <button
+              type="button"
+              class="btn btn-sm rounded-pill tag-toggle-btn"
+              [ngClass]="isTurnoSelected(turno) ? 'btn-success active-tag' : 'btn-outline-secondary'"
+              (click)="toggleTurno(turno)"
+            >
+              @if (isTurnoSelected(turno)) {
+                <mat-icon class="align-middle me-1" style="font-size: 14px; width: 14px; height: 14px;">check</mat-icon>
+              }
+              {{ turno }}
+            </button>
+          }
+        </div>
+      </div>
+
+      <!-- Observações -->
+      <div class="col-12">
+        <mat-form-field appearance="outline" class="w-100">
+          <mat-label>Observações / Atividades de Preferência</mat-label>
+          <textarea
+            id="observacoes_voluntario"
+            matInput
+            rows="3"
+            formControlName="observacoes"
+            placeholder="Ex: Disponibilidade quinzenal, experiência com passeios, ajuda em feiras de adoção..."
+            maxlength="500"
+          ></textarea>
+          <mat-icon matPrefix class="me-2">notes</mat-icon>
+        </mat-form-field>
+      </div>
+    </div>
+
+    <!-- Ações -->
+    <div class="d-flex align-items-center justify-content-end gap-2 pt-3 border-top border-surface mt-3">
+      <button mat-button type="button" (click)="onCancel()" [disabled]="isSaving()">
+        Cancelar
+      </button>
+      <button mat-flat-button color="primary" type="submit" [disabled]="isSaving()" class="px-4">
+        @if (isSaving()) {
+          <span class="d-inline-flex align-items-center gap-2">
+            <mat-spinner diameter="18"></mat-spinner>
+            <span>Salvando...</span>
+          </span>
+        } @else {
+          <span class="d-inline-flex align-items-center gap-1">
+            <mat-icon>save</mat-icon>
+            <span>{{ isEditing() ? 'Atualizar' : 'Salvar Voluntário' }}</span>
+          </span>
+        }
+      </button>
+    </div>
+  </form>
+</div>

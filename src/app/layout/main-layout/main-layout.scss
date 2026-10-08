@@ -1,5 +1,4 @@
 .layout-sidenav-container {
-  height: 100vh;
   height: 100dvh;
   width: 100%;
   background-color: var(--mat-sys-surface);
@@ -15,7 +14,6 @@
 }
 
 .user-sidenav {
-  height: 100vh;
   height: 100dvh;
   max-height: 100dvh;
   width: 420px;
@@ -24,25 +22,37 @@
   border-left: 1px solid var(--mat-sys-outline-variant);
   color: var(--mat-sys-on-surface);
   overflow: hidden;
+
+  &-inner {
+    height: 100%;
+    max-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  &-body {
+    overflow-y: auto;
+    overflow-x: hidden;
+    scrollbar-width: thin;
+  }
 }
 
-.user-sidenav-inner {
-  height: 100%;
-  max-height: 100dvh;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-}
-
-.user-sidenav-body {
-  overflow-y: auto;
-  overflow-x: hidden;
-  scrollbar-width: thin;
-}
-
-.user-drawer-card {
+.user-drawer-card,
+.theme-switch-group {
   background-color: var(--mat-sys-surface-container-low);
   border: 1px solid var(--mat-sys-outline-variant);
+}
+
+.theme-card,
+.admin-card,
+.account-card,
+.advanced-account-box,
+.main-navbar,
+.mobile-menu,
+.main-footer {
+  background-color: var(--mat-sys-surface-container-lowest);
+  border-color: var(--mat-sys-outline-variant);
   color: var(--mat-sys-on-surface);
 }
 
@@ -62,19 +72,6 @@
   }
 }
 
-.theme-card,
-.admin-card,
-.account-card {
-  background-color: var(--mat-sys-surface-container-lowest);
-  border: 1px solid var(--mat-sys-outline-variant);
-  color: var(--mat-sys-on-surface);
-}
-
-.theme-switch-group {
-  background-color: var(--mat-sys-surface-container-low);
-  border: 1px solid var(--mat-sys-outline-variant);
-}
-
 .theme-switch-btn {
   background-color: transparent;
   color: var(--mat-sys-on-surface-variant);
@@ -83,10 +80,7 @@
   justify-content: center;
   gap: 0.35rem;
   line-height: 1;
-  transition:
-    background-color 0.2s ease,
-    color 0.2s ease,
-    box-shadow 0.2s ease;
+  transition: all 0.2s ease;
   cursor: pointer;
 
   mat-icon {
@@ -97,7 +91,6 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    vertical-align: middle;
     margin: 0;
   }
 
@@ -120,7 +113,6 @@
 }
 
 .main-navbar {
-  background-color: var(--mat-sys-surface-container-lowest);
   border-bottom: 1px solid var(--mat-sys-outline-variant);
   z-index: 1030;
 }
@@ -175,12 +167,8 @@
   }
 }
 
-.user-profile-btn {
-  transition: background-color 0.2s ease;
-
-  &:hover {
-    background-color: var(--mat-sys-surface-container);
-  }
+.user-profile-btn:hover {
+  background-color: var(--mat-sys-surface-container);
 }
 
 .user-avatar {
@@ -202,10 +190,6 @@
   }
 }
 
-.mobile-menu {
-  background-color: var(--mat-sys-surface-container-lowest);
-}
-
 .mobile-nav-link {
   color: var(--mat-sys-on-surface);
   transition: all 0.2s;
@@ -218,17 +202,12 @@
 }
 
 .main-footer {
-  background-color: var(--mat-sys-surface-container-lowest);
-  border-color: var(--mat-sys-outline-variant);
   color: var(--mat-sys-on-surface-variant);
 }
 
 .account-advanced-details {
   summary {
-    transition:
-      background-color 0.2s ease,
-      color 0.2s ease;
-
+    transition: all 0.2s ease;
     &:hover {
       background-color: var(--mat-sys-surface-container-low);
       color: var(--mat-sys-on-surface);
@@ -240,21 +219,9 @@
   }
 }
 
-.advanced-account-box {
-  background-color: var(--mat-sys-surface-container-lowest);
-  border-color: var(--mat-sys-outline-variant);
-}
-
 @keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(-8px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .animate-fade-in {

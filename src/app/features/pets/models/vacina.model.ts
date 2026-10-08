@@ -28,6 +28,7 @@ export type VacinaUpdateDto = Partial<
 export const VACINAS_SUGESTOES = [
   'V8 (Óctupla Canina)',
   'V10 (Déctupla Canina)',
+  'DHPPI (Polivalente Canina)',
   'Antirrábica (Raiva)',
   'Giárdiase',
   'Gripe Canina (Tosse dos Canis)',

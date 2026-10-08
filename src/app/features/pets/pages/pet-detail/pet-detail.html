@@ -387,9 +387,9 @@
                     @if (vac.veterinario) {
                     <div class="small">
                       <strong>{{ vac.veterinario.nome }}</strong>
-                      @if (vac.veterinario.crvet) {
-                      <span class="text-surface-muted d-block" style="font-size: 0.75rem">CRVET: {{
-                        vac.veterinario.crvet }}</span>
+                      @if (vac.veterinario.crmv) {
+                      <span class="text-surface-muted d-block" style="font-size: 0.75rem">CRMV: {{
+                        vac.veterinario.crmv }}</span>
                       }
                     </div>
                     } @else {
@@ -492,9 +492,9 @@
                     @if (proc.veterinario) {
                     <div class="small">
                       <strong>{{ proc.veterinario.nome }}</strong>
-                      @if (proc.veterinario.crvet) {
-                      <span class="text-surface-muted d-block" style="font-size: 0.75rem">CRVET: {{
-                        proc.veterinario.crvet }}</span>
+                      @if (proc.veterinario.crmv) {
+                      <span class="text-surface-muted d-block" style="font-size: 0.75rem">CRMV: {{
+                        proc.veterinario.crmv }}</span>
                       }
                     </div>
                     } @else {

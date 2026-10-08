@@ -10,6 +10,7 @@ import { ToastService } from '@core/services/toast.service';
 import { PhoneMaskDirective } from '@shared/directives/phone-mask.directive';
 import { FormErrorPipe } from '@shared/pipes/form-error.pipe';
 import { formatPhone, onlyDigits, sanitize } from '@shared/utils/string-utils';
+import { phoneValidator } from '@shared/validators/phone.validators';
 import {
   Veterinario,
   VeterinarioCreateDto,
@@ -50,8 +51,8 @@ export class VeterinarioDialogComponent implements OnInit {
 
   public vetForm = this.fb.group({
     nome: ['', [Validators.required, Validators.maxLength(30)]],
-    crvet: ['', [Validators.required, Validators.maxLength(30)]],
-    telefone: ['', [Validators.required, Validators.minLength(10)]],
+    crmv: ['', [Validators.required, Validators.maxLength(30)]],
+    telefone: ['', [Validators.required, phoneValidator()]],
   });
 
   ngOnInit(): void {
@@ -60,7 +61,7 @@ export class VeterinarioDialogComponent implements OnInit {
       this.isEditing.set(true);
       this.vetForm.patchValue({
         nome: vet.nome,
-        crvet: vet.crvet,
+        crmv: vet.crmv,
         telefone: formatPhone(vet.telefone),
       });
     }
@@ -87,7 +88,7 @@ export class VeterinarioDialogComponent implements OnInit {
       if (this.isEditing() && this.data?.veterinario?.id) {
         const updateDto: VeterinarioUpdateDto = {
           nome: sanitize(formValues.nome) || '',
-          crvet: sanitize(formValues.crvet) || '',
+          crmv: sanitize(formValues.crmv) || '',
           telefone: rawDigitsPhone,
         };
 
@@ -101,7 +102,7 @@ export class VeterinarioDialogComponent implements OnInit {
       } else {
         const createDto: VeterinarioCreateDto = {
           nome: sanitize(formValues.nome) || '',
-          crvet: sanitize(formValues.crvet) || '',
+          crmv: sanitize(formValues.crmv) || '',
           telefone: rawDigitsPhone,
         };
 

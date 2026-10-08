@@ -7,6 +7,8 @@ import { AbstractControl, ValidationErrors } from '@angular/forms';
 const DEFAULT_ERROR_MESSAGES: Record<string, string | ((err: any) => string)> = {
   required: 'Campo obrigatório',
   email: 'E-mail inválido',
+  telefoneInvalido: 'Telefone inválido (DDD + 8 ou 9 dígitos)',
+  phone: 'Telefone inválido (DDD + 8 ou 9 dígitos)',
   mask: 'Formato inválido',
   minlength: (err) => `Mínimo de ${err.requiredLength} caracteres`,
   maxlength: (err) => `Máximo de ${err.requiredLength} caracteres`,
@@ -29,6 +31,8 @@ const DEFAULT_PRIORITY: string[] = [
   'mismatch',
   'strongPassword',
   'cnpjInvalido',
+  'telefoneInvalido',
+  'phone',
   'email',
   'mask',
   'minlength',

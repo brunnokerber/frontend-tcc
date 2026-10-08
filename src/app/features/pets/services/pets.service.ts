@@ -1,9 +1,9 @@
 import { inject, Injectable, signal } from '@angular/core';
-import { AuthService } from '@core/auth/services/auth.service';
 import { SupabaseService } from '@core/services/supabase';
 import { ToastService } from '@core/services/toast.service';
 import {
   Entrada,
+  EntradaUpdateDto,
   Pet,
   PetCreateDto,
   PetFilter,
@@ -15,7 +15,6 @@ import {
 })
 export class PetsService {
   private supabase = inject(SupabaseService);
-  private authService = inject(AuthService);
   private toast = inject(ToastService);
 
   private readonly petsSignal = signal<Pet[]>([]);
@@ -104,50 +103,28 @@ export class PetsService {
   async createPet(dto: PetCreateDto): Promise<Pet | null> {
     this.loadingSignal.set(true);
     try {
-      const userId = this.authService.getUserId();
-      if (!userId) {
-        throw new Error('Usuário autenticado não encontrado para registrar a entrada.');
-      }
-
       const { local_origem, data_entrada, resgatante, observacoes, ...petPayload } = dto;
-
-      // 1. Inserir na tabela pets
-      const { data: petData, error: petError } = await this.supabase.client
-        .from('pets')
-        .insert([petPayload])
-        .select()
-        .single();
-
-      if (petError) {
-        throw petError;
-      }
-
-      const createdPet = petData as Pet;
-
-      // 2. Inserir na tabela entradas
-      const entradaPayload: Omit<Entrada, 'id' | 'created_at' | 'updated_at'> = {
-        id_pet: createdPet.id,
-        id_usuario: userId,
+      const entradaPayload = {
         local_origem,
         data_entrada,
         resgatante,
         observacoes,
       };
 
-      const { data: entradaData, error: entradaError } = await this.supabase.client
-        .from('entradas')
-        .insert([entradaPayload])
-        .select()
-        .single();
+      // Chamada atômica à stored procedure (RPC) no PostgreSQL
+      const { data, error } = await this.supabase.client.rpc('create_pet_com_entrada', {
+        p_pet_data: petPayload,
+        p_entrada_data: entradaPayload,
+      });
 
-      if (entradaError) {
-        console.error('Erro ao cadastrar entrada do pet:', entradaError);
-        this.toast.warning('Pet cadastrado, mas houve erro ao salvar dados de entrada.');
-      } else {
-        createdPet.entradas = [entradaData as Entrada];
+      if (error) {
+        throw error;
       }
 
-      this.toast.success(`Pet "${createdPet.nome}" cadastrado com sucesso!`);
+      const petId = (data as any)?.pet_id || (typeof data === 'number' ? data : null);
+      const createdPet = petId ? await this.getPetById(petId) : null;
+
+      this.toast.success(`Pet "${dto.nome}" cadastrado com sucesso!`);
       await this.fetchPets();
       return createdPet;
     } catch (err: any) {
@@ -159,25 +136,27 @@ export class PetsService {
     }
   }
 
-  async updatePet(id: number, dto: PetUpdateDto): Promise<Pet | null> {
+  async updatePet(
+    id: number,
+    dto: PetUpdateDto,
+    entradaDto?: EntradaUpdateDto,
+    _entradaId?: number
+  ): Promise<Pet | null> {
     this.loadingSignal.set(true);
     try {
-      const { data, error } = await this.supabase.client
-        .from('pets')
-        .update({
-          ...dto,
-          updated_at: new Date().toISOString(),
-        })
-        .eq('id', id)
-        .select('*, entradas(*)')
-        .single();
+      // Chamada atômica à stored procedure (RPC) no PostgreSQL
+      const { error } = await this.supabase.client.rpc('update_pet_com_entrada', {
+        p_pet_id: id,
+        p_pet_data: dto,
+        p_entrada_data: entradaDto || null,
+      });
 
       if (error) {
         throw error;
       }
 
-      const updated = data as Pet;
-      this.toast.success(`Pet "${updated.nome}" atualizado com sucesso!`);
+      const updated = await this.getPetById(id);
+      this.toast.success(`Pet "${dto.nome || updated?.nome}" atualizado com sucesso!`);
       await this.fetchPets();
       return updated;
     } catch (err: any) {

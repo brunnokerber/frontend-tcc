@@ -2,14 +2,15 @@
 ### Trabalho de Conclusão de Curso (TCC) — Engenharia da Computação | Universidade Feevale
 
 > **Projeto:** DESENVOLVIMENTO E VALIDAÇÃO DE SOFTWARE DE GERENCIAMENTO DE DADOS CADASTRAIS DE ANIMAIS DE ONGS DE ACOLHIMENTO E TRATAMENTO DE ANIMAIS DE RUA  
-> **Frontend:** Single Page Application (SPA) reativa desenvolvida em **Angular 20**, **Signals**, **Angular Material 20** e **Supabase**.
+> **Frontend:** Single Page Application (SPA) reativa desenvolvida em **Angular 20**, **Signals**, **Angular Material 20** e **Supabase**.  
+> **Backend:** Infraestrutura de banco de dados, migrações SQL, Edge Functions e RLS disponíveis no repositório [backend-supabase](https://github.com/brunnokerber/backend-supabase).
 
 ---
 
 ## 📑 Sumário
 
 - [Visão Geral e Contexto](#-visão-geral-e-contexto)
-- [Documentações Oficiais do TCC](#-documentações-oficiais-do-tcc)
+- [Documentações Oficiais do TCC e Repositórios](#-documentações-oficiais-do-tcc-e-repositórios)
 - [Tecnologias Utilizadas](#-tecnologias-utilizadas)
 - [Arquitetura de Diretórios](#-arquitetura-de-diretórios)
 - [Pré-requisitos](#-pré-requisitos)
@@ -27,17 +28,18 @@ A plataforma foi desenvolvida para solucionar desafios operacionais de ONGs e ab
 1. **Triagem de Resgates e Cadastro de Animais:** Coleta detalhada de características biológicas, fotos, documentos e cálculo algorítmico automatizado de fase de vida (*Filhote, Adulto, Sênior*).
 2. **Prontuário Clínico & Financeiro:** Acompanhamento de vacinas com calendário preventivo, consultas, exames laboratoriais, cirurgias e totalização reativa de despesas investidas no animal.
 3. **Gestão de Estadias e Lares Temporários:** Histórico contínuo de movimentação e auxílio financeiro pago a lares parceiros.
-4. **Corpo Clínico Parceiro:** Cadastro e vínculo de médicos veterinários por CRVET.
+4. **Corpo Clínico Parceiro:** Cadastro e vínculo de médicos veterinários por CRMV.
 5. **Governança de Usuários:** Autenticação segura JWT, papéis de acesso (*Administrador* vs. *Operador*), convites por e-mail e soft delete com banimento síncrono.
 
 ---
 
-## 📚 Documentações Oficiais do TCC
+## 📚 Documentações Oficiais do TCC e Repositórios
 
-Acesse os documentos de fundamentação metodológica e modelagem do projeto:
+Acesse os documentos de fundamentação metodológica, modelagem e código-fonte do ecossistema:
 
-* 📄 [**Elicitação e Especificação de Requisitos**](./docs/ELICITACAO_DE_REQUISITOS.md) — 24 Requisitos Funcionais (RF), 18 Regras de Negócio (RN), 10 Requisitos Não-Funcionais (RNF) e Matriz de Rastreabilidade (RTM).
+* 📄 [**Elicitação e Especificação de Requisitos**](./docs/ELICITACAO_DE_REQUISITOS.md) — 27 Requisitos Funcionais (RF), 19 Regras de Negócio (RN), 10 Requisitos Não-Funcionais (RNF) e Matriz de Rastreabilidade (RTM).
 * 🏛️ [**Arquitetura Geral da Solução**](./docs/ARQUITETURA_DO_SISTEMA.md) — Diagrama de arquitetura em 3 camadas (Frontend SPA, Supabase BaaS, DevOps) com script Draw.io nativo.
+* 🗄️ [**Repositório do Backend (Supabase)**](https://github.com/brunnokerber/backend-supabase) — Scripts SQL de migração DDL/DML, modelagem relacional no PostgreSQL, políticas RLS (Row Level Security) e Edge Functions.
 
 ---
 
@@ -46,7 +48,7 @@ Acesse os documentos de fundamentação metodológica e modelagem do projeto:
 * **Framework:** [Angular](https://angular.dev/) v20.2.x (Standalone Components, Signals & Computed Signals, Reactive Forms, Control Flow `@if/@for`)
 * **Design System & UI:** [Angular Material](https://material.angular.io/) v20.2.x, Material Design 3, FontAwesome & Bootstrap Icons
 * **Estilização:** Sass (SCSS) modularizado com temas Light/Dark reativos
-* **Backend as a Service (BaaS):** [Supabase](https://supabase.com/) (PostgreSQL Relacional, GoTrue Auth com JWT, Row Level Security e Edge Functions)
+* **Backend as a Service (BaaS):** [Supabase](https://supabase.com/) (PostgreSQL Relacional, GoTrue Auth com JWT, Row Level Security e Edge Functions) — Repositório com scripts e migrações em [backend-supabase](https://github.com/brunnokerber/backend-supabase)
 * **Linguagem:** [TypeScript](https://www.typescriptlang.org/) v5.9+
 
 ---
@@ -59,6 +61,7 @@ O projeto segue a arquitetura em camadas orientada a funcionalidades (*Feature-D
 frontend-tcc/
 ├── docs/                        # Documentação formal de requisitos e diagramas EER
 │   ├── ELICITACAO_DE_REQUISITOS.md
+│   └── ARQUITETURA_DO_SISTEMA.md
 ├── src/
 │   ├── app/
 │   │   ├── core/                # Serviços singleton, auth, guards, interceptors, supabase client
@@ -72,7 +75,8 @@ frontend-tcc/
 │   │   │   ├── login/           # Tela de autenticação
 │   │   │   ├── pets/            # Prontuário, triagem, vacinas, procedimentos e estadias
 │   │   │   ├── usuarios/        # Administração de usuários e convites (apenas Admin)
-│   │   │   └── veterinarios/    # Cadastro e busca de médicos veterinários
+│   │   │   ├── veterinarios/    # Cadastro e busca de médicos veterinários
+│   │   │   └── voluntarios/     # Gestão e escalas de voluntários por dia/turno (apenas Admin)
 │   │   ├── layout/              # Shell da aplicação (MainLayout, Sidenav, Header, alternância de tema)
 │   │   └── shared/              # Utilitários, pipes, diretivas e componentes reutilizáveis
 │   │       ├── adapters/        # CustomDateAdapter (formatação brasileira DD/MM/YYYY)
@@ -176,12 +180,18 @@ npm run start-remote
 * Histórico de alocação de pets por localidade (`pets_locais`) com valor de auxílio.
 
 ### 3. Módulo de Veterinários (`/veterinarios`)
-* Cadastro de médicos veterinários e clínicas parceiras por nome, CRVET e telefone de contato.
+* Cadastro de médicos veterinários e clínicas parceiras por nome, CRMV e telefone de contato.
 
 ### 4. Módulo de Administração de Usuários (`/usuarios` — Apenas Admin)
 * Convite de novos usuários por e-mail com atribuição de perfil (`admin` ou `user`).
 * Desativação lógica com banimento síncrono no Auth sem exclusão de dados de auditoria (*Soft Delete*).
 * Alternância dinâmica de papéis e auto-desativação com encerramento de sessão.
+
+### 5. Módulo de Voluntários e Escalas de Apoio (`/voluntarios` — Apenas Admin)
+* Cadastro de colaboradores voluntários com nome, telefone com máscara brasileira, e-mail e observações operacionais.
+* Seleção dinâmica de múltiplos dias da semana (*Segunda* a *Domingo*) e turnos disponíveis (*Manhã*, *Tarde*, *Noite*).
+* Filtros combinados por dias e turnos utilizando operador `@>` (`.contains()`) com aceleração por índices GIN no PostgreSQL.
+* Acionamento direto via WhatsApp para convocação rápida para plantões, resgates e eventos.
 
 ---
 
@@ -189,5 +199,5 @@ npm run start-remote
 
 | Perfil | Acessos e Permissões |
 | :--- | :--- |
-| **Administrador (`admin`)** | Acesso total a todas as telas, cadastro de pets, prontuários, clínicas, lares temporários e gestão completa de usuários (`/usuarios`). |
-| **Operador (`user`)** | Acesso operacional para cadastro de pets, lançamentos no prontuário, gestão de lares temporários e veterinários. Bloqueado na rota `/usuarios` via `adminGuard`. |
+| **Administrador (`admin`)** | Acesso total a todas as telas, cadastro de pets, prontuários, retificação e edição de dados de entrada/resgate, gestão de clínicas, lares temporários, quadro de voluntários (`/voluntarios`) e administração completa de usuários (`/usuarios`). |
+| **Operador (`user`)** | Acesso operacional para cadastro de pets, lançamentos no prontuário, gestão de lares temporários e veterinários. Bloqueado nas rotas `/usuarios` e `/voluntarios` via `adminGuard` e com dados de entrada de pets em modo somente-leitura na edição. |

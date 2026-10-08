@@ -327,7 +327,14 @@
             </h2>
           </div>
           @if (isEditing()) {
-            <span class="text-surface-muted small">Registrado no cadastro inicial</span>
+            @if (isAdmin()) {
+              <span class="badge bg-warning text-dark small fw-semibold">
+                <mat-icon class="align-middle me-1" style="font-size: 14px; height: 14px; width: 14px;">admin_panel_settings</mat-icon>
+                Edição de Entrada Habilitada (Admin)
+              </span>
+            } @else {
+              <span class="text-surface-muted small">Registrado no cadastro inicial (somente-leitura para operador)</span>
+            }
           }
         </div>
 
@@ -335,14 +342,14 @@
           <!-- Local de Origem -->
           <div class="col-12 col-md-6">
             <mat-form-field appearance="outline" class="w-100">
-              <mat-label>Local de Origem / Resgate {{ !isEditing() ? '*' : '' }}</mat-label>
+              <mat-label>Local de Origem / Resgate {{ !isEditing() || isAdmin() ? '*' : '' }}</mat-label>
               <input
                 id="local_origem"
                 matInput
                 formControlName="local_origem"
                 placeholder="Ex: Resgate Bairro Centro, Entrega Voluntária, Av. Principal"
                 maxlength="50"
-                [readonly]="isEditing()"
+                [readonly]="isEditing() && !isAdmin()"
                 aria-label="Local de Origem ou Resgate"
               />
               <mat-icon matPrefix class="me-2">location_on</mat-icon>
@@ -355,14 +362,14 @@
           <!-- Resgatante -->
           <div class="col-12 col-md-6">
             <mat-form-field appearance="outline" class="w-100">
-              <mat-label>Resgatante / Responsável {{ !isEditing() ? '*' : '' }}</mat-label>
+              <mat-label>Resgatante / Responsável {{ !isEditing() || isAdmin() ? '*' : '' }}</mat-label>
               <input
                 id="resgatante"
                 matInput
                 formControlName="resgatante"
                 placeholder="Ex: Nome da pessoa ou entidade"
                 maxlength="50"
-                [readonly]="isEditing()"
+                [readonly]="isEditing() && !isAdmin()"
                 aria-label="Resgatante ou Responsável"
               />
               <mat-icon matPrefix class="me-2">person</mat-icon>
@@ -375,7 +382,7 @@
           <!-- Data de Entrada -->
           <div class="col-12 col-md-6">
             <mat-form-field appearance="outline" class="w-100">
-              <mat-label>Data de Entrada {{ !isEditing() ? '*' : '' }}</mat-label>
+              <mat-label>Data de Entrada {{ !isEditing() || isAdmin() ? '*' : '' }}</mat-label>
               <input
                 id="data_entrada"
                 matInput
@@ -386,13 +393,13 @@
                 [matDatepicker]="pickerEntrada"
                 formControlName="data_entrada"
                 placeholder="dd/mm/aaaa"
-                [readonly]="isEditing()"
+                [readonly]="isEditing() && !isAdmin()"
                 aria-label="Data de Entrada"
               />
               <mat-datepicker-toggle
                 matIconSuffix
                 [for]="pickerEntrada"
-                [disabled]="isEditing()"
+                [disabled]="isEditing() && !isAdmin()"
               ></mat-datepicker-toggle>
               <mat-datepicker #pickerEntrada></mat-datepicker>
               @if (petForm.controls.data_entrada.touched && petForm.controls.data_entrada.errors) {
@@ -415,7 +422,7 @@
                 rows="3"
                 placeholder="Ex: Condições de saúde no resgate, comportamento inicial, etc."
                 maxlength="200"
-                [readonly]="isEditing()"
+                [readonly]="isEditing() && !isAdmin()"
                 aria-label="Observações da Entrada"
               ></textarea>
               <mat-icon matPrefix class="me-2">notes</mat-icon>
