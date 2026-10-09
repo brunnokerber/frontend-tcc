@@ -82,3 +82,25 @@ html.dark-theme,
   --mat-snack-bar-supporting-text-color: #ffffff;
   --mat-snack-bar-button-color: #e0e0e0;
 }
+
+/* Menu Dropdown de Exportação alinhado ao botão (sem !important) */
+.mat-mdc-menu-panel.custom-export-menu {
+  min-width: 195px;
+  max-width: 195px;
+  width: 195px;
+  border-radius: 10px;
+
+  .mat-mdc-menu-item {
+    min-height: 44px;
+    font-size: 0.875rem;
+    padding: 0 14px;
+
+    .mat-icon {
+      margin-right: 8px;
+      font-size: 20px;
+      width: 20px;
+      height: 20px;
+    }
+  }
+}
+

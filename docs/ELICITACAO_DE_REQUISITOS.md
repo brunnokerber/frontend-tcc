@@ -108,6 +108,11 @@ O processo metodológico de Engenharia de Requisitos adotado no presente TCC bas
   * **Prioridade:** Must Have (Essencial)
   * **Regras Associadas:** RN11, RN15
 
+* **[RF28] Exportação e Emissão de Relatórios Gerenciais de Pets (Excel e PDF)**
+  * **Descrição:** O sistema deve permitir a exportação dinâmica dos dados dos animais cadastrados para planilha Excel (`.csv` com codificação UTF-8 BOM e delimitador compatível) e a geração de documento para impressão/salvamento em PDF formatado institucionalmente, considerando fielmente todos os filtros aplicados na tela (busca dinâmica, espécie, sexo, status, porte e fase da vida) e incluindo resumo estatístico e indicadores quantitativos.
+  * **Prioridade:** Should Have (Importante)
+  * **Regras Associadas:** RN07, RN08
+
 ---
 
 ### Módulo 3: Prontuário Clínico (Vacinas e Procedimentos/Consultas)
@@ -322,6 +327,7 @@ O processo metodológico de Engenharia de Requisitos adotado no presente TCC bas
 | **RF25** | Cadastro de voluntários e disponibilidades | RN17, RN19 | RNF01, RNF04, RNF08 | `voluntarios` | `VoluntarioDialogComponent`, `VoluntariosService` |
 | **RF26** | Listagem e filtros de voluntários | RN19 | RNF01, RNF03, RNF04 | `voluntarios` | `VoluntarioListComponent`, `VoluntariosService` |
 | **RF27** | Edição e exclusão de voluntários | RN17, RN19 | RNF01, RNF08 | `voluntarios` | `VoluntarioDialogComponent`, `VoluntarioListComponent` |
+| **RF28** | Relatórios gerenciais de pets (Excel/PDF) | RN07, RN08 | RNF01, RNF04, RNF10 | `pets`, `entradas` | `PetReportService`, `PetListComponent` |
 
 ---
 

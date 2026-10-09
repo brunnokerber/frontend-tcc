@@ -49,6 +49,7 @@ Ao concluir qualquer tarefa que envolva nova feature, alteração de regras de n
 - **TypeScript Estrito:** Nunca use `any`. Crie e mantenha interfaces e types consistentes para todos os modelos de dados e respostas de API.
 - **Tratamento de Erros:** Sempre trate respostas de erro da API/Supabase fornecendo feedback visual ao usuário (snackbars/toasts).
 - **Acessibilidade e Design Responsivo:** Garantir conformidade com mobile-first, suporte a tema claro/escuro e acessibilidade (contrastes, labels e tags semânticas).
+- **Boas Práticas de CSS/SCSS:** **Evitar ao máximo o uso de `!important`** em estilizações. Priorize a especificidade correta de seletores, variáveis CSS (`var(--mat-sys-*)`) e herança limpa do Design System.
 
 ---
 
@@ -57,5 +58,7 @@ Ao concluir qualquer tarefa que envolva nova feature, alteração de regras de n
 Antes de considerar uma resposta ou feature concluída, a IA deve verificar:
 - [ ] O código compila sem erros (`npm run build` / typecheck)?
 - [ ] A nova funcionalidade está devidamente tipada sem uso de `any`?
+- [ ] As estilizações respeitam as boas práticas de CSS sem uso desnecessário de `!important`?
 - [ ] A documentação técnica em `docs/` e `README.md` foi atualizada?
 - [ ] Foi comunicado ao usuário um resumo das alterações no código e nos documentos?
+

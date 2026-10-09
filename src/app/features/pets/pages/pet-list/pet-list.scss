@@ -16,6 +16,31 @@
   }
 }
 
+.btn-export {
+  background-color: var(--mat-sys-surface-container-lowest);
+  border-color: var(--mat-sys-outline-variant);
+  color: var(--mat-sys-on-surface);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  @media (min-width: 576px) {
+    min-width: 195px;
+  }
+
+  &:hover:not(:disabled) {
+    background-color: var(--mat-sys-surface-container-high);
+    border-color: var(--mat-sys-outline);
+  }
+}
+
+.btn-create {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+}
+
 .stat-card {
   background-color: var(--mat-sys-surface-container-lowest);
   border: 1px solid var(--mat-sys-outline-variant);

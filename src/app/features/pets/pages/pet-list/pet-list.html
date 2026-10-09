@@ -1,7 +1,7 @@
 <div class="container-fluid px-3 px-md-4">
   <!-- Cabeçalho da Página -->
   <div class="row align-items-center mb-4 g-3">
-    <div class="col-12 col-md-7">
+    <div class="col-12 col-md-6 col-xl-7">
       <div class="d-flex align-items-center gap-3">
         <div class="header-icon-box d-flex align-items-center justify-content-center">
           <mat-icon>pets</mat-icon>
@@ -14,12 +14,34 @@
         </div>
       </div>
     </div>
-    <div class="col-12 col-md-5 d-flex justify-content-md-end gap-2">
-      <button mat-flat-button color="primary" routerLink="/pets/novo"
-        class="btn-create d-flex align-items-center gap-2 py-2 px-3 rounded-3 shadow-sm">
-        <mat-icon>add</mat-icon>
-        <span class="fw-semibold">Cadastrar Novo Pet</span>
-      </button>
+    <div class="col-12 col-md-6 col-xl-5">
+      <div class="d-flex flex-row justify-content-sm-end align-items-center gap-2">
+        <!-- Menu de Exportação / Relatórios -->
+        <button mat-stroked-button [matMenuTriggerFor]="exportMenu"
+          [disabled]="petsService.loading() || petsService.pets().length === 0"
+          class="btn-export flex-fill flex-sm-grow-0 py-2 px-2 px-sm-3 rounded-3 shadow-xs">
+          <mat-icon>file_download</mat-icon>
+          <span class="fw-semibold"><span class="d-none d-sm-inline">Exportar </span>Relatório</span>
+          <mat-icon iconPositionEnd>expand_more</mat-icon>
+        </button>
+
+        <mat-menu #exportMenu="matMenu" class="custom-export-menu shadow-sm">
+          <button mat-menu-item (click)="exportExcel()">
+            <mat-icon class="text-success">table_chart</mat-icon>
+            <span>Planilha Excel</span>
+          </button>
+          <button mat-menu-item (click)="exportPdf()">
+            <mat-icon class="text-danger">picture_as_pdf</mat-icon>
+            <span>Relatório em PDF</span>
+          </button>
+        </mat-menu>
+
+        <button mat-flat-button color="primary" routerLink="/pets/novo"
+          class="btn-create flex-fill flex-sm-grow-0 py-2 px-2 px-sm-3 rounded-3 shadow-sm">
+          <mat-icon>add</mat-icon>
+          <span class="fw-semibold"><span class="d-none d-sm-inline">Cadastrar </span>Novo Pet</span>
+        </button>
+      </div>
     </div>
   </div>
 

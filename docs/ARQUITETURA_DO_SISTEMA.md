@@ -39,7 +39,7 @@ Para atender aos critérios de usabilidade móvel, baixo tempo de resposta, segu
 | :--- | :--- | :--- |
 | **Apresentação (Frontend)** | **Angular 20 (Zoneless + Signals)** | Gestão de estado reativo fino, roteamento de telas com Lazy Loading e renderização otimizada. |
 | | **Angular Material 20 + Bootstrap 5** | Design System responsivo, temas Light/Dark e componentes acessíveis com alvos de toque ergonômicos. |
-| | **Core & Shared Modules** | Serviços singleton (`AuthService`, `SupabaseService`), guardas de rota (`authGuard`, `adminGuard`) e componentes comuns. |
+| | **Core, Features & Shared Services** | Serviços de negócio e infraestrutura (`AuthService`, `SupabaseService`, `PetsService`, `PetReportService` para relatórios Excel/PDF client-side), guardas de rota (`authGuard`, `adminGuard`) e componentes comuns. |
 | **Comunicação** | **HTTPS / TLS 1.3 & JWT (RFC 7519)** | Tráfego criptografado e autenticação stateless com tokens no header `Authorization: Bearer <token>`. |
 | **Serviços e Banco (BaaS)** | **Supabase Auth (GoTrue)** | Gestão de sessões, criptografia de credenciais, disparo de convites e recuperação de senhas. |
 | | **PostgREST API Engine** | Interface RESTful gerada automaticamente sobre o schema relacional do PostgreSQL. |

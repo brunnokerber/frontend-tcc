@@ -7,6 +7,7 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
+import { MatMenuModule } from '@angular/material/menu';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSelectModule } from '@angular/material/select';
@@ -26,6 +27,7 @@ import {
   STATUS_OPTIONS,
   TIPO_PET_OPTIONS,
 } from '../../models/pet.model';
+import { PetReportFilterItem, PetReportService } from '../../services/pet-report.service';
 import { PetsService } from '../../services/pets.service';
 
 @Component({
@@ -42,6 +44,7 @@ import { PetsService } from '../../services/pets.service';
     MatFormFieldModule,
     MatSelectModule,
     MatChipsModule,
+    MatMenuModule,
     MatPaginatorModule,
     MatProgressSpinnerModule,
     MatTooltipModule,
@@ -51,6 +54,7 @@ import { PetsService } from '../../services/pets.service';
 })
 export default class PetListComponent implements OnInit {
   public petsService = inject(PetsService);
+  public petReportService = inject(PetReportService);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
 
@@ -203,6 +207,59 @@ export default class PetListComponent implements OnInit {
   readonly getTipoBadgeClass = getTipoBadgeClass;
   readonly getTipoFaIcon = getTipoFaIcon;
   readonly getSexoIcon = getSexoIcon;
+
+  getAppliedFiltersSummary(): PetReportFilterItem[] {
+    const items: PetReportFilterItem[] = [];
+
+    const val = this.searchValue().trim();
+    if (val) {
+      const fieldOption = this.searchFields.find((f) => f.value === this.searchField());
+      items.push({
+        label: fieldOption?.label || 'Busca',
+        value: val,
+      });
+    }
+
+    if (this.tipoFilter()) {
+      items.push({ label: 'Espécie', value: this.tipoFilter() });
+    }
+    if (this.sexoFilter()) {
+      items.push({ label: 'Sexo', value: this.sexoFilter() });
+    }
+    if (this.statusFilter()) {
+      items.push({ label: 'Status', value: this.statusFilter() });
+    }
+    if (this.porteFilter()) {
+      items.push({ label: 'Porte', value: this.porteFilter() });
+    }
+    if (this.senioridadeFilter()) {
+      items.push({ label: 'Fase da Vida', value: this.senioridadeFilter() });
+    }
+
+    return items;
+  }
+
+  exportExcel(): void {
+    const list = this.petsService.pets();
+    if (!list || list.length === 0) return;
+    this.petReportService.exportToCsv(list, this.getAppliedFiltersSummary());
+  }
+
+  exportPdf(): void {
+    const list = this.petsService.pets();
+    if (!list || list.length === 0) return;
+    this.petReportService.generatePdfReport(
+      list,
+      {
+        total: this.totalPets(),
+        disponiveis: this.totalDisponiveis(),
+        tratamento: this.totalTratamento(),
+        adotados: this.totalAdotados(),
+        obitos: this.totalObitos(),
+      },
+      this.getAppliedFiltersSummary(),
+    );
+  }
 
   goToDetails(pet: Pet) {
     this.petsService.setCachedPet(pet);
