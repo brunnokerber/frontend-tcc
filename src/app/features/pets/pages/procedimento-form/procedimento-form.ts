@@ -130,8 +130,17 @@ export default class ProcedimentoFormComponent implements OnInit {
 
     this.petId.set(idPet);
 
-    // Carregar dados do pet e veterinários em paralelo
-    await Promise.all([this.loadPetData(idPet), this.loadVeterinarios()]);
+    // Carrega dados do Pet (aproveitando state se disponível)
+    const statePet = history.state?.pet as Pet | undefined;
+    if (statePet && statePet.id === idPet) {
+      this.pet.set(statePet);
+      this.procedimentoForm.controls.data_realizacao.updateValueAndValidity({ emitEvent: false });
+    } else {
+      this.loadPetData(idPet);
+    }
+
+    // Carregar veterinários em segundo plano com loading local no selector
+    this.loadVeterinarios();
 
     // Se estiver em modo edição
     if (procIdParam) {
@@ -139,19 +148,30 @@ export default class ProcedimentoFormComponent implements OnInit {
       if (!isNaN(idProc)) {
         this.isEditing.set(true);
         this.procedimentoId.set(idProc);
-        await this.loadProcedimentoData(idProc);
+
+        // Otimização: Reaproveitar procedimento/consulta passado no state da rota anterior
+        const stateProc = (history.state?.procedimento || history.state?.consulta) as ConsultaExame | undefined;
+        if (stateProc && stateProc.id === idProc) {
+          this.setProcedimentoData(stateProc);
+        } else {
+          this.loadProcedimentoData(idProc);
+        }
       }
     }
   }
 
-  async loadPetData(id: number): Promise<void> {
-    const statePet = history.state?.pet as Pet | undefined;
-    if (statePet && statePet.id === id) {
-      this.pet.set(statePet);
-      this.procedimentoForm.controls.data_realizacao.updateValueAndValidity({ emitEvent: false });
-      return;
-    }
+  private setProcedimentoData(proc: ConsultaExame): void {
+    this.existingProcedimento.set(proc);
+    this.procedimentoForm.patchValue({
+      tipo_operacao: proc.tipo_operacao,
+      operacao_medicamento: proc.operacao_medicamento,
+      data_realizacao: parseIsoToDate(proc.data_realizacao),
+      custo: proc.custo != null ? Number(proc.custo) : null,
+      id_veterinario: proc.id_veterinario || null,
+    });
+  }
 
+  async loadPetData(id: number): Promise<void> {
     const pet = await this.petsService.getPetById(id);
     if (!pet) {
       this.toast.error('Pet não encontrado.');
@@ -183,15 +203,7 @@ export default class ProcedimentoFormComponent implements OnInit {
         this.goBack();
         return;
       }
-
-      this.existingProcedimento.set(proc);
-      this.procedimentoForm.patchValue({
-        tipo_operacao: proc.tipo_operacao,
-        operacao_medicamento: proc.operacao_medicamento,
-        data_realizacao: parseIsoToDate(proc.data_realizacao),
-        custo: proc.custo != null ? Number(proc.custo) : null,
-        id_veterinario: proc.id_veterinario || null,
-      });
+      this.setProcedimentoData(proc);
     } catch (err: any) {
       this.toast.error(err.message || 'Erro ao carregar dados do procedimento.');
     } finally {
@@ -272,8 +284,6 @@ export default class ProcedimentoFormComponent implements OnInit {
   }
 
   goBack(): void {
-    const id = this.petId();
-    const fallback = id ? ['/pets', 'detalhes', id] : ['/pets'];
-    this.nav.back(fallback);
+    this.nav.back(this.petId() ? ['/pets/detalhes', this.petId()!] : ['/pets']);
   }
 }

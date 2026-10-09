@@ -13,7 +13,15 @@ export class PetsLocaisService {
   private readonly loadingSignal = signal<boolean>(false);
   public readonly loading = this.loadingSignal.asReadonly();
 
-  async getPetsLocaisByPetId(petId: number): Promise<PetLocal[]> {
+  private readonly cachedPetIdSignal = signal<number | null>(null);
+  private readonly locaisSignal = signal<PetLocal[]>([]);
+  public readonly petsLocais = this.locaisSignal.asReadonly();
+
+  async getPetsLocaisByPetId(petId: number, forceRefresh = false): Promise<PetLocal[]> {
+    if (!forceRefresh && this.cachedPetIdSignal() === petId) {
+      return this.locaisSignal();
+    }
+
     this.loadingSignal.set(true);
     try {
       const { data, error } = await this.supabase.client
@@ -24,9 +32,14 @@ export class PetsLocaisService {
 
       if (error) {
         console.warn('Tabela pets_locais vazia ou com erro de consulta:', error.message);
+        this.locaisSignal.set([]);
+        this.cachedPetIdSignal.set(petId);
         return [];
       }
-      return (data as PetLocal[]) || [];
+      const list = (data as PetLocal[]) || [];
+      this.locaisSignal.set(list);
+      this.cachedPetIdSignal.set(petId);
+      return list;
     } catch (err: any) {
       console.warn('Erro ao carregar histórico de locais do pet:', err);
       return [];
@@ -36,6 +49,11 @@ export class PetsLocaisService {
   }
 
   async getPetLocalById(id: number): Promise<PetLocal | null> {
+    const cached = this.locaisSignal().find((l) => l.id === id);
+    if (cached) {
+      return cached;
+    }
+
     this.loadingSignal.set(true);
     try {
       const { data, error } = await this.supabase.client
@@ -71,6 +89,9 @@ export class PetsLocaisService {
 
       const created = data as PetLocal;
       this.toast.success('Local de passagem registrado com sucesso!');
+      if (this.cachedPetIdSignal() === dto.id_pet) {
+        this.locaisSignal.update((list) => [created, ...list]);
+      }
       return created;
     } catch (err: any) {
       const msg = err.message || 'Erro ao registrar local de passagem.';
@@ -100,6 +121,7 @@ export class PetsLocaisService {
 
       const updated = data as PetLocal;
       this.toast.success('Local de passagem atualizado com sucesso!');
+      this.locaisSignal.update((list) => list.map((l) => (l.id === id ? updated : l)));
       return updated;
     } catch (err: any) {
       const msg = err.message || 'Erro ao atualizar local de passagem.';
@@ -108,5 +130,10 @@ export class PetsLocaisService {
     } finally {
       this.loadingSignal.set(false);
     }
+  }
+
+  clearCache(): void {
+    this.cachedPetIdSignal.set(null);
+    this.locaisSignal.set([]);
   }
 }

@@ -13,7 +13,15 @@ export class VacinasService {
   private readonly loadingSignal = signal<boolean>(false);
   public readonly loading = this.loadingSignal.asReadonly();
 
-  async getVacinasByPetId(petId: number): Promise<Vacina[]> {
+  private readonly cachedPetIdSignal = signal<number | null>(null);
+  private readonly vacinasSignal = signal<Vacina[]>([]);
+  public readonly vacinas = this.vacinasSignal.asReadonly();
+
+  async getVacinasByPetId(petId: number, forceRefresh = false): Promise<Vacina[]> {
+    if (!forceRefresh && this.cachedPetIdSignal() === petId) {
+      return this.vacinasSignal();
+    }
+
     this.loadingSignal.set(true);
     try {
       const { data, error } = await this.supabase.client
@@ -24,9 +32,14 @@ export class VacinasService {
 
       if (error) {
         console.warn('Tabela vacinas vazia ou com erro de consulta:', error.message);
+        this.vacinasSignal.set([]);
+        this.cachedPetIdSignal.set(petId);
         return [];
       }
-      return (data as Vacina[]) || [];
+      const list = (data as Vacina[]) || [];
+      this.vacinasSignal.set(list);
+      this.cachedPetIdSignal.set(petId);
+      return list;
     } catch (err: any) {
       console.warn('Erro ao carregar vacinas do pet:', err);
       return [];
@@ -36,6 +49,11 @@ export class VacinasService {
   }
 
   async getVacinaById(id: number): Promise<Vacina | null> {
+    const cached = this.vacinasSignal().find((v) => v.id === id);
+    if (cached) {
+      return cached;
+    }
+
     this.loadingSignal.set(true);
     try {
       const { data, error } = await this.supabase.client
@@ -71,6 +89,9 @@ export class VacinasService {
 
       const created = data as Vacina;
       this.toast.success(`Vacina "${created.nome_vacina}" registrada com sucesso!`);
+      if (this.cachedPetIdSignal() === dto.id_pet) {
+        this.vacinasSignal.update((list) => [created, ...list]);
+      }
       return created;
     } catch (err: any) {
       const msg = err.message || 'Erro ao registrar a vacina.';
@@ -100,6 +121,7 @@ export class VacinasService {
 
       const updated = data as Vacina;
       this.toast.success(`Vacina "${updated.nome_vacina}" atualizada com sucesso!`);
+      this.vacinasSignal.update((list) => list.map((v) => (v.id === id ? updated : v)));
       return updated;
     } catch (err: any) {
       const msg = err.message || 'Erro ao atualizar a vacina.';
@@ -108,5 +130,10 @@ export class VacinasService {
     } finally {
       this.loadingSignal.set(false);
     }
+  }
+
+  clearCache(): void {
+    this.cachedPetIdSignal.set(null);
+    this.vacinasSignal.set([]);
   }
 }

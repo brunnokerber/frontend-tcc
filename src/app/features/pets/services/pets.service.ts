@@ -26,6 +26,9 @@ export class PetsService {
   private readonly errorSignal = signal<string | null>(null);
   public readonly error = this.errorSignal.asReadonly();
 
+  private readonly cachedPetSignal = signal<Pet | null>(null);
+  public readonly cachedPet = this.cachedPetSignal.asReadonly();
+
   async fetchPets(filter?: PetFilter): Promise<Pet[]> {
     this.loadingSignal.set(true);
     this.errorSignal.set(null);
@@ -79,7 +82,11 @@ export class PetsService {
     }
   }
 
-  async getPetById(id: number): Promise<Pet | null> {
+  async getPetById(id: number, forceRefresh = false): Promise<Pet | null> {
+    if (!forceRefresh && this.cachedPetSignal()?.id === id) {
+      return this.cachedPetSignal();
+    }
+
     this.loadingSignal.set(true);
     try {
       const { data, error } = await this.supabase.client
@@ -91,13 +98,19 @@ export class PetsService {
       if (error) {
         throw error;
       }
-      return data as Pet;
+      const pet = data as Pet;
+      this.cachedPetSignal.set(pet);
+      return pet;
     } catch (err: any) {
       this.toast.error(err.message || 'Erro ao buscar dados do pet.');
       return null;
     } finally {
       this.loadingSignal.set(false);
     }
+  }
+
+  setCachedPet(pet: Pet | null): void {
+    this.cachedPetSignal.set(pet);
   }
 
   async createPet(dto: PetCreateDto): Promise<Pet | null> {

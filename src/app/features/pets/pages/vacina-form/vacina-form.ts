@@ -168,8 +168,18 @@ export default class VacinaFormComponent implements OnInit {
 
     this.petId.set(idPet);
 
-    // Carregar veterinários e dados do pet em paralelo
-    await Promise.all([this.loadPetData(idPet), this.loadVeterinarios()]);
+    // Carrega dados do Pet (aproveitando state se disponível)
+    const statePet = history.state?.pet as Pet | undefined;
+    if (statePet && statePet.id === idPet) {
+      this.pet.set(statePet);
+      this.vacinaForm.controls.data_prevista.updateValueAndValidity({ emitEvent: false });
+      this.vacinaForm.controls.data_aplicacao.updateValueAndValidity({ emitEvent: false });
+    } else {
+      this.loadPetData(idPet);
+    }
+
+    // Carregar veterinários em segundo plano com loading local no selector
+    this.loadVeterinarios();
 
     // Verificar se é modo de edição
     if (vacinaIdParam) {
@@ -177,19 +187,30 @@ export default class VacinaFormComponent implements OnInit {
       if (!isNaN(idVac)) {
         this.isEditing.set(true);
         this.vacinaId.set(idVac);
-        await this.loadVacinaData(idVac);
+
+        // Otimização: Reaproveitar registro de vacina passado pelo state da rota anterior
+        const stateVacina = history.state?.vacina as Vacina | undefined;
+        if (stateVacina && stateVacina.id === idVac) {
+          this.setVacinaData(stateVacina);
+        } else {
+          this.loadVacinaData(idVac);
+        }
       }
     }
   }
 
-  async loadPetData(id: number): Promise<void> {
-    // Tenta obter dados do pet via history state (otimização)
-    const statePet = history.state?.pet as Pet | undefined;
-    if (statePet && statePet.id === id) {
-      this.pet.set(statePet);
-      return;
-    }
+  private setVacinaData(vacina: Vacina): void {
+    this.existingVacina.set(vacina);
+    this.vacinaForm.patchValue({
+      nome_vacina: vacina.nome_vacina,
+      data_prevista: parseIsoToDate(vacina.data_prevista),
+      data_aplicacao: parseIsoToDate(vacina.data_aplicacao),
+      custo: vacina.custo != null ? Number(vacina.custo) : null,
+      id_veterinario: vacina.id_veterinario || null,
+    });
+  }
 
+  async loadPetData(id: number): Promise<void> {
     const pet = await this.petsService.getPetById(id);
     if (!pet) {
       this.toast.error('Pet não encontrado.');
@@ -222,15 +243,7 @@ export default class VacinaFormComponent implements OnInit {
         this.goBack();
         return;
       }
-
-      this.existingVacina.set(vacina);
-      this.vacinaForm.patchValue({
-        nome_vacina: vacina.nome_vacina,
-        data_prevista: parseIsoToDate(vacina.data_prevista),
-        data_aplicacao: parseIsoToDate(vacina.data_aplicacao),
-        custo: vacina.custo != null ? Number(vacina.custo) : null,
-        id_veterinario: vacina.id_veterinario || null,
-      });
+      this.setVacinaData(vacina);
     } catch (err: any) {
       this.toast.error(err.message || 'Erro ao carregar dados da vacina.');
     } finally {
@@ -309,8 +322,6 @@ export default class VacinaFormComponent implements OnInit {
   }
 
   goBack(): void {
-    const id = this.petId();
-    const fallback = id ? ['/pets', 'detalhes', id] : ['/pets'];
-    this.nav.back(fallback);
+    this.nav.back(this.petId() ? ['/pets/detalhes', this.petId()!] : ['/pets']);
   }
 }

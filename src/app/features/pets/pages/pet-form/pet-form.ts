@@ -137,22 +137,19 @@ export default class PetFormComponent implements OnInit {
       if (!isNaN(id)) {
         this.isEditing.set(true);
         this.petId.set(id);
-        this.loadPetData(id);
+
+        // Otimização: Reaproveitar dados de pet e entrada vindos da tela anterior (state do Router)
+        const statePet = history.state?.pet as Pet | undefined;
+        if (statePet && statePet.id === id) {
+          this.setPetFormData(statePet);
+        } else {
+          this.loadPetData(id);
+        }
       }
     }
   }
 
-  async loadPetData(id: number) {
-    this.isLoading.set(true);
-    const pet = await this.petsService.getPetById(id);
-    this.isLoading.set(false);
-
-    if (!pet) {
-      this.toast.error('Pet não encontrado.');
-      this.router.navigate(['/pets']);
-      return;
-    }
-
+  private setPetFormData(pet: Pet) {
     this.existingPet.set(pet);
 
     // Se o usuário não for administrador na edição, desabilita validação ativa dos campos de entrada
@@ -190,6 +187,20 @@ export default class PetFormComponent implements OnInit {
       resgatante: firstEntrada ? firstEntrada.resgatante : '',
       observacoes: firstEntrada ? firstEntrada.observacoes || '' : '',
     });
+  }
+
+  async loadPetData(id: number) {
+    this.isLoading.set(true);
+    const pet = await this.petsService.getPetById(id);
+    this.isLoading.set(false);
+
+    if (!pet) {
+      this.toast.error('Pet não encontrado.');
+      this.router.navigate(['/pets']);
+      return;
+    }
+
+    this.setPetFormData(pet);
   }
 
   async onSubmit() {
@@ -281,6 +292,6 @@ export default class PetFormComponent implements OnInit {
   }
 
   goBack() {
-    this.nav.back('/pets');
+    this.nav.back(this.petId() ? ['/pets/detalhes', this.petId()!] : ['/pets']);
   }
 }

@@ -82,6 +82,9 @@
                 <mat-label>Local / Estabelecimento Parceiro *</mat-label>
                 <mat-select id="id_local" formControlName="id_local" aria-label="Local ou Estabelecimento Parceiro">
                   <mat-option [value]="null">-- Selecione um local cadastrado --</mat-option>
+                  @if (loadingLocais()) {
+                    <mat-option disabled>Carregando locais parceiros...</mat-option>
+                  }
                   @for (loc of locais(); track loc.id) {
                     <mat-option [value]="loc.id">
                       {{ loc.local }} ({{ loc.tipo_local }}) &bull; {{ loc.cidade }}/{{ loc.estado }}
@@ -89,6 +92,9 @@
                   }
                 </mat-select>
                 <mat-icon matPrefix class="me-2">holiday_village</mat-icon>
+                @if (loadingLocais()) {
+                  <mat-spinner matSuffix diameter="18" class="me-2"></mat-spinner>
+                }
                 <mat-hint>Lar temporário, clínica, abrigo ou hotel parceiro</mat-hint>
                 @if (
                   petLocalForm.controls.id_local.touched &&
@@ -106,6 +112,7 @@
                 (click)="openNewLocalDialog()"
                 matTooltip="Cadastrar novo local parceiro sem sair da tela"
                 aria-label="Cadastrar novo local parceiro"
+                [disabled]="loadingLocais()"
               >
                 <mat-icon>add_location_alt</mat-icon>
                 <span class="d-none d-sm-inline">Novo</span>

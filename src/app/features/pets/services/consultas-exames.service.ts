@@ -17,7 +17,15 @@ export class ConsultasExamesService {
   private readonly loadingSignal = signal<boolean>(false);
   public readonly loading = this.loadingSignal.asReadonly();
 
-  async getConsultasExamesByPetId(petId: number): Promise<ConsultaExame[]> {
+  private readonly cachedPetIdSignal = signal<number | null>(null);
+  private readonly consultasSignal = signal<ConsultaExame[]>([]);
+  public readonly consultas = this.consultasSignal.asReadonly();
+
+  async getConsultasExamesByPetId(petId: number, forceRefresh = false): Promise<ConsultaExame[]> {
+    if (!forceRefresh && this.cachedPetIdSignal() === petId) {
+      return this.consultasSignal();
+    }
+
     this.loadingSignal.set(true);
     try {
       const { data, error } = await this.supabase.client
@@ -28,9 +36,14 @@ export class ConsultasExamesService {
 
       if (error) {
         console.warn('Tabela consultas_exames vazia ou com erro de consulta:', error.message);
+        this.consultasSignal.set([]);
+        this.cachedPetIdSignal.set(petId);
         return [];
       }
-      return (data as ConsultaExame[]) || [];
+      const list = (data as ConsultaExame[]) || [];
+      this.consultasSignal.set(list);
+      this.cachedPetIdSignal.set(petId);
+      return list;
     } catch (err: any) {
       console.warn('Erro ao carregar consultas/exames do pet:', err);
       return [];
@@ -40,6 +53,11 @@ export class ConsultasExamesService {
   }
 
   async getConsultaExameById(id: number): Promise<ConsultaExame | null> {
+    const cached = this.consultasSignal().find((c) => c.id === id);
+    if (cached) {
+      return cached;
+    }
+
     this.loadingSignal.set(true);
     try {
       const { data, error } = await this.supabase.client
@@ -75,6 +93,9 @@ export class ConsultasExamesService {
 
       const created = data as ConsultaExame;
       this.toast.success(`Procedimento "${created.operacao_medicamento}" registrado com sucesso!`);
+      if (this.cachedPetIdSignal() === dto.id_pet) {
+        this.consultasSignal.update((list) => [created, ...list]);
+      }
       return created;
     } catch (err: any) {
       const msg = err.message || 'Erro ao registrar procedimento/consulta.';
@@ -107,6 +128,7 @@ export class ConsultasExamesService {
 
       const updated = data as ConsultaExame;
       this.toast.success(`Procedimento "${updated.operacao_medicamento}" atualizado com sucesso!`);
+      this.consultasSignal.update((list) => list.map((c) => (c.id === id ? updated : c)));
       return updated;
     } catch (err: any) {
       const msg = err.message || 'Erro ao atualizar procedimento/consulta.';
@@ -115,5 +137,10 @@ export class ConsultasExamesService {
     } finally {
       this.loadingSignal.set(false);
     }
+  }
+
+  clearCache(): void {
+    this.cachedPetIdSignal.set(null);
+    this.consultasSignal.set([]);
   }
 }

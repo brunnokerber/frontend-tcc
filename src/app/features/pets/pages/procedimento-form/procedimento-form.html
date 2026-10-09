@@ -166,6 +166,9 @@
                   aria-label="Veterinário(a) Responsável"
                 >
                   <mat-option [value]="null">-- Nenhum selecionado --</mat-option>
+                  @if (loadingVets()) {
+                    <mat-option disabled>Carregando veterinários...</mat-option>
+                  }
                   @for (vet of veterinarios(); track vet.id) {
                     <mat-option [value]="vet.id">
                       {{ vet.nome }} (CRMV: {{ vet.crmv }})
@@ -173,6 +176,9 @@
                   }
                 </mat-select>
                 <mat-icon matPrefix class="me-2">medical_services</mat-icon>
+                @if (loadingVets()) {
+                  <mat-spinner matSuffix diameter="18" class="me-2"></mat-spinner>
+                }
                 @if (
                   procedimentoForm.controls.id_veterinario.touched &&
                   procedimentoForm.controls.id_veterinario.errors
@@ -189,6 +195,7 @@
                 (click)="openNewVeterinarioDialog()"
                 matTooltip="Cadastrar novo veterinário sem sair da tela"
                 aria-label="Cadastrar novo veterinário"
+                [disabled]="loadingVets()"
               >
                 <mat-icon>person_add</mat-icon>
                 <span class="d-none d-sm-inline">Novo</span>

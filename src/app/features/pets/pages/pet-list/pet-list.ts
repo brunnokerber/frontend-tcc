@@ -205,10 +205,12 @@ export default class PetListComponent implements OnInit {
   readonly getSexoIcon = getSexoIcon;
 
   goToDetails(pet: Pet) {
-    this.router.navigate(['/pets/detalhes', pet.id], { state: { pet } });
+    this.petsService.setCachedPet(pet);
+    this.router.navigate(['/pets/detalhes', pet.id]);
   }
 
-  goToEdit(id: number) {
-    this.router.navigate(['/pets', id, 'editar']);
+  goToEdit(pet: Pet) {
+    this.petsService.setCachedPet(pet);
+    this.router.navigate(['/pets', pet.id, 'editar']);
   }
 }

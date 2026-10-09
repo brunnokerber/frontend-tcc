@@ -59,13 +59,15 @@ export default class PetDetailComponent implements OnInit {
   private toast = inject(ToastService);
 
   public petId = signal<number | null>(null);
-  public pet = signal<Pet | null>(null);
-  public vacinas = signal<Vacina[]>([]);
-  public consultasExames = signal<ConsultaExame[]>([]);
-  public petsLocais = signal<PetLocal[]>([]);
+  public pet = this.petsService.cachedPet;
+  public vacinas = this.vacinasService.vacinas;
+  public consultasExames = this.consultasExamesService.consultas;
+  public petsLocais = this.petsLocaisService.petsLocais;
 
-  public loadingPet = signal<boolean>(true);
-  public loadingDetails = signal<boolean>(true);
+  public loadingPet = this.petsService.loading;
+  public loadingVacinas = this.vacinasService.loading;
+  public loadingConsultas = this.consultasExamesService.loading;
+  public loadingLocais = this.petsLocaisService.loading;
 
   // Modos de ordenação (Toggles)
   public vacinaSortMode = signal<SortOrderMode>('cronologico');
@@ -159,53 +161,17 @@ export default class PetDetailComponent implements OnInit {
 
     this.petId.set(id);
 
-    // Otimização: Verificar se recebemos dados do pet via Router State da listagem
-    const statePet = history.state?.pet as Pet | undefined;
-    if (statePet && statePet.id === id) {
-      this.pet.set(statePet);
-      this.loadingPet.set(false);
-      this.loadSubCollections(id);
-    } else {
-      // Carregamento completo do banco
-      this.loadFullPet(id);
-    }
+    // Otimização: A responsabilidade de cache e estado é das services singleton.
+    // Ao navegar de volta (seja por salvar, cancelar ou voltar), se os dados já existirem em memória para o id,
+    // nenhuma chamada de rede é feita.
+    this.loadPetAndSubCollections(id);
   }
 
-  async loadFullPet(id: number) {
-    this.loadingPet.set(true);
-    try {
-      const petData = await this.petsService.getPetById(id);
-      if (!petData) {
-        this.toast.error('Pet não encontrado.');
-        this.goBack();
-        return;
-      }
-      this.pet.set(petData);
-      await this.loadSubCollections(id);
-    } catch (err: any) {
-      this.toast.error(err.message || 'Erro ao carregar dados do pet.');
-    } finally {
-      this.loadingPet.set(false);
-    }
-  }
-
-  async loadSubCollections(id: number) {
-    this.loadingDetails.set(true);
-    try {
-      const [vacs, consultas, locais] = await Promise.all([
-        this.vacinasService.getVacinasByPetId(id),
-        this.consultasExamesService.getConsultasExamesByPetId(id),
-        this.petsLocaisService.getPetsLocaisByPetId(id),
-      ]);
-
-      this.vacinas.set(vacs);
-      this.consultasExames.set(consultas);
-      this.petsLocais.set(locais);
-    } catch (err) {
-      console.error('Erro ao carregar registros clínicos e locais:', err);
-    } finally {
-      this.loadingDetails.set(false);
-    }
+  loadPetAndSubCollections(id: number, forceRefresh = false): void {
+    this.petsService.getPetById(id, forceRefresh);
+    this.vacinasService.getVacinasByPetId(id, forceRefresh);
+    this.consultasExamesService.getConsultasExamesByPetId(id, forceRefresh);
+    this.petsLocaisService.getPetsLocaisByPetId(id, forceRefresh);
   }
 
   setVacinaSort(mode: SortOrderMode) {
@@ -228,7 +194,7 @@ export default class PetDetailComponent implements OnInit {
   goToEdit() {
     const p = this.pet();
     if (p) {
-      this.router.navigate(['/pets', p.id, 'editar']);
+      this.router.navigate(['/pets', p.id, 'editar'], { state: { pet: p } });
     }
   }
 
@@ -242,7 +208,9 @@ export default class PetDetailComponent implements OnInit {
   openEditVacina(vacina: Vacina) {
     const p = this.pet();
     if (p && vacina.id) {
-      this.router.navigate(['/pets', p.id, 'vacinas', vacina.id, 'editar'], { state: { pet: p } });
+      this.router.navigate(['/pets', p.id, 'vacinas', vacina.id, 'editar'], {
+        state: { pet: p, vacina },
+      });
     }
   }
 
@@ -256,7 +224,9 @@ export default class PetDetailComponent implements OnInit {
   openEditProcedimento(proc: ConsultaExame) {
     const p = this.pet();
     if (p && proc.id) {
-      this.router.navigate(['/pets', p.id, 'procedimentos', proc.id, 'editar'], { state: { pet: p } });
+      this.router.navigate(['/pets', p.id, 'procedimentos', proc.id, 'editar'], {
+        state: { pet: p, procedimento: proc },
+      });
     }
   }
 
@@ -270,7 +240,9 @@ export default class PetDetailComponent implements OnInit {
   openEditLocal(local: PetLocal) {
     const p = this.pet();
     if (p && local.id) {
-      this.router.navigate(['/pets', p.id, 'locais', local.id, 'editar'], { state: { pet: p } });
+      this.router.navigate(['/pets', p.id, 'locais', local.id, 'editar'], {
+        state: { pet: p, petLocal: local },
+      });
     }
   }
 }

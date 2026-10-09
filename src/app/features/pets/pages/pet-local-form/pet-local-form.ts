@@ -201,13 +201,30 @@ export default class PetLocalFormComponent implements OnInit {
       this.loadPet(this.petId()!);
     }
 
-    // Carrega lista de locais disponíveis
-    await this.loadLocais();
+    // Carrega lista de locais disponíveis em segundo plano com loading local no selector
+    this.loadLocais();
 
-    // Se estiver editando, busca os dados da passagem
+    // Se estiver editando, busca os dados da passagem (aproveitando state se disponível)
     if (this.isEditing() && this.petLocalId()) {
-      await this.loadPetLocal(this.petLocalId()!);
+      const statePetLocal = history.state?.petLocal as PetLocal | undefined;
+      if (statePetLocal && statePetLocal.id === this.petLocalId()) {
+        this.setPetLocalData(statePetLocal);
+      } else {
+        this.loadPetLocal(this.petLocalId()!);
+      }
     }
+  }
+
+  private setPetLocalData(petLocal: PetLocal): void {
+    this.existingPetLocal.set(petLocal);
+    this.petLocalForm.patchValue({
+      id_local: petLocal.id_local || null,
+      data_saida: parseIsoToDate(petLocal.data_saida),
+      data_reentrada: parseIsoToDate(petLocal.data_reentrada),
+      motivo_saida: petLocal.motivo_saida || '',
+      valor_auxilio: petLocal.valor_auxilio != null ? Number(petLocal.valor_auxilio) : null,
+      obs: petLocal.obs || petLocal.observacoes || '',
+    });
   }
 
   async loadPet(id: number): Promise<void> {
@@ -244,16 +261,7 @@ export default class PetLocalFormComponent implements OnInit {
         this.goBack();
         return;
       }
-
-      this.existingPetLocal.set(petLocal);
-      this.petLocalForm.patchValue({
-        id_local: petLocal.id_local || null,
-        data_saida: parseIsoToDate(petLocal.data_saida),
-        data_reentrada: parseIsoToDate(petLocal.data_reentrada),
-        motivo_saida: petLocal.motivo_saida || '',
-        valor_auxilio: petLocal.valor_auxilio != null ? Number(petLocal.valor_auxilio) : null,
-        obs: petLocal.obs || petLocal.observacoes || '',
-      });
+      this.setPetLocalData(petLocal);
     } catch (err: any) {
       this.toast.error(err.message || 'Erro ao carregar dados da passagem.');
     } finally {
@@ -351,11 +359,6 @@ export default class PetLocalFormComponent implements OnInit {
   }
 
   goBack(): void {
-    const currentPetId = this.petId();
-    if (currentPetId) {
-      this.router.navigate(['/pets/detalhes', currentPetId]);
-    } else {
-      this.nav.back(['/pets']);
-    }
+    this.nav.back(this.petId() ? ['/pets/detalhes', this.petId()!] : ['/pets']);
   }
 }
