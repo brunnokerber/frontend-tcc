@@ -66,7 +66,7 @@ export default class PetListComponent implements OnInit {
   // Filtros Categóricos em Signals
   public tipoFilter = signal<string>('');
   public sexoFilter = signal<string>('');
-  public statusFilter = signal<string>('');
+  public statusFilter = signal<string>('Disponível');
   public porteFilter = signal<string>('');
   public senioridadeFilter = signal<string>('');
 

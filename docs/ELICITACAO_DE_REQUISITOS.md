@@ -99,7 +99,7 @@ O processo metodológico de Engenharia de Requisitos adotado no presente TCC bas
   * **Regras Associadas:** RN07, RN10, RN17, RN20
 
 * **[RF11] Listagem Filtrada e Busca Multicritério de Pets**
-  * **Descrição:** O sistema deve prover listagem em cards visuais com filtros simultâneos por: Nome (busca textual com debounce e ignore case), Espécie/Tipo, Sexo, Status Operacional, Senioridade e Porte.
+  * **Descrição:** O sistema deve prover listagem em cards visuais com filtros simultâneos por: Nome (busca textual com debounce e ignore case), Espécie/Tipo, Sexo, Status Operacional, Senioridade e Porte. Por padrão operacional, a tela inicial de listagem é carregada filtrando automaticamente os animais com Status 'Disponível', permitindo ao usuário alternar para outros status específicos ou selecionar a opção 'Todos'.
   * **Prioridade:** Must Have (Essencial)
   * **Regras Associadas:** RN07, RN08
 
