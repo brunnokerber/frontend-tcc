@@ -1,31 +1,15 @@
-<div class="user-dialog-container p-2 p-md-3">
-  <!-- Cabeçalho do Modal -->
-  <div class="d-flex align-items-center justify-content-between pb-3 mb-3 border-bottom">
-    <div class="d-flex align-items-center gap-3">
-      <div class="dialog-icon-box rounded-circle d-flex align-items-center justify-content-center">
-        <mat-icon>person_add</mat-icon>
-      </div>
-      <div>
-        <h2 class="h5 fw-bold mb-0">Convidar Novo Usuário</h2>
-        <span class="text-surface-muted small">
-          Envie um convite de acesso para novos colaboradores da ONG
-        </span>
-      </div>
-    </div>
-    <button
-      mat-icon-button
-      type="button"
-      (click)="onCancel()"
-      [disabled]="isSubmitting()"
-      matTooltip="Fechar modal"
-    >
-      <mat-icon>close</mat-icon>
-    </button>
-  </div>
-
-  <form [formGroup]="inviteForm" (ngSubmit)="onSendInvite()">
+<form [formGroup]="inviteForm" (ngSubmit)="onSendInvite()">
+  <app-dialog-layout
+    title="Convidar Novo Usuário"
+    subtitle="Envie um convite de acesso para novos colaboradores da ONG"
+    icon="person_add"
+    iconVariant="primary"
+    size="md"
+    [closeDisabled]="isSubmitting()"
+    (close)="onCancel()"
+  >
     <!-- Informação Explicativa -->
-    <div class="alert alert-info py-2 px-3 rounded-3 small d-flex align-items-center gap-2 mb-4">
+    <div class="alert alert-info py-2 px-3 rounded-3 small d-flex align-items-center gap-2 mb-3">
       <mat-icon style="font-size: 20px; width: 20px; height: 20px">mark_email_read</mat-icon>
       <span>
         O colaborador receberá um e-mail com link de confirmação para cadastrar sua senha de acesso.
@@ -34,7 +18,7 @@
 
     <!-- Alerta caso o usuário já esteja cadastrado -->
     @if (userAlreadyExists()) {
-      <div class="alert alert-warning py-3 px-3 rounded-3 small mb-4 border border-warning-subtle">
+      <div class="alert alert-warning py-3 px-3 rounded-3 small mb-3 border border-warning-subtle">
         <div class="d-flex align-items-start gap-2 mb-2">
           <mat-icon class="text-warning" style="font-size: 20px; width: 20px; height: 20px">info</mat-icon>
           <div>
@@ -58,19 +42,18 @@
       </div>
     }
 
-    <!-- Campo: E-mail do Usuário -->
-    <div class="mb-4">
+    <!-- Campo: E-mail -->
+    <div class="mb-3">
       <mat-form-field appearance="outline" class="w-100">
-        <mat-label>E-mail do Colaborador</mat-label>
+        <mat-label>E-mail de Convite</mat-label>
         <input
-          id="email_convite"
+          id="invite_user_email"
           matInput
           type="email"
           formControlName="email"
-          placeholder="exemplo@ong.org.br"
+          placeholder="colaborador@exemplo.com.br"
           maxlength="100"
-          autocomplete="off"
-          aria-label="E-mail do Colaborador"
+          cdkFocusInitial
         />
         <mat-icon matPrefix class="me-2">mail</mat-icon>
         <mat-hint>Endereço eletrônico para onde o convite será enviado</mat-hint>
@@ -81,7 +64,7 @@
     </div>
 
     <!-- Campo: Perfil de Acesso (Role) -->
-    <div class="mb-4">
+    <div class="mb-2">
       <label id="role-group-label" class="form-label fw-semibold small mb-2 text-surface-main">
         Perfil de Acesso (Permissões)
       </label>
@@ -91,7 +74,6 @@
         formControlName="role"
         class="d-flex flex-column gap-2"
       >
-
         @for (opt of roleOptions; track opt.value) {
           <div
             class="role-card p-3 rounded-3 border transition-all cursor-pointer"
@@ -111,18 +93,14 @@
                   </mat-icon>
                   <span class="fw-bold">{{ opt.label }}</span>
                   <span
-                    class="badge small"
-                    [class.bg-primary-subtle]="opt.value === 'admin'"
-                    [class.text-primary]="opt.value === 'admin'"
-                    [class.bg-secondary-subtle]="opt.value === 'user'"
-                    [class.text-secondary]="opt.value === 'user'"
+                    class="badge"
+                    [class.bg-primary]="opt.value === 'admin'"
+                    [class.bg-secondary]="opt.value === 'user'"
                   >
                     {{ opt.badge }}
                   </span>
                 </div>
-                <p class="text-surface-muted small mb-0">
-                  {{ opt.description }}
-                </p>
+                <p class="text-surface-muted small mb-0">{{ opt.description }}</p>
               </div>
             </div>
           </div>
@@ -131,10 +109,10 @@
     </div>
 
     <!-- Rodapé de Ações -->
-    <div class="d-flex align-items-center justify-content-end gap-2 pt-3 border-top">
+    <div dialog-actions>
       <button
         type="button"
-        mat-stroked-button
+        mat-button
         (click)="onCancel()"
         [disabled]="isSubmitting()"
       >
@@ -159,5 +137,5 @@
         }
       </button>
     </div>
-  </form>
-</div>
+  </app-dialog-layout>
+</form>

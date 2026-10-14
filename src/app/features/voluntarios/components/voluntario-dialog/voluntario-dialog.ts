@@ -9,6 +9,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ToastService } from '@core/services/toast.service';
+import { DialogLayoutComponent } from '@shared/components/dialog-layout/dialog-layout';
 import { PhoneMaskDirective } from '@shared/directives/phone-mask.directive';
 import { FormErrorPipe } from '@shared/pipes/form-error.pipe';
 import { formatPhone, onlyDigits, sanitize } from '@shared/utils/string-utils';
@@ -44,6 +45,7 @@ export interface VoluntarioDialogData {
     MatProgressSpinnerModule,
     PhoneMaskDirective,
     FormErrorPipe,
+    DialogLayoutComponent,
   ],
   templateUrl: './voluntario-dialog.html',
   styleUrls: ['./voluntario-dialog.scss'],

@@ -1,0 +1,185 @@
+:host {
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.app-dialog-container {
+  width: 100%;
+  margin: 0;
+  box-sizing: border-box;
+  overflow: hidden;
+  background-color: var(--mat-sys-surface, #ffffff);
+  color: var(--mat-sys-on-surface, #1e293b);
+
+  // Variações de Largura:
+  // Preenchem 100% da superfície do MatDialog sem margens ou gaps indesejados.
+  // Caso o MatDialog não defina largura explícita, o min-width responsivo expande a superfície.
+  &.dialog-size-sm {
+    min-width: min(440px, 100%);
+  }
+
+  &.dialog-size-md {
+    min-width: min(500px, 100%);
+  }
+
+  &.dialog-size-lg {
+    min-width: min(680px, 100%);
+  }
+
+  &.dialog-size-xl {
+    min-width: min(840px, 100%);
+  }
+
+  &.dialog-size-full {
+    min-width: 100%;
+  }
+}
+
+// ----------------------------------------------------
+// Cabeçalho
+// ----------------------------------------------------
+.dialog-header {
+  background-color: var(--mat-sys-surface, #ffffff);
+  flex-shrink: 0;
+}
+
+.dialog-icon-box {
+  width: 42px;
+  height: 42px;
+  min-width: 42px;
+  transition: transform 0.2s ease;
+
+  mat-icon {
+    font-size: 22px;
+    width: 22px;
+    height: 22px;
+    line-height: 22px;
+  }
+
+  &.dialog-icon-primary {
+    background-color: var(--mat-sys-primary-container);
+    color: var(--mat-sys-on-primary-container);
+  }
+
+  &.dialog-icon-warn {
+    background-color: rgba(220, 53, 69, 0.12);
+    color: #dc3545;
+  }
+
+  &.dialog-icon-success {
+    background-color: rgba(25, 135, 84, 0.12);
+    color: #198754;
+  }
+
+  &.dialog-icon-warning {
+    background-color: rgba(255, 193, 7, 0.18);
+    color: #b45309;
+  }
+
+  &.dialog-icon-info {
+    background-color: rgba(13, 202, 240, 0.15);
+    color: #087990;
+  }
+
+  &.dialog-icon-neutral {
+    background-color: var(--mat-sys-surface-container-high, #e2e8f0);
+    color: var(--mat-sys-on-surface-variant, #475569);
+  }
+}
+
+.dialog-title {
+  letter-spacing: -0.01em;
+}
+
+.dialog-subtitle {
+  color: var(--mat-sys-on-surface-variant, #64748b);
+}
+
+.dialog-close-btn {
+  color: var(--mat-sys-on-surface-variant, #64748b);
+
+  &:hover {
+    color: var(--mat-sys-on-surface, #0f172a);
+  }
+}
+
+// ----------------------------------------------------
+// Corpo Principal (Body)
+// ----------------------------------------------------
+.dialog-body {
+  flex-grow: 1;
+  box-sizing: border-box;
+
+  &.dialog-scrollable {
+    max-height: calc(88vh - 160px);
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding-top: 14px; // Espaçamento de segurança contra corte de floating labels
+
+    &::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: var(--mat-sys-outline-variant, rgba(0, 0, 0, 0.15));
+      border-radius: 4px;
+
+      &:hover {
+        background: var(--mat-sys-outline, rgba(0, 0, 0, 0.3));
+      }
+    }
+  }
+}
+
+// ----------------------------------------------------
+// Rodapé (Footer) & Ações Padronizadas
+// ----------------------------------------------------
+.dialog-footer {
+  flex-shrink: 0;
+  background-color: var(--mat-sys-surface-container-lowest, #f8fafc);
+
+  &:empty,
+  .dialog-actions-wrapper:empty {
+    display: none;
+  }
+
+  .dialog-actions-wrapper {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+  }
+
+  // Estilização unificada do container de ações (div[dialog-actions] ou direto)
+  ::ng-deep [dialog-actions],
+  ::ng-deep [dialog-footer] {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.75rem; // 12px de espaçamento padronizado entre as ações
+    flex-wrap: wrap;
+    width: 100%;
+  }
+
+  // Em telas de smartphones estreitas (< 480px), empilha ações com largura total
+  @media (max-width: 480px) {
+    ::ng-deep [dialog-actions],
+    ::ng-deep [dialog-footer] {
+      flex-direction: column-reverse;
+      gap: 0.5rem;
+
+      > button,
+      > a {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+  }
+}

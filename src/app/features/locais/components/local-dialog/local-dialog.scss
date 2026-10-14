@@ -1,36 +1,3 @@
-.dialog-container {
-  width: 100%;
-  max-width: 880px;
-  box-sizing: border-box;
-}
-
-.dialog-icon-wrapper {
-  width: 44px;
-  height: 44px;
-  min-width: 44px;
-  background-color: var(--mat-sys-primary-container);
-  color: var(--mat-sys-primary);
-}
-
-.dialog-scroll-body {
-  max-height: calc(92vh - 170px);
-  overflow-y: auto;
-  overflow-x: hidden;
-  padding-right: 2px;
-
-  &::-webkit-scrollbar {
-    width: 6px;
-  }
-
-  &::-webkit-scrollbar-track {
-    background: transparent;
-  }
-
-  &::-webkit-scrollbar-thumb {
-    background: var(--mat-sys-outline-variant, rgba(0, 0, 0, 0.15));
-    border-radius: 4px;
-  }
-}
 
 .form-section-card {
   background-color: var(--mat-sys-surface-container-low, rgba(0, 0, 0, 0.02));
@@ -59,18 +26,10 @@
   font-weight: 700;
   letter-spacing: 0.03em;
   text-transform: uppercase;
-  color: var(--mat-sys-on-surface);
+  color: var(--mat-sys-primary);
 }
 
 .sub-header-desc {
-  font-size: 0.75rem;
-  color: var(--mat-sys-on-surface-variant);
-}
-
-.bg-primary-subtle {
-  background-color: var(--mat-sys-primary-container);
-}
-
-.text-primary {
-  color: var(--mat-sys-primary);
+  font-size: 0.78rem;
+  color: var(--mat-sys-on-surface-variant, #64748b);
 }

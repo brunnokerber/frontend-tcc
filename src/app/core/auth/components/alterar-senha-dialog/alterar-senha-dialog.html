@@ -1,28 +1,15 @@
-<div class="alterar-senha-dialog p-2 p-md-3">
-  <!-- Cabeçalho -->
-  <div class="d-flex align-items-center justify-content-between pb-2 mb-3 border-bottom">
-    <div class="d-flex align-items-center gap-2">
-      <div class="header-icon-box rounded-3 d-flex align-items-center justify-content-center">
-        <mat-icon class="text-primary">lock_reset</mat-icon>
-      </div>
-      <div>
-        <h2 class="m-0 p-0 fs-5 fw-bold">Alterar Minha Senha</h2>
-        <span class="small text-surface-muted">Atualize sua credencial de acesso à plataforma</span>
-      </div>
-    </div>
-    <button
-      mat-icon-button
-      type="button"
-      (click)="onCancel()"
-      [disabled]="isSubmitting()"
-      aria-label="Fechar"
-    >
-      <mat-icon>close</mat-icon>
-    </button>
-  </div>
-
-  <form [formGroup]="passwordForm" (ngSubmit)="onSubmit()">
-    <div class="dialog-content-body d-flex flex-column gap-2 mb-2">
+<form [formGroup]="passwordForm" (ngSubmit)="onSubmit()">
+  <app-dialog-layout
+    title="Alterar Minha Senha"
+    subtitle="Atualize sua credencial de acesso à plataforma"
+    icon="lock_reset"
+    iconVariant="primary"
+    size="md"
+    [closeDisabled]="isSubmitting()"
+    (close)="onCancel()"
+  >
+    <!-- Corpo / Formulário -->
+    <div class="d-flex flex-column gap-2">
       <!-- Campo: Nova Senha -->
       <mat-form-field appearance="outline" class="w-100 mb-1">
         <mat-label>Nova Senha</mat-label>
@@ -108,7 +95,7 @@
     </div>
 
     <!-- Rodapé de Ações -->
-    <div class="d-flex align-items-center justify-content-end gap-2 pt-3 border-top mt-3">
+    <div dialog-actions>
       <button
         mat-button
         type="button"
@@ -135,5 +122,5 @@
         }
       </button>
     </div>
-  </form>
-</div>
+  </app-dialog-layout>
+</form>

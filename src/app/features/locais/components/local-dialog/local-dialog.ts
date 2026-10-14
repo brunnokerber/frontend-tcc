@@ -10,6 +10,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSelectModule } from '@angular/material/select';
 import { ToastService } from '@core/services/toast.service';
 import { CepMaskDirective } from '@shared/directives/cep-mask.directive';
+import { DialogLayoutComponent } from '@shared/components/dialog-layout/dialog-layout';
 import { PhoneMaskDirective } from '@shared/directives/phone-mask.directive';
 import { FormErrorPipe } from '@shared/pipes/form-error.pipe';
 import { formatCep, formatPhone, onlyDigits, sanitize } from '@shared/utils/string-utils';
@@ -48,6 +49,7 @@ export const ESTADOS_BRASIL = [
     FormErrorPipe,
     PhoneMaskDirective,
     CepMaskDirective,
+    DialogLayoutComponent,
   ],
   templateUrl: './local-dialog.html',
   styleUrls: ['./local-dialog.scss'],

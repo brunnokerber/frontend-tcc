@@ -1,27 +1,18 @@
-<div class="confirm-dialog-container p-2 p-md-3">
-  <!-- Topo com Ícone e Título -->
-  <div class="d-flex align-items-center gap-3 mb-3">
-    <div
-      class="confirm-icon-box rounded-circle d-flex align-items-center justify-content-center"
-      [class.bg-warn-subtle]="data.isDestructive !== false"
-      [class.text-danger]="data.isDestructive !== false"
-      [class.bg-primary-subtle]="data.isDestructive === false"
-      [class.text-primary]="data.isDestructive === false"
-    >
-      <mat-icon>{{ data.icon || (data.isDestructive !== false ? 'warning' : 'help_outline') }}</mat-icon>
-    </div>
-    <div>
-      <h2 class="h5 fw-bold mb-0">{{ data.title || 'Confirmar Ação' }}</h2>
-    </div>
-  </div>
-
+<app-dialog-layout
+  [title]="data.title || 'Confirmar Ação'"
+  [icon]="data.icon || (data.isDestructive !== false ? 'warning' : 'help_outline')"
+  [iconVariant]="data.isDestructive !== false ? 'warn' : 'primary'"
+  size="sm"
+  [scrollable]="false"
+  (close)="onCancel()"
+>
   <!-- Mensagem de Confirmação -->
-  <div class="confirm-message mb-4">
+  <div class="confirm-message py-1">
     <p class="text-surface-main mb-0">{{ data.message }}</p>
   </div>
 
-  <!-- Ações -->
-  <div class="d-flex align-items-center justify-content-end gap-2 pt-2 border-top">
+  <!-- Ações no rodapé -->
+  <div dialog-actions>
     <button mat-stroked-button (click)="onCancel()" type="button">
       {{ data.cancelText || 'Cancelar' }}
     </button>
@@ -35,4 +26,4 @@
       {{ data.confirmText || 'Confirmar' }}
     </button>
   </div>
-</div>
+</app-dialog-layout>

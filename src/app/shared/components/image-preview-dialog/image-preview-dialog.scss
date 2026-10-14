@@ -1,34 +1,13 @@
-.image-preview-dialog-container {
-  min-width: 280px;
-  max-width: 90vw;
-  max-height: 90vh;
-}
-
-.header-icon-box {
-  width: 36px;
-  height: 36px;
-  min-width: 36px;
-
-  mat-icon {
-    font-size: 20px;
-    width: 20px;
-    height: 20px;
-  }
-}
-
-.bg-primary-subtle {
-  background-color: var(--mat-sys-primary-container);
-}
 
 .image-preview-body {
   background-color: var(--mat-sys-surface-container-lowest);
   min-height: 220px;
-  max-height: calc(85vh - 120px);
+  max-height: calc(85vh - 140px);
   overflow: auto;
 }
 
 .preview-image {
-  max-height: calc(85vh - 130px);
+  max-height: calc(85vh - 160px);
   max-width: 100%;
   object-fit: contain;
   transition: opacity 0.2s ease-in-out;

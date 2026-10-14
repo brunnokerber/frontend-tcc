@@ -5,6 +5,8 @@ import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/materia
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 
+import { DialogLayoutComponent } from '../dialog-layout/dialog-layout';
+
 export interface ImagePreviewDialogData {
   imageUrl: string;
   title?: string;
@@ -14,7 +16,14 @@ export interface ImagePreviewDialogData {
 @Component({
   selector: 'app-image-preview-dialog',
   standalone: true,
-  imports: [CommonModule, MatDialogModule, MatButtonModule, MatIconModule, MatTooltipModule],
+  imports: [
+    CommonModule,
+    MatDialogModule,
+    MatButtonModule,
+    MatIconModule,
+    MatTooltipModule,
+    DialogLayoutComponent,
+  ],
   templateUrl: './image-preview-dialog.html',
   styleUrls: ['./image-preview-dialog.scss'],
 })

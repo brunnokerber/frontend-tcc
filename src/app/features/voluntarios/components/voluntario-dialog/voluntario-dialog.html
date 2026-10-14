@@ -1,26 +1,13 @@
-<div class="dialog-container p-4">
-  <!-- Cabeçalho -->
-  <div class="d-flex align-items-center justify-content-between pb-3 mb-3 border-bottom border-surface">
-    <div class="d-flex align-items-center gap-2">
-      <div class="dialog-icon-badge rounded-circle d-flex align-items-center justify-content-center">
-        <mat-icon>{{ isEditing() ? 'edit' : 'volunteer_activism' }}</mat-icon>
-      </div>
-      <div>
-        <h2 class="h5 fw-bold mb-0 text-surface-main">
-          {{ isEditing() ? 'Editar Voluntário(a)' : 'Novo Voluntário(a)' }}
-        </h2>
-        <span class="text-surface-muted small">
-          {{ isEditing() ? 'Atualize as informações cadastrais e disponibilidade' : 'Cadastre um novo colaborador voluntário na ONG' }}
-        </span>
-      </div>
-    </div>
-    <button mat-icon-button type="button" (click)="onCancel()" [disabled]="isSaving()" aria-label="Fechar modal">
-      <mat-icon>close</mat-icon>
-    </button>
-  </div>
-
-  <!-- Formulário -->
-  <form [formGroup]="voluntarioForm" (ngSubmit)="onSave()" novalidate>
+<form [formGroup]="voluntarioForm" (ngSubmit)="onSave()" novalidate>
+  <app-dialog-layout
+    [title]="isEditing() ? 'Editar Voluntário(a)' : 'Novo Voluntário(a)'"
+    [subtitle]="isEditing() ? 'Atualize as informações cadastrais e disponibilidade' : 'Cadastre um novo colaborador voluntário na ONG'"
+    [icon]="isEditing() ? 'edit' : 'volunteer_activism'"
+    iconVariant="primary"
+    size="lg"
+    [closeDisabled]="isSaving()"
+    (close)="onCancel()"
+  >
     <div class="row g-3">
       <!-- Nome -->
       <div class="col-12">
@@ -142,8 +129,8 @@
       </div>
     </div>
 
-    <!-- Ações -->
-    <div class="d-flex align-items-center justify-content-end gap-2 pt-3 border-top border-surface mt-3">
+    <!-- Ações no rodapé -->
+    <div dialog-actions>
       <button mat-button type="button" (click)="onCancel()" [disabled]="isSaving()">
         Cancelar
       </button>
@@ -161,5 +148,5 @@
         }
       </button>
     </div>
-  </form>
-</div>
+  </app-dialog-layout>
+</form>

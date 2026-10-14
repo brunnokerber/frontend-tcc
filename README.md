@@ -80,7 +80,7 @@ frontend-tcc/
 │   │   ├── layout/              # Shell da aplicação (MainLayout, Sidenav, Header, alternância de tema)
 │   │   └── shared/              # Utilitários, pipes, diretivas e componentes reutilizáveis
 │   │       ├── adapters/        # CustomDateAdapter (formatação brasileira DD/MM/YYYY)
-│   │       ├── components/      # ConfirmationDialog e modais genéricos
+│   │       ├── components/      # DialogLayout padronizado, ConfirmationDialog e modais utilitários
 │   │       ├── directives/      # Máscaras de data e formulários
 │   │       ├── pipes/           # FormErrorPipe e pipes de formatação
 │   │       └── utils/           # Manipulação de strings e tratamento de erros do Supabase

@@ -11,6 +11,7 @@ import { MatRadioModule } from '@angular/material/radio';
 import { MatSelectModule } from '@angular/material/select';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { ToastService } from '@core/services/toast.service';
+import { DialogLayoutComponent } from '@shared/components/dialog-layout/dialog-layout';
 import { FormErrorPipe } from '@shared/pipes/form-error.pipe';
 import { emailValidator } from '@shared/validators/email.validators';
 import { AppRole } from '../../models/login.model';
@@ -40,6 +41,7 @@ export interface RoleOption {
     MatProgressSpinnerModule,
     MatTooltipModule,
     FormErrorPipe,
+    DialogLayoutComponent,
   ],
   templateUrl: './usuario-dialog.html',
   styleUrls: ['./usuario-dialog.scss'],

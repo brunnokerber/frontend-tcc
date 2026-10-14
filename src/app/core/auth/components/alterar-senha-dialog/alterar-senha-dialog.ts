@@ -11,6 +11,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 import { AuthService } from '@core/auth/services/auth.service';
 import { ToastService } from '@core/services/toast.service';
+import { DialogLayoutComponent } from '@shared/components/dialog-layout/dialog-layout';
 import { PasswordRequirementsComponent } from '@shared/components/password-requirements/password-requirements';
 import { FormErrorPipe } from '@shared/pipes/form-error.pipe';
 import {
@@ -32,6 +33,7 @@ import {
     MatProgressSpinnerModule,
     FormErrorPipe,
     PasswordRequirementsComponent,
+    DialogLayoutComponent,
   ],
   templateUrl: './alterar-senha-dialog.html',
   styleUrls: ['./alterar-senha-dialog.scss'],

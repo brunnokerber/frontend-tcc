@@ -1,27 +1,14 @@
-<div class="dialog-container p-3 p-md-4">
-  <!-- Cabeçalho -->
-  <div class="d-flex align-items-center justify-content-between mb-3 pb-2 border-bottom border-surface">
-    <div class="d-flex align-items-center gap-3">
-      <div class="dialog-icon-wrapper rounded-3 d-flex align-items-center justify-content-center shadow-sm">
-        <mat-icon>{{ isEditing() ? 'edit_location' : 'add_location_alt' }}</mat-icon>
-      </div>
-      <div>
-        <h2 class="h5 fw-bold mb-0">
-          {{ isEditing() ? 'Editar Local / Parceiro' : 'Novo Local / Parceiro' }}
-        </h2>
-        <span class="text-surface-muted small">
-          {{ isEditing() ? 'Atualize as informações do lar temporário, clínica ou ponto de exposição' : 'Cadastre um novo lar temporário, abrigo, clínica parceira ou ponto de exposição' }}
-        </span>
-      </div>
-    </div>
-    <button mat-icon-button type="button" (click)="onCancel()" [disabled]="isSaving()" matTooltip="Fechar">
-      <mat-icon>close</mat-icon>
-    </button>
-  </div>
-
-  <form [formGroup]="localForm" (ngSubmit)="onSave()">
-    <div class="dialog-scroll-body">
-      <!-- SEÇÃO 1: DADOS DO LOCAL & CONTATO -->
+<form [formGroup]="localForm" (ngSubmit)="onSave()">
+  <app-dialog-layout
+    [title]="isEditing() ? 'Editar Local / Parceiro' : 'Novo Local / Parceiro'"
+    [subtitle]="isEditing() ? 'Atualize as informações do lar temporário, clínica ou ponto de exposição' : 'Cadastre um novo lar temporário, abrigo, clínica parceira ou ponto de exposição'"
+    [icon]="isEditing() ? 'edit_location' : 'add_location_alt'"
+    iconVariant="primary"
+    size="xl"
+    [closeDisabled]="isSaving()"
+    (close)="onCancel()"
+  >
+    <!-- SEÇÃO 1: DADOS DO LOCAL & CONTATO -->
       <div class="form-section-card">
         <div class="d-flex align-items-center gap-2 mb-3">
           <div class="section-icon-badge d-flex align-items-center justify-content-center">
@@ -266,10 +253,9 @@
         </div>
 
       </div>
-    </div>
 
-    <!-- Ações -->
-    <div class="d-flex align-items-center justify-content-end gap-2 pt-3 border-top border-surface">
+    <!-- Ações no rodapé -->
+    <div dialog-actions>
       <button type="button" mat-stroked-button (click)="onCancel()" [disabled]="isSaving()">
         Cancelar
       </button>
@@ -285,5 +271,5 @@
         }
       </button>
     </div>
-  </form>
-</div>
+  </app-dialog-layout>
+</form>

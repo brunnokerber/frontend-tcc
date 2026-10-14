@@ -261,7 +261,7 @@ export default class PetFormComponent implements OnInit {
           maxFileSizeKB: 256,
         },
         width: '100%',
-        maxWidth: '440px',
+        maxWidth: '480px',
         disableClose: true,
       }
     );

@@ -1,30 +1,15 @@
-<div class="cropper-dialog-container d-flex flex-column">
-  <!-- Topo -->
-  <div class="d-flex align-items-center justify-content-between p-3 border-bottom border-surface">
-    <div class="d-flex align-items-center gap-2 overflow-hidden pe-2">
-      <div class="cropper-icon-box rounded-circle d-flex align-items-center justify-content-center bg-primary-subtle text-primary">
-        <mat-icon>crop</mat-icon>
-      </div>
-      <div>
-        <h2 class="h6 fw-bold mb-0 text-truncate">{{ data.title || 'Ajustar Enquadramento' }}</h2>
-        <span class="small text-surface-muted">Posicione e dê zoom no rosto do animal</span>
-      </div>
-    </div>
-
-    <button
-      type="button"
-      mat-icon-button
-      (click)="cancelar()"
-      [disabled]="isExporting()"
-      matTooltip="Cancelar"
-      aria-label="Cancelar enquadramento"
-    >
-      <mat-icon>close</mat-icon>
-    </button>
-  </div>
-
+<app-dialog-layout
+  [title]="data.title || 'Ajustar Enquadramento'"
+  subtitle="Posicione e dê zoom no rosto do animal"
+  icon="crop"
+  iconVariant="primary"
+  size="sm"
+  [scrollable]="false"
+  [closeDisabled]="isExporting()"
+  (close)="cancelar()"
+>
   <!-- Área de Enquadramento Interativo -->
-  <div class="cropper-workspace d-flex flex-column align-items-center justify-content-center p-3">
+  <div class="cropper-workspace d-flex flex-column align-items-center justify-content-center">
     @if (errorMessage()) {
       <div class="text-center py-4 px-3 text-surface-muted">
         <mat-icon class="text-danger mb-2" style="font-size: 40px; width: 40px; height: 40px;">error_outline</mat-icon>
@@ -136,7 +121,7 @@
   </div>
 
   <!-- Rodapé com Ações -->
-  <div class="d-flex align-items-center justify-content-end gap-2 p-3 border-top border-surface bg-surface-subtle">
+  <div dialog-actions>
     <button
       type="button"
       mat-stroked-button
@@ -151,7 +136,7 @@
       color="primary"
       (click)="aplicarEnquadramento()"
       [disabled]="isLoading() || !!errorMessage() || isExporting()"
-      class="d-flex align-items-center gap-1 px-3"
+      class="px-3"
     >
       @if (isExporting()) {
         <mat-spinner diameter="18" class="me-1"></mat-spinner>
@@ -164,4 +149,4 @@
       }
     </button>
   </div>
-</div>
+</app-dialog-layout>

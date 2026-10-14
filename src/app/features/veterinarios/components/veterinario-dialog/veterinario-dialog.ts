@@ -7,6 +7,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { ToastService } from '@core/services/toast.service';
+import { DialogLayoutComponent } from '@shared/components/dialog-layout/dialog-layout';
 import { PhoneMaskDirective } from '@shared/directives/phone-mask.directive';
 import { FormErrorPipe } from '@shared/pipes/form-error.pipe';
 import { formatPhone, onlyDigits, sanitize } from '@shared/utils/string-utils';
@@ -35,6 +36,7 @@ export interface VeterinarioDialogData {
     MatFormFieldModule,
     FormErrorPipe,
     PhoneMaskDirective,
+    DialogLayoutComponent,
   ],
   templateUrl: './veterinario-dialog.html',
   styleUrls: ['./veterinario-dialog.scss'],

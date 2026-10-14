@@ -1,21 +1,3 @@
-.user-dialog-container {
-  min-width: 320px;
-  max-width: 580px;
-}
-
-.dialog-icon-box {
-  width: 44px;
-  height: 44px;
-  min-width: 44px;
-  background-color: var(--mat-sys-primary-container);
-  color: var(--mat-sys-on-primary-container);
-
-  mat-icon {
-    font-size: 24px;
-    width: 24px;
-    height: 24px;
-  }
-}
 
 .role-card {
   background-color: var(--mat-sys-surface-container-lowest);

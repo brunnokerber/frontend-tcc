@@ -24,6 +24,8 @@ export interface ImageCropperDialogData {
   maxFileSizeKB?: number;
 }
 
+import { DialogLayoutComponent } from '../dialog-layout/dialog-layout';
+
 export interface ImageCropperResult {
   file: File;
   previewUrl: string;
@@ -39,6 +41,7 @@ export interface ImageCropperResult {
     MatIconModule,
     MatTooltipModule,
     MatProgressSpinnerModule,
+    DialogLayoutComponent,
   ],
   templateUrl: './image-cropper-dialog.html',
   styleUrls: ['./image-cropper-dialog.scss'],
