@@ -33,6 +33,14 @@
         <span>Prontuário / Docs</span>
       </a>
       }
+      @if (p.status === 'Disponível') {
+      <button type="button" mat-flat-button (click)="openAdotarModal()"
+        class="btn-adotar-destaque d-flex align-items-center gap-2 py-2 px-3 rounded-3 shadow-sm"
+        matTooltip="Registrar a adoção definitiva deste animal">
+        <mat-icon>volunteer_activism</mat-icon>
+        <span class="fw-semibold">Registrar Adoção</span>
+      </button>
+      }
       <button mat-flat-button color="primary" (click)="goToEdit()"
         class="d-flex align-items-center gap-2 py-2 px-3 rounded-3 shadow-sm">
         <mat-icon>edit</mat-icon>
@@ -558,9 +566,16 @@
               </div>
             </div>
 
-            <button mat-stroked-button color="primary" (click)="openAddLocal()" class="btn-sm rounded-3">
-              <mat-icon>add</mat-icon> Adicionar Local
-            </button>
+            <div class="d-flex align-items-center gap-2 flex-wrap">
+              @if (p.status === 'Disponível') {
+              <button mat-stroked-button color="primary" (click)="openAdotarModal()" class="btn-sm rounded-3 text-success border-success">
+                <mat-icon>volunteer_activism</mat-icon> Registrar Adoção
+              </button>
+              }
+              <button mat-stroked-button color="primary" (click)="openAddLocal()" class="btn-sm rounded-3">
+                <mat-icon>add</mat-icon> Adicionar Local
+              </button>
+            </div>
           </div>
 
           @if (loadingLocais()) {
@@ -620,9 +635,16 @@
             <p class="mb-1 fw-semibold text-surface-main">Nenhum histórico de local de passagem</p>
             <p class="text-surface-muted small mb-2">Registre quando o animal for encaminhado a lares temporários ou
               clínicas.</p>
-            <button mat-stroked-button color="primary" (click)="openAddLocal()" class="btn-sm">
-              <mat-icon>add</mat-icon> Registrar Passagem
-            </button>
+            <div class="d-flex align-items-center justify-content-center gap-2 flex-wrap">
+              @if (p.status === 'Disponível') {
+              <button mat-flat-button color="primary" (click)="openAdotarModal()" class="btn-sm rounded-3">
+                <mat-icon>volunteer_activism</mat-icon> Registrar Adoção
+              </button>
+              }
+              <button mat-stroked-button color="primary" (click)="openAddLocal()" class="btn-sm rounded-3">
+                <mat-icon>add</mat-icon> Registrar Passagem
+              </button>
+            </div>
           </div>
           }
         </div>

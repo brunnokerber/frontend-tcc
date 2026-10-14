@@ -187,3 +187,15 @@
     height: 22px;
   }
 }
+
+/* Botão de Destaque para Adoção */
+.btn-adotar-destaque {
+  background-color: var(--mat-sys-primary, #198754);
+  color: var(--mat-sys-on-primary, #ffffff);
+  transition: transform 0.2s ease, filter 0.2s ease;
+
+  &:hover {
+    transform: translateY(-1px);
+    filter: brightness(1.08);
+  }
+}

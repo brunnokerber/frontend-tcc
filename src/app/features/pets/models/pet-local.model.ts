@@ -28,3 +28,11 @@ export interface PetLocalCreateDto {
 export type PetLocalUpdateDto = Partial<
   Omit<PetLocal, 'id' | 'created_at' | 'updated_at' | 'locais' | 'local'>
 >;
+
+export interface AdotarPetDto {
+  id_local: number;
+  data_saida: string;
+  motivo_saida?: string | null;
+  obs?: string | null;
+  valor_auxilio?: number | null;
+}

@@ -382,9 +382,14 @@
             </div>
           </td>
 
-          <!-- Ações (Detalhes, Docs e Edição) -->
+          <!-- Ações (Detalhes, Docs, Adoção e Edição) -->
           <td class="text-end pe-4">
             <div class="d-flex align-items-center justify-content-end gap-1">
+              @if (pet.status === 'Disponível') {
+              <button matIconButton (click)="openAdotarModal(pet)" matTooltip="Registrar Adoção Definitiva">
+                <mat-icon class="text-success">volunteer_activism</mat-icon>
+              </button>
+              }
               <button matIconButton color="primary" (click)="goToDetails(pet)" matTooltip="Ver detalhes do Pet">
                 <mat-icon>visibility</mat-icon>
               </button>
@@ -476,6 +481,12 @@
             <div></div>
             }
             <div class="d-flex align-items-center gap-2">
+              @if (pet.status === 'Disponível') {
+              <button mat-stroked-button color="accent" class="btn-sm text-success border-success" (click)="openAdotarModal(pet)" matTooltip="Registrar Adoção">
+                <mat-icon style="font-size: 16px; width: 16px; height: 16px">volunteer_activism</mat-icon>
+                <span>Adotar</span>
+              </button>
+              }
               <button mat-stroked-button color="primary" class="btn-sm" (click)="goToDetails(pet)">
                 <mat-icon style="font-size: 16px; width: 16px; height: 16px">visibility</mat-icon>
                 <span>Detalhes</span>

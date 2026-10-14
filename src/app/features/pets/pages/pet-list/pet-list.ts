@@ -12,7 +12,9 @@ import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSelectModule } from '@angular/material/select';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { AdotarPetDialogComponent } from '../../components/adotar-pet-dialog/adotar-pet-dialog';
 import {
   getSexoIcon,
   getStatusBadgeClass,
@@ -48,6 +50,7 @@ import { PetsService } from '../../services/pets.service';
     MatPaginatorModule,
     MatProgressSpinnerModule,
     MatTooltipModule,
+    MatDialogModule,
   ],
   templateUrl: './pet-list.html',
   styleUrls: ['./pet-list.scss'],
@@ -57,6 +60,7 @@ export default class PetListComponent implements OnInit {
   public petReportService = inject(PetReportService);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
+  private dialog = inject(MatDialog);
 
   // Busca Dinâmica por Campo de Identificação / Registro
   public searchField = signal<PetSearchField>('nome');
@@ -269,5 +273,25 @@ export default class PetListComponent implements OnInit {
   goToEdit(pet: Pet) {
     this.petsService.setCachedPet(pet);
     this.router.navigate(['/pets', pet.id, 'editar']);
+  }
+
+  /**
+   * Abre o modal padronizado de registro de adoção rápida para o pet selecionado na listagem.
+   */
+  openAdotarModal(pet: Pet): void {
+    const dialogRef = this.dialog.open(AdotarPetDialogComponent, {
+      data: { pet },
+      width: '640px',
+      maxWidth: '96vw',
+      disableClose: true,
+      autoFocus: false,
+    });
+
+    dialogRef.afterClosed().subscribe((adotadoComSucesso: boolean) => {
+      if (adotadoComSucesso) {
+        // Atualiza a listagem respeitando os filtros ativos
+        this.applyFilters();
+      }
+    });
   }
 }

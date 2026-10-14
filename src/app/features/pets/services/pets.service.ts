@@ -9,6 +9,7 @@ import {
   PetFilter,
   PetUpdateDto,
 } from '../models/pet.model';
+import { AdotarPetDto } from '../models/pet-local.model';
 import { compressAndResizeImage } from '@shared/utils/image-utils';
 
 @Injectable({
@@ -288,6 +289,47 @@ export class PetsService {
       return updated;
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Erro ao atualizar o pet.';
+      this.toast.error(msg);
+      throw err;
+    } finally {
+      this.loadingSignal.set(false);
+    }
+  }
+
+  /**
+   * Realiza a adoção definitiva de um pet de forma atômica via Supabase RPC (`adotar_pet`).
+   * Altera o status do pet para 'Adotado' e insere o registro em `pets_locais`.
+   */
+  async adotarPet(petId: number, dto: AdotarPetDto): Promise<boolean> {
+    this.loadingSignal.set(true);
+    try {
+      const { data, error } = await this.supabase.client.rpc('adotar_pet', {
+        p_pet_id: petId,
+        p_pet_local_data: {
+          id_local: dto.id_local,
+          data_saida: dto.data_saida,
+          motivo_saida: dto.motivo_saida || 'Adoção Definitiva',
+          obs: dto.obs || null,
+          valor_auxilio: dto.valor_auxilio != null ? Number(dto.valor_auxilio) : null,
+        },
+      });
+
+      if (error) {
+        throw error;
+      }
+
+      // Atualiza o estado reativo localmente
+      this.petsSignal.update((list) =>
+        list.map((p) => (p.id === petId ? { ...p, status: 'Adotado' } : p))
+      );
+      if (this.cachedPetSignal()?.id === petId) {
+        this.cachedPetSignal.update((p) => (p ? { ...p, status: 'Adotado' } : null));
+      }
+
+      this.toast.success('Adoção registrada com sucesso! Parabéns ao animal e à nova família!');
+      return true;
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Erro ao processar a adoção.';
       this.toast.error(msg);
       throw err;
     } finally {

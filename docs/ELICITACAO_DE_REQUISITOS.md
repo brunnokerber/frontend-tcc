@@ -208,6 +208,11 @@ O processo metodológico de Engenharia de Requisitos adotado no presente TCC bas
   * **Prioridade:** Must Have (Essencial)
   * **Regras Associadas:** RN19, RN17
 
+* **[RF29] Fluxo de Adoção Definitiva e Transferência Atômica do Pet**
+  * **Descrição:** O sistema deve prover fluxo ágil de adoção definitiva para animais com status operacional 'Disponível', acionado diretamente do prontuário ou da listagem geral de pets via modal padronizada (`AdotarPetDialogComponent`). A operação deve invocar a stored procedure atômica `adotar_pet` no Supabase, alterando simultaneamente o status do animal para 'Adotado' e inserindo o registro da estadia definitiva na tabela `pets_locais` (vinculando adotante/local parceiro, data de saída, motivo 'Adoção Definitiva', observações do termo assinado e auxílio financeiro opcional).
+  * **Prioridade:** Must Have (Essencial)
+  * **Regras Associadas:** RN08, RN15, RN16, RN21
+
 ---
 
 ## 4. Regras de Negócio (RN)
@@ -302,6 +307,11 @@ O processo metodológico de Engenharia de Requisitos adotado no presente TCC bas
   - **Atomicidade Transacional:** A persistência do caminho relativo da foto (`foto_url`) ocorre exclusivamente através das *Stored Procedures* transacionais (`create_pet_com_entrada` e `update_pet_com_entrada`).
   - **Estratégia de Desempenho e Economia de Banda:** A imagem não é renderizada na listagem geral paginada de animais (tabela/cards gerais), sendo carregada e exibida sob demanda exclusivamente na tela de detalhes do animal (`/pets/detalhes/:id`) e no formulário de edição/cadastro.
 
+* **[RN21] Regra de Elegibilidade e Transição Atômica de Adoção Definitiva:**  
+  - **Elegibilidade Rígida de Status:** Animais só podem ser submetidos ao fluxo de adoção definitiva se seu status operacional atual for estritamente `'Disponível'`. Caso o animal esteja em status `'Em Tratamento'`, `'Quarentena'`, `'Adotado'` ou `'Óbito'`, tanto o frontend (bloqueando/ocultando as ações) quanto a stored procedure PostgreSQL `adotar_pet` (lançando exceção amigável) impedem a operação.
+  - **Atomicidade Transacional:** A transição de status do animal para `'Adotado'` e a inserção do registro de saída na tabela `pets_locais` ocorrem dentro de uma única transação atômica ACID no banco de dados, garantindo que não existam animais adotados sem vínculo com o adotante/local de destino ou passagens de adoção sem a devida atualização do status do pet.
+  - **Cadastro Inline de Novo Adotante:** A interface de adoção permite pesquisar adotantes existentes ou invocar o modal de cadastro de novo local/tutor em tempo de execução sem perda dos dados preenchidos no formulário de adoção.
+
 ---
 
 ## 5. Requisitos Não-Funcionais (RNF)
@@ -353,6 +363,7 @@ O processo metodológico de Engenharia de Requisitos adotado no presente TCC bas
 | **RF26** | Listagem e filtros de voluntários | RN19 | RNF01, RNF03, RNF04 | `voluntarios` | `VoluntarioListComponent`, `VoluntariosService` |
 | **RF27** | Edição e exclusão de voluntários | RN17, RN19 | RNF01, RNF08 | `voluntarios` | `VoluntarioDialogComponent`, `VoluntarioListComponent` |
 | **RF28** | Relatórios gerenciais de pets (Excel/PDF) | RN07, RN08 | RNF01, RNF04, RNF10 | `pets`, `entradas` | `PetReportService`, `PetListComponent` |
+| **RF29** | Fluxo de Adoção Definitiva e Transferência Atômica | RN08, RN15, RN16, RN21 | RNF01, RNF04, RNF06, RNF08 | `pets`, `pets_locais`, `RPC ('adotar_pet')` | `AdotarPetDialogComponent`, `PetDetailComponent`, `PetListComponent`, `PetsService` |
 
 ---
 

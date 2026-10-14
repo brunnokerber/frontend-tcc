@@ -14,6 +14,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { NavigationService } from '@core/services/navigation.service';
 import { ToastService } from '@core/services/toast.service';
 import { ImagePreviewDialogComponent } from '@shared/components/image-preview-dialog/image-preview-dialog';
+import { AdotarPetDialogComponent } from '../../components/adotar-pet-dialog/adotar-pet-dialog';
 import {
   ConsultaExame,
   getSexoIcon,
@@ -43,9 +44,9 @@ import { VacinasService } from '../../services/vacinas.service';
     MatChipsModule,
     MatProgressSpinnerModule,
     MatTooltipModule,
+    MatTabsModule,
     MatButtonToggleModule,
     MatDividerModule,
-    MatTabsModule,
     MatDialogModule,
   ],
   templateUrl: './pet-detail.html',
@@ -289,5 +290,28 @@ export default class PetDetailComponent implements OnInit {
         state: { pet: p, petLocal: local },
       });
     }
+  }
+
+  /**
+   * Abre o modal padronizado de registro de adoção definitiva para o pet atual.
+   */
+  openAdotarModal(): void {
+    const p = this.pet();
+    if (!p) return;
+
+    const dialogRef = this.dialog.open(AdotarPetDialogComponent, {
+      data: { pet: p },
+      width: '640px',
+      maxWidth: '96vw',
+      disableClose: true,
+      autoFocus: false,
+    });
+
+    dialogRef.afterClosed().subscribe((adotadoComSucesso: boolean) => {
+      if (adotadoComSucesso && p.id) {
+        // Atualiza os dados do pet (agora 'Adotado') e recarrega os locais de passagem
+        this.loadPetAndSubCollections(p.id, true);
+      }
+    });
   }
 }
