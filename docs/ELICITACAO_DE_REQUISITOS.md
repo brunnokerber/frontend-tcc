@@ -44,13 +44,13 @@ O processo metodológico de Engenharia de Requisitos adotado no presente TCC bas
 
 ### Módulo 1: Autenticação, Controle de Acesso e Gestão de Usuários
 
-* **[RF01] Autenticação por E-mail e Senha**
-  * **Descrição:** O sistema deve autenticar usuários cadastrados através de e-mail e senha com persistência segura de token JWT.
+* **[RF01] Autenticação por E-mail e Senha e Gestão de Sessão**
+  * **Descrição:** O sistema deve autenticar usuários cadastrados através de e-mail e senha com persistência segura de token JWT, gerenciando limites rígidos de inatividade (8h) e duração máxima de sessão (24h) com encerramento automático e aviso amigável.
   * **Prioridade:** Must Have (Essencial)
   * **Regras Associadas:** RN01, RN02, RN04
 
-* **[RF02] Redefinição e Primeiro Acesso de Senha**
-  * **Descrição:** O sistema deve permitir que o usuário defina sua senha a partir de link de convite ou solicite a recuperação de senha via e-mail.
+* **[RF02] Redefinição, Primeiro Acesso e Alteração de Senha com Política de Senhas Fortes**
+  * **Descrição:** O sistema deve permitir que o usuário defina ou altere sua senha (primeiro acesso de convite, recuperação de credencial ou alteração direta no perfil de usuário), aplicando validação estrita de complexidade e checklist visual reativo em tempo real.
   * **Prioridade:** Must Have (Essencial)
   * **Regras Associadas:** RN03, RN04
 
@@ -78,10 +78,10 @@ O processo metodológico de Engenharia de Requisitos adotado no presente TCC bas
 
 ### Módulo 2: Gestão Cadastral e Triagem de Pets
 
-* **[RF07] Cadastro Completo de Animal Resgatado**
-  * **Descrição:** O sistema deve permitir o cadastro de animais acolhidos contendo: Nome, Tipo de Espécie (Cachorro, Gato, Outro), Sexo (Macho, Fêmea), Raça, Porte (Mini, Pequeno, Médio, Grande, Gigante), Cor Majoritária, Status (Disponível, Em Tratamento, Quarentena, Adotado, Óbito), Marcadores de Identificação (Moura, Microchip, RGA), Datas (Nascimento aproximada/exata, Castração) e Link de Documentos externos (ex: exames no Google Drive).
+* **[RF07] Cadastro Completo de Animal Resgatado e Enquadramento de Foto**
+  * **Descrição:** O sistema deve permitir o cadastro de animais acolhidos contendo: Nome, Foto de Perfil com ferramenta interativa de enquadramento (ajuste de zoom, posicionamento e rotação via Canvas antes do upload para o Supabase Storage), Tipo de Espécie (Cachorro, Gato, Outro), Sexo (Macho, Fêmea), Raça, Porte (Mini, Pequeno, Médio, Grande, Gigante), Cor Majoritária, Status (Disponível, Em Tratamento, Quarentena, Adotado, Óbito), Marcadores de Identificação (Moura, Microchip, RGA), Datas (Nascimento aproximada/exata, Castração) e Link de Documentos externos (ex: exames no Google Drive).
   * **Prioridade:** Must Have (Essencial)
-  * **Regras Associadas:** RN07, RN08, RN09, RN10
+  * **Regras Associadas:** RN07, RN08, RN09, RN10, RN20
 
 * **[RF08] Registro Mandatório de Entrada / Histórico de Resgate**
   * **Descrição:** No momento do cadastro do pet, o sistema deve obrigatoriamente registrar os dados da entrada: Local de Origem/Resgate, Data de Entrada, Nome do Resgatante, Observações da Triagem e identificador do usuário logado.
@@ -93,20 +93,20 @@ O processo metodológico de Engenharia de Requisitos adotado no presente TCC bas
   * **Prioridade:** Must Have (Essencial)
   * **Regras Associadas:** RN09
 
-* **[RF10] Edição Cadastral do Pet e Dados de Entrada**
-  * **Descrição:** Permitir a edição e retificação dos dados cadastrais do animal a qualquer momento por usuários autorizados. Caso o usuário autenticado possua perfil de **Administrador (`admin`)**, o sistema deve permitir adicionalmente a atualização (PUT/UPDATE) dos dados da entrada inicial (local de origem, data de entrada, resgatante e observações).
+* **[RF10] Edição Cadastral do Pet, Enquadramento e Dados de Entrada**
+  * **Descrição:** Permitir a edição e retificação dos dados cadastrais do animal a qualquer momento por usuários autorizados, incluindo alteração, reajuste de enquadramento (crop/zoom) ou remoção da foto de perfil. Caso o usuário autenticado possua perfil de **Administrador (`admin`)**, o sistema deve permitir adicionalmente a atualização (PUT/UPDATE) dos dados da entrada inicial (local de origem, data de entrada, resgatante e observações).
   * **Prioridade:** Must Have (Essencial)
-  * **Regras Associadas:** RN07, RN10, RN17
+  * **Regras Associadas:** RN07, RN10, RN17, RN20
 
 * **[RF11] Listagem Filtrada e Busca Multicritério de Pets**
   * **Descrição:** O sistema deve prover listagem em cards visuais com filtros simultâneos por: Nome (busca textual com debounce e ignore case), Espécie/Tipo, Sexo, Status Operacional, Senioridade e Porte.
   * **Prioridade:** Must Have (Essencial)
   * **Regras Associadas:** RN07, RN08
 
-* **[RF12] Prontuário Consolidado e Visualização de Detalhes do Pet**
-  * **Descrição:** Exibição detalhada contendo visão geral do animal, dias de permanência na ONG (calculados a partir da data de resgate), total financeiro acumulado investido no animal e abas para histórico clínico e estadias.
+* **[RF12] Prontuário Consolidado e Visualização de Detalhes do Pet com Expansão de Foto**
+  * **Descrição:** Exibição detalhada contendo visão geral do animal com avatar interativo permitindo ampliação e visualização em alta resolução da foto cadastrada (lightbox/modal), dias de permanência na ONG (calculados a partir da data de resgate), total financeiro acumulado investido no animal e abas para histórico clínico e estadias.
   * **Prioridade:** Must Have (Essencial)
-  * **Regras Associadas:** RN11, RN15
+  * **Regras Associadas:** RN11, RN15, RN20
 
 * **[RF28] Exportação e Emissão de Relatórios Gerenciais de Pets (Excel e PDF)**
   * **Descrição:** O sistema deve permitir a exportação dinâmica dos dados dos animais cadastrados para planilha Excel (`.csv` com codificação UTF-8 BOM e delimitador compatível) e a geração de documento para impressão/salvamento em PDF formatado institucionalmente, considerando fielmente todos os filtros aplicados na tela (busca dinâmica, espécie, sexo, status, porte e fase da vida) e incluindo resumo estatístico e indicadores quantitativos.
@@ -215,14 +215,29 @@ O processo metodológico de Engenharia de Requisitos adotado no presente TCC bas
 * **[RN01] Restrição de Gestão de Usuários por Papel (RBAC):**  
   Apenas usuários autenticados com a role `admin` podem visualizar a tela de gestão de usuários, enviar convites de acesso e alterar papéis. Operadores comuns (`user`) que tentarem acessar a rota `/usuarios` devem ser barrados por `adminGuard` e redirecionados.
 
-* **[RN02] Controle de Sessão e Sessão Expirada:**  
-  Todas as rotas da aplicação (exceto `/login` e `/definir-senha`) são protegidas por `authGuard`. Tentativas de acesso não autenticadas resultam em redirecionamento para `/login`.
+* **[RN02] Controle de Sessão, Timeouts de Inatividade e Sessão Expirada:**  
+  Todas as rotas da aplicação (exceto `/login` e `/definir-senha`) são protegidas por `authGuard`. Tentativas de acesso não autenticadas resultam em redirecionamento para `/login`. O Supabase Auth implementa limites rígidos de ciclo de vida de sessão:
+  - **Duração Máxima da Sessão (Timebox):** 24 horas.
+  - **Inatividade Máxima (Inactivity Timeout):** 8 horas.
+  - **Escuta Reativa do Ciclo de Vida:** O `AuthService` escuta os eventos `onAuthStateChange` (`SIGNED_OUT` ou `TOKEN_REFRESHED` com sessão nula). Caso o tempo limite de inatividade expire ou a renovação do token falhe, o usuário é redirecionado automaticamente para `/login` e um toast informativo exibe: *"Sua sessão expirou por inatividade. Por favor, faça login novamente."*.
 
-* **[RN03] Fluxo de Definição de Senha e Tokens:**  
-  Ao aceitar um convite ou solicitar reset de senha, o usuário é direcionado para a tela `/definir-senha`, onde a validação de token do Supabase Auth é executada para permitir a atualização criptografada da nova credencial.
+* **[RN03] Fluxo Fechado de Inscrição, Primeiro Acesso e Proteção na Troca de Senha:**  
+  - **Auto-Cadastro Desativado (Signup Fechado):** O endpoint público de auto-registro (`auth.signUp`) é desativado (`signup_disabled`). Não há link nem tela pública de cadastro/inscrição no sistema.
+  - **Inclusão Exclusiva por Administradores:** Novos voluntários são incluídos exclusivamente por administradores (`admin`) através da Edge Function `invite-user`.
+  - **Primeiro Acesso / Redefinição:** O voluntário convidado recebe link temporário por e-mail com token na URL hash e é direcionado para a rota `/definir-senha`, onde cadastra sua senha pela primeira vez cumprindo a política de senha forte.
+  - **Proteção na Troca de Senha (`secure_password_change: true`):** O Supabase Auth exige reautenticação recente para alteração de credencial pelo próprio usuário. Caso a sessão seja antiga, a operação é bloqueada e o frontend orienta o usuário a reautenticar-se antes de definir a nova senha.
 
-* **[RN04] Complexidade e Validação de Credenciais:**  
-  Senhas devem possuir no mínimo 6 caracteres. O e-mail deve obedecer à sintaxe RFC 5322 e ter comprimento máximo de 100 caracteres.
+* **[RN04] Política de Senhas Fortes e Validação de Credenciais:**  
+  O backend do Supabase Auth rejeita nativamente senhas fracas retornando HTTP 422 (`weak_password`), assim como rejeita tentativas de redefinição para a mesma senha atual do usuário (HTTP 422 - `same_password`: *"New password should be different from the old password."*). O frontend Angular trata ambas as situações:
+  - **Tratamento de Senha Idêntica (`same_password`):** Mapeado no `AuthService` e nos formulários reativos via erro `samePassword`, exibindo a mensagem explicativa: *"A nova senha deve ser diferente da senha anterior."*.
+  - **Validação de Complexidade:** Aplica validação síncrona reativa nos formulários (`strongPasswordValidator` e `SENHA_FORTE_REGEX`) acompanhada de checklist visual com indicadores dinâmicos em tempo real nas telas de Definição de Senha de Convite, Redefinição de Senha e Alteração de Senha no Perfil:
+    - **Comprimento Mínimo:** 8 caracteres.
+    - **Letra Maiúscula:** ao menos uma (A-Z).
+    - **Letra Minúscula:** ao menos uma (a-z).
+    - **Número:** ao menos um (0-9).
+    - **Símbolo / Caractere Especial:** ao menos um (`!@#$%^&*()_+-=[]{};':"|,.<>/?~`).
+    - **Expressão Regular Estrita:** `/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~`]).{8,}$/`.
+  - O e-mail deve obedecer à sintaxe RFC 5322 e ter comprimento máximo de 100 caracteres.
 
 * **[RN05] Preservação de Integridade Referencial em Desativações (Soft Delete):**  
   Nenhum usuário é deletado fisicamente do banco de dados relacional (`hard delete`). Ao desativar um usuário, o campo `ativo` é alterado para `false` no perfil e o Supabase Auth aplica um banimento temporal (`banned_until`), impedindo novos logins sem comprometer o histórico de registros (como quem cadastrou cada pet na tabela `entradas`).
@@ -277,6 +292,16 @@ O processo metodológico de Engenharia de Requisitos adotado no presente TCC bas
 * **[RN19] Acesso Exclusivo e Governança do Quadro de Voluntários (RBAC):**  
   Apenas usuários autenticados com o papel de Administrador (`admin`) possuem permissão para acessar a rota `/voluntarios`, visualizar a lista de contatos, consultar disponibilidades por dia/turno e realizar o cadastro, alteração ou exclusão de voluntários. O acesso direto ao banco de dados PostgreSQL é protegido por políticas de Row Level Security (RLS) baseadas na função `public.is_admin()`, e no frontend o acesso à rota é bloqueado por `adminGuard`.
 
+* **[RN20] Armazenamento Seguro, Enquadramento Pré-Upload e Exibição de Fotos (Supabase Storage):**  
+  O armazenamento de fotos dos animais é gerenciado em bucket privado (`pets`) no Supabase Storage:
+  - **Controle de Acesso e Privacidade:** O bucket é estritamente privado (`public = false`), não permitindo URLs públicas estáticas. O acesso às imagens no frontend é realizado mediante geração de URLs temporárias assinadas (`createSignedUrl`) com tempo de expiração determinado (1 hora / 3600s).
+  - **Enquadramento Circular e Compressão Pré-Upload (Canvas):** Ao selecionar uma nova foto no formulário de cadastro/edição, o sistema abre automaticamente modal interativo (`ImageCropperDialogComponent`) com molde exclusivo de avatar circular, provendo controles de zoom (slider, botões +/- e roda do mouse), deslocamento panorâmico (mouse drag ou touch mobile) e rotação em 90°. Ao confirmar o enquadramento, um Canvas desacoplado recorta e converte a área circular selecionada para WebP (600x600 px) com compressão dinâmica progressiva e redução dimensional caso necessário (`image-utils.ts`), garantindo de forma autônoma que qualquer foto de smartphone (mesmo de 10 MB+) seja convertida para um arquivo leve estritamente inferior a 256 KB (262.144 bytes).
+  - **Visualização Ampliada (Lightbox Modal):** Na tela de detalhes do animal (`/pets/detalhes/:id`), o avatar com foto assinada é clicável e exibe overlay indicativo ao passar o cursor, abrindo modal em alta resolução (`ImagePreviewDialogComponent`) com opções de fechamento e abertura em nova aba do navegador.
+  - **Restrição de Carga e Tipos MIME:** Uploads são estritamente limitados ao tamanho máximo de 256 KB (262.144 bytes) — dimensionamento planejado para viabilizar o armazenamento de no mínimo 4.000 fotos dentro da cota gratuita de 1.000 MB do Supabase Storage — e formatos de imagem aceitos: `image/jpeg`, `image/png` e `image/webp`. Validações ocorrem tanto no cliente quanto na política de integridade do bucket no Supabase.
+  - **Limpeza Automática de Fotos Substituídas (Economia de Storage):** Na edição ou remoção de fotos de pets existentes, o sistema remove automaticamente a foto anterior do bucket privado no Supabase Storage, prevenindo o acúmulo de arquivos órfãos e maximizando a retenção útil de armazenamento.
+  - **Atomicidade Transacional:** A persistência do caminho relativo da foto (`foto_url`) ocorre exclusivamente através das *Stored Procedures* transacionais (`create_pet_com_entrada` e `update_pet_com_entrada`).
+  - **Estratégia de Desempenho e Economia de Banda:** A imagem não é renderizada na listagem geral paginada de animais (tabela/cards gerais), sendo carregada e exibida sob demanda exclusivamente na tela de detalhes do animal (`/pets/detalhes/:id`) e no formulário de edição/cadastro.
+
 ---
 
 ## 5. Requisitos Não-Funcionais (RNF)
@@ -287,7 +312,7 @@ O processo metodológico de Engenharia de Requisitos adotado no presente TCC bas
 | **[RNF02]** | **Acessibilidade** | A interface deve prover contraste adequado entre texto e fundo, suporte a leitor de telas e rótulos semânticos (`aria-label`, ícones intuitivos). | WCAG 2.1 Nível AA para contraste e navegação por teclado. |
 | **[RNF03]** | **Desempenho de Carga e Banco** | O carregamento inicial e transições devem utilizar Lazy Loading no Angular, e as consultas no PostgreSQL devem ser aceleradas por índices GIN trigram, GIN para arrays e B-Tree compostos para eliminar table scans. | FCP < 1.5s, LCP < 2.5s; tempo de execução de queries de prontuário < 1ms via Index Scan (aferido em 0.109ms via EXPLAIN ANALYZE). |
 | **[RNF04]** | **Reatividade de Estado** | O gerenciamento de estado do frontend deve utilizar o novo paradigma de **Signals** e **Computed Signals** do Angular 20, evitando renderizações desnecessárias. | Zero subscrições manuais não gerenciadas em componentes principais; reatividade fina de signals. |
-| **[RNF05]** | **Segurança & Autenticação** | Todas as requisições autenticadas devem trafegar via HTTPS com Bearer Tokens JWT emitidos pelo Supabase Auth, com validação de expiração e refresh automático. | Criptografia em trânsito (TLS 1.3) e armazenamento seguro de tokens. |
+| **[RNF05]** | **Segurança & Autenticação** | Todas as requisições autenticadas devem trafegar via HTTPS com Bearer Tokens JWT emitidos pelo Supabase Auth, política estrita de senhas fortes (8+ caracteres, maiúsculas, minúsculas, números e símbolos com rejeição nativa HTTP 422), proteção contra alteração desautorizada (`secure_password_change: true`), gestão de timeouts de sessão (timebox de 24h e inatividade de 8h) e refresh automático. | Criptografia em trânsito (TLS 1.3), validação estrita de credenciais e proteção em tempo real contra máquinas compartilhadas. |
 | **[RNF06]** | **Segurança em Nível de Banco (RLS) e Integridade Referencial** | O banco de dados PostgreSQL deve implementar Row Level Security (RLS) protegendo mutações não autorizadas. Tabelas primárias (`pets`, `locais`, `veterinarios`, `entradas`, `profiles`) possuem exclusão física (`DELETE`) bloqueada para prevenção de órfãos e perda de histórico; exclusões são restritas a itens de prontuário/estadias (`vacinas`, `consultas_exames`, `pets_locais`) exclusivas para administradores (`is_admin()`). | Políticas RLS ativas para todas as tabelas do schema público com matriz de DELETE auditada. |
 | **[RNF07]** | **Persistência de Preferências** | As preferências visuais do usuário (Tema Claro / Escuro) devem ser persistidas localmente no navegador (`LocalStorage`). | Retenção da preferência visual em novas sessões sem flicker de tela. |
 | **[RNF08]** | **Confiabilidade & Tratamento de Erros** | Erros de rede, validação de formulário ou falhas de Edge Function devem ser interceptados por utilitários centralizados e convertidos em mensagens amigáveis em português. | Ausência de stacktraces expostos ao usuário final; toasts informativos. |
@@ -301,17 +326,17 @@ O processo metodológico de Engenharia de Requisitos adotado no presente TCC bas
 | ID Requisito | Descrição Resumida | Regras de Negócio (RN) | Requisitos Não-Funcionais (RNF) | Entidades / Tabelas do Banco | Componentes / Serviços Frontend |
 | :---: | :--- | :---: | :---: | :--- | :--- |
 | **RF01** | Autenticação com e-mail/senha | RN01, RN02, RN04 | RNF05, RNF08 | `auth.users`, `profiles` | `AuthService`, `LoginComponent`, `authGuard` |
-| **RF02** | Redefinição e primeiro acesso | RN03, RN04 | RNF05, RNF08 | `auth.users` | `DefinirSenhaComponent`, `AuthService` |
+| **RF02** | Redefinição, primeiro acesso e alteração de senha | RN03, RN04 | RNF05, RNF08 | `auth.users` | `DefinirSenhaComponent`, `AlterarSenhaDialogComponent`, `PasswordRequirementsComponent`, `AuthService` |
 | **RF03** | Convite de usuários por admin | RN01, RN05 | RNF05, RNF08 | `profiles`, `auth.users` | `UsuarioDialogComponent`, `AuthService` |
 | **RF04** | Desativação/Reativação de contas | RN05, RN06 | RNF05, RNF08 | `profiles`, `Edge Function` | `UsuariosService`, `UsuarioListComponent` |
 | **RF05** | Auto-desativação de conta | RN06 | RNF05, RNF08 | `profiles`, `Edge Function` | `MainLayoutComponent`, `UsuariosService` |
 | **RF06** | Alteração de Role (RBAC) | RN01, RN05 | RNF05, RNF08 | `profiles` | `UsuariosService`, `UsuarioListComponent` |
-| **RF07** | Cadastro completo de pet | RN07, RN08, RN09 | RNF01, RNF04, RNF08 | `pets` | `PetFormComponent`, `PetsService` |
+| **RF07** | Cadastro completo de pet, foto e enquadramento | RN07, RN08, RN09, RN20 | RNF01, RNF04, RNF08 | `pets`, `Storage ('pets')` | `PetFormComponent`, `ImageCropperDialogComponent`, `PetsService` |
 | **RF08** | Registro obrigatório de entrada | RN10, RN17 | RNF08, RNF09 | `entradas` | `PetFormComponent`, `PetsService` |
 | **RF09** | Cálculo de senioridade | RN09 | RNF04 | `pets` | `pet.model.ts (calculateSenioridade)` |
-| **RF10** | Edição de pet | RN07, RN17 | RNF01, RNF08 | `pets` | `PetFormComponent`, `PetsService` |
+| **RF10** | Edição de pet, reajuste de enquadramento e foto | RN07, RN17, RN20 | RNF01, RNF08 | `pets`, `Storage ('pets')` | `PetFormComponent`, `ImageCropperDialogComponent`, `PetsService` |
 | **RF11** | Listagem e filtros de pets | RN07, RN08 | RNF01, RNF03, RNF04 | `pets`, `entradas` | `PetListComponent`, `PetsService` |
-| **RF12** | Prontuário consolidado | RN11, RN15 | RNF01, RNF04 | `pets`, `vacinas`, `consultas_exames`, `pets_locais` | `PetDetailComponent`, `PetsService` |
+| **RF12** | Prontuário consolidado e visualização/expansão de foto | RN11, RN15, RN20 | RNF01, RNF04 | `pets`, `vacinas`, `consultas_exames`, `pets_locais`, `Storage ('pets')` | `PetDetailComponent`, `ImagePreviewDialogComponent`, `PetsService` |
 | **RF13** | Cadastro/Gestão de vacinas | RN11, RN12, RN14 | RNF01, RNF04 | `vacinas` | `VacinaFormComponent`, `VacinasService` |
 | **RF14** | Procedimentos clínicos e exames | RN11, RN13, RN14 | RNF01, RNF04 | `consultas_exames` | `ProcedimentoFormComponent`, `ConsultasExamesService` |
 | **RF15** | Ordenação de prontuário | RN11 | RNF04 | `vacinas`, `consultas_exames` | `PetDetailComponent (Signals)` |

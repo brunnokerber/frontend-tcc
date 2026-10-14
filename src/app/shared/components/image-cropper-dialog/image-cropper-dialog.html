@@ -1,0 +1,167 @@
+<div class="cropper-dialog-container d-flex flex-column">
+  <!-- Topo -->
+  <div class="d-flex align-items-center justify-content-between p-3 border-bottom border-surface">
+    <div class="d-flex align-items-center gap-2 overflow-hidden pe-2">
+      <div class="cropper-icon-box rounded-circle d-flex align-items-center justify-content-center bg-primary-subtle text-primary">
+        <mat-icon>crop</mat-icon>
+      </div>
+      <div>
+        <h2 class="h6 fw-bold mb-0 text-truncate">{{ data.title || 'Ajustar Enquadramento' }}</h2>
+        <span class="small text-surface-muted">Posicione e dê zoom no rosto do animal</span>
+      </div>
+    </div>
+
+    <button
+      type="button"
+      mat-icon-button
+      (click)="cancelar()"
+      [disabled]="isExporting()"
+      matTooltip="Cancelar"
+      aria-label="Cancelar enquadramento"
+    >
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <!-- Área de Enquadramento Interativo -->
+  <div class="cropper-workspace d-flex flex-column align-items-center justify-content-center p-3">
+    @if (errorMessage()) {
+      <div class="text-center py-4 px-3 text-surface-muted">
+        <mat-icon class="text-danger mb-2" style="font-size: 40px; width: 40px; height: 40px;">error_outline</mat-icon>
+        <p class="mb-2 fw-medium text-danger">{{ errorMessage() }}</p>
+        <button type="button" mat-stroked-button (click)="cancelar()">Fechar</button>
+      </div>
+    } @else {
+      <!-- Viewport da Imagem com Máscara de Enquadramento -->
+      <div class="viewport-wrapper position-relative shadow-sm">
+        @if (isLoading()) {
+          <div class="cropper-loading-overlay d-flex flex-column align-items-center justify-content-center">
+            <mat-spinner diameter="44"></mat-spinner>
+            <span class="small text-surface-muted mt-3">Carregando imagem para enquadramento...</span>
+          </div>
+        }
+
+        <canvas
+          #cropCanvas
+          [width]="canvasSize"
+          [height]="canvasSize"
+          class="crop-canvas"
+          (mousedown)="onMouseDown($event)"
+          (mousemove)="onMouseMove($event)"
+          (mouseup)="onMouseUp()"
+          (mouseleave)="onMouseLeave()"
+          (touchstart)="onTouchStart($event)"
+          (touchmove)="onTouchMove($event)"
+          (touchend)="onTouchEnd()"
+          (wheel)="onWheel($event)"
+          title="Clique e arraste para posicionar. Use a roda do mouse para zoom."
+        ></canvas>
+
+        <!-- Máscara de recorte sobreposta (Avatar Circular) -->
+        <div class="crop-mask-overlay"></div>
+
+        <!-- Indicador de ajuda flutuante -->
+        @if (!isLoading()) {
+          <div class="drag-hint-badge">
+            <mat-icon>open_with</mat-icon>
+            <span>Arraste para mover</span>
+          </div>
+        }
+      </div>
+
+      <!-- Barra de Ferramentas / Controles de Enquadramento -->
+      <div class="cropper-controls w-100 mt-3 pt-2" [class.opacity-50]="isLoading()" [class.pe-none]="isLoading()">
+        <!-- Controle de Zoom Deslizante -->
+        <div class="d-flex align-items-center gap-2 mb-2 px-1">
+          <button
+            type="button"
+            mat-icon-button
+            (click)="zoomOut()"
+            [disabled]="zoom() <= 1.0"
+            matTooltip="Diminuir Zoom"
+            class="btn-control-icon"
+          >
+            <mat-icon>zoom_out</mat-icon>
+          </button>
+
+          <input
+            type="range"
+            class="form-range flex-grow-1"
+            min="1.0"
+            max="3.5"
+            step="0.05"
+            [value]="zoom()"
+            (input)="onZoomSliderInput($event)"
+            aria-label="Controle de Zoom da foto"
+          />
+
+          <button
+            type="button"
+            mat-icon-button
+            (click)="zoomIn()"
+            [disabled]="zoom() >= 3.5"
+            matTooltip="Aumentar Zoom"
+            class="btn-control-icon"
+          >
+            <mat-icon>zoom_in</mat-icon>
+          </button>
+        </div>
+
+        <!-- Botões de Ação Secundária (Girar, Resetar) -->
+        <div class="d-flex align-items-center justify-content-center gap-2 pt-2 border-top border-surface">
+          <button
+            type="button"
+            mat-stroked-button
+            (click)="rotateClockwise()"
+            class="btn-sm"
+            matTooltip="Girar 90 graus no sentido horário"
+          >
+            <mat-icon>rotate_right</mat-icon>
+            <span>Girar</span>
+          </button>
+
+          <button
+            type="button"
+            mat-stroked-button
+            (click)="resetarTransformacoes()"
+            class="btn-sm"
+            matTooltip="Redefinir posição e zoom originais"
+          >
+            <mat-icon>restart_alt</mat-icon>
+            <span>Redefinir</span>
+          </button>
+        </div>
+      </div>
+    }
+  </div>
+
+  <!-- Rodapé com Ações -->
+  <div class="d-flex align-items-center justify-content-end gap-2 p-3 border-top border-surface bg-surface-subtle">
+    <button
+      type="button"
+      mat-stroked-button
+      (click)="cancelar()"
+      [disabled]="isExporting()"
+    >
+      Cancelar
+    </button>
+    <button
+      type="button"
+      mat-flat-button
+      color="primary"
+      (click)="aplicarEnquadramento()"
+      [disabled]="isLoading() || !!errorMessage() || isExporting()"
+      class="d-flex align-items-center gap-1 px-3"
+    >
+      @if (isExporting()) {
+        <mat-spinner diameter="18" class="me-1"></mat-spinner>
+        <span>Processando...</span>
+      } @else {
+        <span class="d-inline-flex align-items-center gap-1">
+          <mat-icon>check</mat-icon>
+          <span>Aplicar Enquadramento</span>
+        </span>
+      }
+    </button>
+  </div>
+</div>

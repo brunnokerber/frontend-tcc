@@ -43,10 +43,73 @@
         </div>
 
         <div class="row g-3">
+          <!-- Upload e Pré-visualização da Foto de Perfil -->
+          <div class="col-12">
+            <div class="pet-photo-upload-box d-flex flex-column flex-sm-row align-items-center gap-3 p-3 rounded-3 border border-surface bg-surface-subtle">
+              <div class="pet-photo-preview-circle position-relative rounded-circle overflow-hidden shadow-xs">
+                @if (photoPreviewUrl()) {
+                  <img
+                    [src]="photoPreviewUrl()"
+                    alt="Foto de perfil do pet"
+                    class="pet-photo-preview-img"
+                  />
+                } @else {
+                  <div class="pet-photo-placeholder d-flex flex-column align-items-center justify-content-center w-100 h-100">
+                    <mat-icon class="text-surface-muted">add_a_photo</mat-icon>
+                    <span class="small text-surface-muted" style="font-size: 0.7rem;">Sem foto</span>
+                  </div>
+                }
+              </div>
+
+              <div class="flex-grow-1 text-center text-sm-start">
+                <div class="fw-semibold mb-1">Foto de Perfil</div>
+                <p class="text-surface-muted small mb-2">
+                  Formatos aceitos: JPG, PNG ou WebP. Tamanho máximo: 256 KB.
+                </p>
+
+                <div class="d-flex align-items-center justify-content-center justify-content-sm-start gap-2 flex-wrap">
+                  <input
+                    #fileInput
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp"
+                    (change)="onFileSelected($event)"
+                    class="d-none"
+                    aria-label="Selecionar foto do pet"
+                  />
+                  <button
+                    type="button"
+                    mat-stroked-button
+                    color="primary"
+                    (click)="fileInput.click()"
+                    [disabled]="isSaving()"
+                    class="btn-sm"
+                  >
+                    <mat-icon>upload</mat-icon>
+                    <span>{{ photoPreviewUrl() ? 'Alterar Foto' : 'Selecionar Foto' }}</span>
+                  </button>
+
+                  @if (photoPreviewUrl()) {
+                    <button
+                      type="button"
+                      mat-button
+                      color="warn"
+                      (click)="removePhoto(fileInput)"
+                      [disabled]="isSaving()"
+                      class="btn-sm"
+                    >
+                      <mat-icon>delete_outline</mat-icon>
+                      <span>Remover</span>
+                    </button>
+                  }
+                </div>
+              </div>
+            </div>
+          </div>
+
           <!-- Nome -->
           <div class="col-12 col-md-6">
             <mat-form-field appearance="outline" class="w-100">
-              <mat-label>Nome do Pet *</mat-label>
+              <mat-label>Nome do Pet</mat-label>
               <input
                 id="nome"
                 matInput
@@ -65,7 +128,7 @@
           <!-- Status -->
           <div class="col-12 col-md-6">
             <mat-form-field appearance="outline" class="w-100">
-              <mat-label>Status do Animal *</mat-label>
+              <mat-label>Status do Animal</mat-label>
               <mat-select id="status" formControlName="status" aria-label="Status do Animal">
                 @for (opt of statusOptions; track opt.value) {
                   <mat-option [value]="opt.value">{{ opt.label }}</mat-option>
@@ -80,7 +143,7 @@
           <!-- Tipo / Espécie -->
           <div class="col-12 col-md-6">
             <mat-form-field appearance="outline" class="w-100">
-              <mat-label>Espécie *</mat-label>
+              <mat-label>Espécie</mat-label>
               <mat-select id="tipo_pet" formControlName="tipo_pet" aria-label="Espécie">
                 @for (opt of tipoOptions; track opt.value) {
                   <mat-option [value]="opt.value">{{ opt.label }}</mat-option>
@@ -95,7 +158,7 @@
           <!-- Sexo -->
           <div class="col-12 col-md-6">
             <mat-form-field appearance="outline" class="w-100">
-              <mat-label>Sexo *</mat-label>
+              <mat-label>Sexo</mat-label>
               <mat-select id="sexo" formControlName="sexo" aria-label="Sexo">
                 @for (opt of sexoOptions; track opt.value) {
                   <mat-option [value]="opt.value">{{ opt.label }}</mat-option>
@@ -145,7 +208,7 @@
           <!-- Senioridade / Fase da Vida -->
           <div class="col-12 col-md-6">
             <mat-form-field appearance="outline" class="w-100">
-              <mat-label>Fase da Vida / Senioridade *</mat-label>
+              <mat-label>Fase da Vida / Senioridade</mat-label>
               <mat-select id="senioridade" formControlName="senioridade" aria-label="Fase da Vida ou Senioridade">
                 @for (opt of senioridadeOptions; track opt.value) {
                   <mat-option [value]="opt.value">{{ opt.label }}</mat-option>
@@ -160,7 +223,7 @@
           <!-- Raça -->
           <div class="col-12 col-md-6">
             <mat-form-field appearance="outline" class="w-100">
-              <mat-label>Raça *</mat-label>
+              <mat-label>Raça</mat-label>
               <input
                 id="raca"
                 matInput
@@ -342,7 +405,7 @@
           <!-- Local de Origem -->
           <div class="col-12 col-md-6">
             <mat-form-field appearance="outline" class="w-100">
-              <mat-label>Local de Origem / Resgate {{ !isEditing() || isAdmin() ? '*' : '' }}</mat-label>
+              <mat-label>Local de Origem / Resgate</mat-label>
               <input
                 id="local_origem"
                 matInput
@@ -362,7 +425,7 @@
           <!-- Resgatante -->
           <div class="col-12 col-md-6">
             <mat-form-field appearance="outline" class="w-100">
-              <mat-label>Resgatante / Responsável {{ !isEditing() || isAdmin() ? '*' : '' }}</mat-label>
+              <mat-label>Resgatante / Responsável</mat-label>
               <input
                 id="resgatante"
                 matInput
@@ -382,7 +445,7 @@
           <!-- Data de Entrada -->
           <div class="col-12 col-md-6">
             <mat-form-field appearance="outline" class="w-100">
-              <mat-label>Data de Entrada {{ !isEditing() || isAdmin() ? '*' : '' }}</mat-label>
+              <mat-label>Data de Entrada</mat-label>
               <input
                 id="data_entrada"
                 matInput

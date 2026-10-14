@@ -195,9 +195,37 @@ npm run start-remote
 
 ---
 
-## 🔐 Controle de Acesso e Permissões (RBAC)
+## 🔐 Controle de Acesso, Autenticação e Segurança
+
+### 1. Papéis de Acesso (RBAC)
 
 | Perfil | Acessos e Permissões |
 | :--- | :--- |
 | **Administrador (`admin`)** | Acesso total a todas as telas, cadastro de pets, prontuários, retificação e edição de dados de entrada/resgate, gestão de clínicas, lares temporários, quadro de voluntários (`/voluntarios`) e administração completa de usuários (`/usuarios`). |
 | **Operador (`user`)** | Acesso operacional para cadastro de pets, lançamentos no prontuário, gestão de lares temporários e veterinários. Bloqueado nas rotas `/usuarios` e `/voluntarios` via `adminGuard` e com dados de entrada de pets em modo somente-leitura na edição. |
+
+### 2. Credenciais de Desenvolvimento (Mock Local / Seed)
+A conta de administrador inicial da seed de banco de dados (`seed.sql`) está em estrita conformidade com a política de senhas fortes:
+
+* **E-mail:** `admin@admin.com`
+* **Senha:** `Admin@123`
+* **Papel:** `admin`
+
+### 3. Diretrizes de Segurança do Supabase Auth
+
+1. **Política de Senhas Fortes:**
+   * Rejeição nativa no backend via HTTP 422 (`weak_password`).
+   * Validação reativa síncrona nos formulários Angular (`strongPasswordValidator` e `SENHA_FORTE_REGEX`) acompanhada de checklist visual com indicadores dinâmicos em tempo real nas telas de Primeiro Acesso (`/definir-senha`), Redefinição e Alteração de Senha no Perfil.
+   * Regras mandatórias: Mínimo 8 caracteres, ao menos 1 maiúscula (A-Z), ao menos 1 minúscula (a-z), ao menos 1 número (0-9) e ao menos 1 caractere especial (`!@#$%^&*()_+-=[]{};':"|,.<>/?~`).
+
+2. **Fluxo de Cadastro Fechado (Signup Fechado):**
+   * Auto-registro desativado (`signup_disabled`). Não há rotas nem formulários públicos de cadastro desassistido.
+   * Novos voluntários são adicionados exclusivamente por administradores via Edge Function `invite-user`, recebendo link temporário seguro para definição de credencial inicial em `/definir-senha`.
+
+3. **Gerenciamento de Sessão e Timeouts de Inatividade:**
+   * Duração máxima da sessão (*Timebox*): **24 horas**.
+   * Timeout de inatividade: **8 horas**.
+   * O `AuthService` monitora o ciclo de vida via `supabase.auth.onAuthStateChange` (`SIGNED_OUT` ou expiração de refresh), redirecionando para `/login` com emissão de notificação informativa (*toast*).
+
+4. **Proteção na Troca de Senha (`secure_password_change: true`):**
+   * O Supabase exige reautenticação recente para alteração de credencial pelo próprio usuário. Caso a sessão tenha sido aberta há muito tempo, o frontend detecta o bloqueio e orienta o usuário a realizar novo login antes de prosseguir.

@@ -4,21 +4,29 @@ import { AbstractControl, ValidationErrors } from '@angular/forms';
 /**
  * Dicionário padrão e agnóstico de mensagens para validadores comuns.
  */
-const DEFAULT_ERROR_MESSAGES: Record<string, string | ((err: any) => string)> = {
+type ErrorMessageFn = (err: Record<string, unknown>) => string;
+
+/**
+ * Dicionário padrão e agnóstico de mensagens para validadores comuns.
+ */
+const DEFAULT_ERROR_MESSAGES: Record<string, string | ErrorMessageFn> = {
   required: 'Campo obrigatório',
   email: 'E-mail inválido',
   telefoneInvalido: 'Telefone inválido (DDD + 8 ou 9 dígitos)',
   phone: 'Telefone inválido (DDD + 8 ou 9 dígitos)',
   mask: 'Formato inválido',
-  minlength: (err) => `Mínimo de ${err.requiredLength} caracteres`,
-  maxlength: (err) => `Máximo de ${err.requiredLength} caracteres`,
-  min: (err) => `O valor mínimo permitido é ${err.min}`,
-  max: (err) => `O valor máximo permitido é ${err.max}`,
+  minlength: (err) => `Mínimo de ${String(err['requiredLength'] ?? 8)} caracteres`,
+  maxlength: (err) => `Máximo de ${String(err['requiredLength'] ?? 100)} caracteres`,
+  min: (err) => `O valor mínimo permitido é ${String(err['min'] ?? '')}`,
+  max: (err) => `O valor máximo permitido é ${String(err['max'] ?? '')}`,
   matDatepickerParse: 'Data inválida ou formato incorreto',
   matDatepickerMin: 'Data anterior ao limite mínimo permitido',
   matDatepickerMax: 'Data posterior ao limite máximo permitido',
   mismatch: 'Os valores informados não conferem',
-  strongPassword: 'Senha não atende aos requisitos de segurança',
+  passwordMismatch: 'As senhas digitadas não coincidem',
+  samePassword: 'A nova senha deve ser diferente da senha anterior',
+  strongPassword: 'A senha deve conter ao menos 8 caracteres, com maiúscula, minúscula, número e símbolo',
+  pattern: 'Formato inválido ou requisitos de segurança não atendidos',
   cnpjInvalido: 'CNPJ inválido ou inexistente',
 };
 
@@ -29,6 +37,8 @@ const DEFAULT_PRIORITY: string[] = [
   'matDatepickerMax',
   'required',
   'mismatch',
+  'passwordMismatch',
+  'samePassword',
   'strongPassword',
   'cnpjInvalido',
   'telefoneInvalido',

@@ -1,0 +1,74 @@
+<div class="image-preview-dialog-container d-flex flex-column">
+  <!-- Topo: Título e Ações -->
+  <div class="d-flex align-items-center justify-content-between p-3 border-bottom border-surface">
+    <div class="d-flex align-items-center gap-2 overflow-hidden pe-2">
+      <div class="header-icon-box rounded-circle d-flex align-items-center justify-content-center bg-primary-subtle text-primary">
+        <mat-icon>photo</mat-icon>
+      </div>
+      <div class="text-truncate">
+        <h2 class="h6 fw-bold mb-0 text-truncate">{{ data.title || 'Foto do Pet' }}</h2>
+        @if (data.subtitle) {
+          <span class="small text-surface-muted">{{ data.subtitle }}</span>
+        }
+      </div>
+    </div>
+
+    <div class="d-flex align-items-center gap-1 flex-shrink-0">
+      <a
+        [href]="data.imageUrl"
+        target="_blank"
+        rel="noopener noreferrer"
+        mat-icon-button
+        matTooltip="Abrir imagem em nova aba"
+        aria-label="Abrir imagem em nova aba"
+      >
+        <mat-icon>open_in_new</mat-icon>
+      </a>
+      <button
+        type="button"
+        mat-icon-button
+        (click)="close()"
+        matTooltip="Fechar visualização"
+        aria-label="Fechar"
+      >
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+  </div>
+
+  <!-- Corpo com Imagem Ampliada -->
+  <div class="image-preview-body p-2 p-md-3 d-flex align-items-center justify-content-center position-relative">
+    @if (!isLoaded() && !hasError()) {
+      <div class="loading-overlay d-flex flex-column align-items-center justify-content-center py-5">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Carregando imagem...</span>
+        </div>
+        <span class="small text-surface-muted mt-2">Carregando imagem em alta resolução...</span>
+      </div>
+    }
+
+    @if (hasError()) {
+      <div class="text-center py-5 text-surface-muted">
+        <mat-icon class="text-danger mb-2 error-icon">broken_image</mat-icon>
+        <p class="mb-0 fw-medium">Não foi possível carregar a imagem ampliada.</p>
+        <span class="small text-surface-muted">O link temporário pode ter expirado. Tente recarregar a página.</span>
+      </div>
+    } @else {
+      <img
+        [src]="data.imageUrl"
+        [alt]="data.title || 'Foto do Pet'"
+        class="img-fluid rounded-3 preview-image shadow-sm"
+        [class.d-none]="!isLoaded()"
+        (load)="onImageLoad()"
+        (error)="onImageError()"
+      />
+    }
+  </div>
+
+  <!-- Rodapé -->
+  <div class="d-flex align-items-center justify-content-end p-2 px-3 border-top border-surface bg-surface-subtle">
+    <button type="button" mat-stroked-button (click)="close()">
+      Fechar
+    </button>
+  </div>
+</div>

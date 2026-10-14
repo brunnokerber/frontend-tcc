@@ -8,6 +8,7 @@ import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { UsuarioDialogComponent } from '@core/auth/components/usuario-dialog/usuario-dialog';
+import { AlterarSenhaDialogComponent } from '@core/auth/components/alterar-senha-dialog/alterar-senha-dialog';
 import { AuthService } from '@core/auth/services/auth.service';
 import { ThemeMode, ThemeService } from '@core/services/theme.service';
 import { environment } from '@env/environment';
@@ -83,6 +84,15 @@ export class MainLayoutComponent {
       width: '540px',
       maxWidth: '96vw',
       disableClose: true,
+      autoFocus: false,
+    });
+  }
+
+  openChangePasswordDialog(): void {
+    this.closeUserSidenav();
+    this.dialog.open(AlterarSenhaDialogComponent, {
+      width: '500px',
+      maxWidth: '96vw',
       autoFocus: false,
     });
   }

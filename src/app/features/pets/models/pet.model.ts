@@ -23,6 +23,7 @@ export interface Pet extends Audit {
   moura?: string | null;
   chip?: string | null;
   rga?: string | null;
+  foto_url?: string | null;
   entradas?: Entrada[];
   vacinas?: Vacina[];
   consultas_exames?: ConsultaExame[];
@@ -54,6 +55,7 @@ export interface PetCreateDto extends EntradaDto {
   moura?: string | null;
   chip?: string | null;
   rga?: string | null;
+  foto_url?: string | null;
 }
 
 export interface EntradaDto {

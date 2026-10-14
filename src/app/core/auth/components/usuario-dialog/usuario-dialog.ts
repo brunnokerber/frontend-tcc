@@ -94,8 +94,8 @@ export class UsuarioDialogComponent {
       await this.authService.inviteUser(email, role);
       this.toast.success(`Convite de acesso enviado com sucesso para "${email}"!`);
       this.dialogRef.close({ email, role });
-    } catch (err: any) {
-      const errorMsg = err.message || 'Erro ao enviar convite para o usuário.';
+    } catch (err: unknown) {
+      const errorMsg = err instanceof Error ? err.message : 'Erro ao enviar convite para o usuário.';
       const isRegistered =
         errorMsg.toLowerCase().includes('já está cadastrado') ||
         errorMsg.toLowerCase().includes('already') ||
@@ -124,8 +124,8 @@ export class UsuarioDialogComponent {
       await this.authService.sendResetPassword(email);
       this.toast.success(`E-mail com link de redefinição de senha enviado com sucesso para "${email}"!`);
       this.dialogRef.close({ email, role, action: 'reset_password' });
-    } catch (err: any) {
-      const errorMsg = err.message || 'Erro ao enviar e-mail de redefinição.';
+    } catch (err: unknown) {
+      const errorMsg = err instanceof Error ? err.message : 'Erro ao enviar e-mail de redefinição.';
       this.toast.error(errorMsg);
     } finally {
       this.isSubmitting.set(false);

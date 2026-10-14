@@ -146,3 +146,44 @@
 .tracking-wide {
   letter-spacing: 0.05em;
 }
+
+/* Avatar Interativo com Expansão / Lightbox */
+.pet-hero-avatar-btn {
+  cursor: pointer;
+  outline: none;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+  &:hover {
+    transform: scale(1.04);
+
+    .pet-hero-photo {
+      border-color: var(--mat-sys-primary);
+    }
+
+    .avatar-zoom-overlay {
+      opacity: 1;
+    }
+  }
+
+  &:focus-visible {
+    box-shadow: 0 0 0 3px var(--mat-sys-primary);
+  }
+}
+
+.avatar-zoom-overlay {
+  position: absolute;
+  inset: 0;
+  background-color: rgba(15, 23, 42, 0.45);
+  backdrop-filter: blur(1px);
+  -webkit-backdrop-filter: blur(1px);
+  color: #ffffff;
+  opacity: 0;
+  transition: opacity 0.2s ease-in-out;
+  pointer-events: none;
+
+  mat-icon {
+    font-size: 22px;
+    width: 22px;
+    height: 22px;
+  }
+}

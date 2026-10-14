@@ -26,8 +26,8 @@ export interface LoginResponse {
     email: string;
     role?: AppRole;
     ativo?: boolean;
-    app_metadata?: { [key: string]: any; role?: AppRole };
-    user_metadata?: { [key: string]: any; role?: AppRole };
+    app_metadata?: { [key: string]: unknown; role?: AppRole };
+    user_metadata?: { [key: string]: unknown; role?: AppRole };
   };
 }
 

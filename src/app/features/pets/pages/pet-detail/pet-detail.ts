@@ -1,9 +1,10 @@
 import { CommonModule, CurrencyPipe, DatePipe } from '@angular/common';
-import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, effect, inject, OnInit, signal } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatCardModule } from '@angular/material/card';
 import { MatChipsModule } from '@angular/material/chips';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
@@ -12,6 +13,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NavigationService } from '@core/services/navigation.service';
 import { ToastService } from '@core/services/toast.service';
+import { ImagePreviewDialogComponent } from '@shared/components/image-preview-dialog/image-preview-dialog';
 import {
   ConsultaExame,
   getSexoIcon,
@@ -44,6 +46,7 @@ import { VacinasService } from '../../services/vacinas.service';
     MatButtonToggleModule,
     MatDividerModule,
     MatTabsModule,
+    MatDialogModule,
   ],
   templateUrl: './pet-detail.html',
   styleUrls: ['./pet-detail.scss'],
@@ -52,6 +55,7 @@ export default class PetDetailComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private nav = inject(NavigationService);
+  private dialog = inject(MatDialog);
   public petsService = inject(PetsService);
   public vacinasService = inject(VacinasService);
   public consultasExamesService = inject(ConsultasExamesService);
@@ -64,6 +68,9 @@ export default class PetDetailComponent implements OnInit {
   public consultasExames = this.consultasExamesService.consultas;
   public petsLocais = this.petsLocaisService.petsLocais;
 
+  // Foto assinada do pet (Supabase Storage)
+  public fotoUrl = signal<string | null>(null);
+
   public loadingPet = this.petsService.loading;
   public loadingVacinas = this.vacinasService.loading;
   public loadingConsultas = this.consultasExamesService.loading;
@@ -72,6 +79,44 @@ export default class PetDetailComponent implements OnInit {
   // Modos de ordenação (Toggles)
   public vacinaSortMode = signal<SortOrderMode>('cronologico');
   public procedimentoSortMode = signal<SortOrderMode>('cronologico');
+
+  constructor() {
+    // Reage dinamicamente às mudanças do pet em memória para buscar a URL assinada da foto
+    effect(() => {
+      const p = this.pet();
+      const fotoPath = p?.foto_url;
+      if (!fotoPath) {
+        this.fotoUrl.set(null);
+        return;
+      }
+
+      this.carregarFotoPet(fotoPath).then((url) => {
+        this.fotoUrl.set(url);
+      });
+    });
+  }
+
+  /**
+   * Obtém uma URL assinada temporária (1 hora) para o bucket privado 'pets' do Supabase Storage.
+   */
+  async carregarFotoPet(caminhoFoto: string | null | undefined): Promise<string | null> {
+    return this.petsService.getSignedFotoUrl(caminhoFoto, 3600);
+  }
+
+  /**
+   * Abre o modal de visualização ampliada (lightbox) com a foto do pet.
+   */
+  openPhotoPreview(url: string, nome: string): void {
+    this.dialog.open(ImagePreviewDialogComponent, {
+      data: {
+        imageUrl: url,
+        title: nome,
+        subtitle: 'Foto cadastrada do pet',
+      },
+      maxWidth: '92vw',
+      maxHeight: '92vh',
+    });
+  }
 
   // Computeds de ordenação
   public sortedVacinas = computed(() => {

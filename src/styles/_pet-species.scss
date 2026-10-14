@@ -70,6 +70,12 @@
   }
 }
 
+.pet-hero-photo {
+  object-fit: cover;
+  border: 2px solid var(--mat-sys-outline-variant);
+  background-color: var(--mat-sys-surface-container);
+}
+
 /* Pet Species Badges & Avatars */
 .bg-dog {
   background-color: var(--color-pet-dog-bg);

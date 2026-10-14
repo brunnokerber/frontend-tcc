@@ -4,6 +4,7 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
@@ -13,6 +14,11 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from '@core/auth/services/auth.service';
 import { NavigationService } from '@core/services/navigation.service';
 import { ToastService } from '@core/services/toast.service';
+import {
+  ImageCropperDialogComponent,
+  ImageCropperDialogData,
+  ImageCropperResult,
+} from '@shared/components/image-cropper-dialog/image-cropper-dialog';
 import { DateMaskDirective } from '@shared/directives/date-mask.directive';
 import { FormErrorPipe } from '@shared/pipes/form-error.pipe';
 import { dateSequenceValidator, maxDateTodayValidator } from '@shared/validators/date.validators';
@@ -45,6 +51,7 @@ import { PetsService } from '../../services/pets.service';
     MatSelectModule,
     MatDatepickerModule,
     MatProgressSpinnerModule,
+    MatDialogModule,
     FormErrorPipe,
     DateMaskDirective,
   ],
@@ -59,6 +66,7 @@ export default class PetFormComponent implements OnInit {
   private petsService = inject(PetsService);
   private authService = inject(AuthService);
   private toast = inject(ToastService);
+  private dialog = inject(MatDialog);
 
   // Permissões
   public isAdmin = this.authService.isAdmin;
@@ -69,6 +77,12 @@ export default class PetFormComponent implements OnInit {
   public isSaving = signal(false);
   public petId = signal<number | null>(null);
   public existingPet = signal<Pet | null>(null);
+
+  // Foto do Pet (Supabase Storage)
+  public selectedPhotoFile = signal<File | null>(null);
+  public photoPreviewUrl = signal<string | null>(null);
+  public photoRemoved = signal<boolean>(false);
+  public existingPhotoPath = signal<string | null>(null);
 
   // Opções para os Selects
   public tipoOptions = TIPO_PET_OPTIONS;
@@ -165,6 +179,21 @@ export default class PetFormComponent implements OnInit {
     // Preencher dados do formulário
     const firstEntrada = pet.entradas && pet.entradas.length > 0 ? pet.entradas[0] : null;
 
+    // Foto de perfil existente
+    if (pet.foto_url) {
+      this.existingPhotoPath.set(pet.foto_url);
+      this.petsService.getSignedFotoUrl(pet.foto_url).then((url) => {
+        if (url && !this.selectedPhotoFile()) {
+          this.photoPreviewUrl.set(url);
+        }
+      });
+    } else {
+      this.existingPhotoPath.set(null);
+      this.photoPreviewUrl.set(null);
+    }
+    this.photoRemoved.set(false);
+    this.selectedPhotoFile.set(null);
+
     this.petForm.patchValue({
       nome: pet.nome,
       tipo_pet: pet.tipo_pet || 'Cachorro',
@@ -187,6 +216,75 @@ export default class PetFormComponent implements OnInit {
       resgatante: firstEntrada ? firstEntrada.resgatante : '',
       observacoes: firstEntrada ? firstEntrada.observacoes || '' : '',
     });
+  }
+
+  onFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (!input.files || input.files.length === 0) {
+      return;
+    }
+
+    const file = input.files[0];
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
+    if (!allowedTypes.includes(file.type)) {
+      this.toast.error('Formato de imagem inválido. Formatos aceitos: JPEG, PNG e WebP.');
+      input.value = '';
+      return;
+    }
+
+    const MAX_RAW_SIZE = 15 * 1024 * 1024; // 15 MB antes do enquadramento/compressão
+    if (file.size > MAX_RAW_SIZE) {
+      this.toast.error('A imagem selecionada é muito grande (máximo 15 MB).');
+      input.value = '';
+      return;
+    }
+
+    // Abre o modal de recorte e enquadramento com a imagem selecionada
+    this.abrirModalEnquadramento(file, input);
+  }
+
+  /**
+   * Abre o modal de enquadramento (zoom, pan, rotação) para ajustar o avatar.
+   */
+  abrirModalEnquadramento(source: File | string, fileInput?: HTMLInputElement): void {
+    const isFile = source instanceof File;
+    const dialogRef = this.dialog.open<
+      ImageCropperDialogComponent,
+      ImageCropperDialogData,
+      ImageCropperResult | null
+    >(ImageCropperDialogComponent, {
+        data: {
+          imageFile: isFile ? source : undefined,
+          imageUrl: !isFile ? source : undefined,
+          title: 'Enquadrar Foto do Pet',
+          outputSize: 600,
+          maxFileSizeKB: 256,
+        },
+        width: '100%',
+        maxWidth: '440px',
+        disableClose: true,
+      }
+    );
+
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result) {
+        this.selectedPhotoFile.set(result.file);
+        this.photoPreviewUrl.set(result.previewUrl);
+        this.photoRemoved.set(false);
+      } else if (fileInput && !this.selectedPhotoFile() && !this.photoPreviewUrl()) {
+        fileInput.value = '';
+      }
+    });
+  }
+
+
+  removePhoto(fileInput?: HTMLInputElement): void {
+    this.selectedPhotoFile.set(null);
+    this.photoPreviewUrl.set(null);
+    this.photoRemoved.set(true);
+    if (fileInput) {
+      fileInput.value = '';
+    }
   }
 
   async loadPetData(id: number) {
@@ -214,6 +312,31 @@ export default class PetFormComponent implements OnInit {
     this.isSaving.set(true);
 
     try {
+      // Processamento de upload de foto (se nova foto foi selecionada)
+      let fotoUrlPayload: string | null | undefined = undefined;
+
+      if (this.selectedPhotoFile()) {
+        fotoUrlPayload = await this.petsService.uploadPetFoto(
+          this.selectedPhotoFile()!,
+          this.petId() || undefined
+        );
+        // Remove a foto antiga do bucket para preservar a cota de storage
+        const oldFoto = this.existingPhotoPath();
+        if (oldFoto && oldFoto !== fotoUrlPayload) {
+          await this.petsService.deletePetFoto(oldFoto);
+        }
+      } else if (this.photoRemoved()) {
+        fotoUrlPayload = null;
+        const oldFoto = this.existingPhotoPath();
+        if (oldFoto) {
+          await this.petsService.deletePetFoto(oldFoto);
+        }
+      } else if (this.isEditing()) {
+        fotoUrlPayload = this.existingPhotoPath();
+      } else {
+        fotoUrlPayload = null;
+      }
+
       if (this.isEditing() && this.petId()) {
         const updateDto: PetUpdateDto = {
           nome: formValues.nome?.trim() || '',
@@ -230,6 +353,7 @@ export default class PetFormComponent implements OnInit {
           data_nascimento: dateToIsoString(formValues.data_nascimento),
           data_castracao: dateToIsoString(formValues.data_castracao),
           link_documentos: sanitize(formValues.link_documentos),
+          foto_url: fotoUrlPayload,
         };
 
         let entradaUpdateDto: EntradaUpdateDto | undefined;
@@ -254,6 +378,7 @@ export default class PetFormComponent implements OnInit {
         );
 
         if (updated) {
+          this.petsService.setCachedPet(updated);
           this.goBack();
         }
       } else {
@@ -272,6 +397,7 @@ export default class PetFormComponent implements OnInit {
           data_nascimento: dateToIsoString(formValues.data_nascimento),
           data_castracao: dateToIsoString(formValues.data_castracao),
           link_documentos: sanitize(formValues.link_documentos),
+          foto_url: fotoUrlPayload,
           local_origem: formValues.local_origem?.trim() || 'Não informado',
           data_entrada:
             dateToIsoString(formValues.data_entrada) || new Date().toISOString().split('T')[0],
@@ -284,8 +410,8 @@ export default class PetFormComponent implements OnInit {
           this.router.navigate(['/pets']);
         }
       }
-    } catch (err) {
-      console.error(err);
+    } catch (err: unknown) {
+      console.error('Erro ao salvar pet:', err);
     } finally {
       this.isSaving.set(false);
     }

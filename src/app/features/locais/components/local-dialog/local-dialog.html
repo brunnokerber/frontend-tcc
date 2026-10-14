@@ -37,7 +37,7 @@
           <!-- Tipo de Local -->
           <div class="col-12 col-md-5">
             <mat-form-field appearance="outline" class="w-100">
-              <mat-label>Tipo de Local *</mat-label>
+              <mat-label>Tipo de Local</mat-label>
               <mat-select id="tipo_local" formControlName="tipo_local" aria-label="Tipo de Local">
                 @for (tipo of tipoLocalOptions; track tipo.value) {
                   <mat-option [value]="tipo.value">
@@ -55,7 +55,7 @@
           <!-- Nome do Local / Lar -->
           <div class="col-12 col-md-7">
             <mat-form-field appearance="outline" class="w-100">
-              <mat-label>Nome do Local / Estabelecimento *</mat-label>
+              <mat-label>Nome do Local / Estabelecimento</mat-label>
               <input
                 id="nome_local"
                 matInput
@@ -74,7 +74,7 @@
           <!-- Pessoa de Contato -->
           <div class="col-12 col-md-7">
             <mat-form-field appearance="outline" class="w-100">
-              <mat-label>Pessoa de Contato / Responsável *</mat-label>
+              <mat-label>Pessoa de Contato / Responsável</mat-label>
               <input
                 id="contato_responsavel"
                 matInput
@@ -92,7 +92,7 @@
           <!-- Telefone / WhatsApp -->
           <div class="col-12 col-md-5">
             <mat-form-field appearance="outline" class="w-100">
-              <mat-label>Telefone / WhatsApp *</mat-label>
+              <mat-label>Telefone / WhatsApp</mat-label>
               <input
                 id="telefone_local"
                 matInput
@@ -126,7 +126,7 @@
           <!-- CEP -->
           <div class="col-12 col-md-4">
             <mat-form-field appearance="outline" class="w-100">
-              <mat-label>CEP *</mat-label>
+              <mat-label>CEP</mat-label>
               <input
                 id="cep_local"
                 matInput
@@ -160,7 +160,7 @@
           <!-- Rua / Logradouro -->
           <div class="col-12 col-md-8">
             <mat-form-field appearance="outline" class="w-100">
-              <mat-label>Rua / Logradouro *</mat-label>
+              <mat-label>Rua / Logradouro</mat-label>
               <input
                 id="rua_local"
                 matInput
@@ -178,7 +178,7 @@
           <!-- Número -->
           <div class="col-12 col-sm-4 col-md-3">
             <mat-form-field appearance="outline" class="w-100">
-              <mat-label>Número *</mat-label>
+              <mat-label>Número</mat-label>
               <input
                 id="numero_local"
                 matInput
@@ -215,7 +215,7 @@
           <!-- Bairro -->
           <div class="col-12 col-md-4">
             <mat-form-field appearance="outline" class="w-100">
-              <mat-label>Bairro *</mat-label>
+              <mat-label>Bairro</mat-label>
               <input
                 id="bairro_local"
                 matInput
@@ -233,7 +233,7 @@
           <!-- Cidade -->
           <div class="col-12 col-md-8">
             <mat-form-field appearance="outline" class="w-100">
-              <mat-label>Cidade *</mat-label>
+              <mat-label>Cidade</mat-label>
               <input
                 id="cidade_local"
                 matInput
@@ -251,7 +251,7 @@
           <!-- Estado / UF -->
           <div class="col-12 col-md-4">
             <mat-form-field appearance="outline" class="w-100">
-              <mat-label>UF *</mat-label>
+              <mat-label>UF</mat-label>
               <mat-select id="uf_local" formControlName="estado" aria-label="UF ou Estado">
                 @for (uf of estadosBrasil; track uf) {
                   <mat-option [value]="uf">{{ uf }}</mat-option>
