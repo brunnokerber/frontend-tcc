@@ -43,4 +43,3 @@ export const USER_SEARCH_FIELDS_OPTIONS: UserSearchFieldOption[] = [
   { value: 'status', label: 'Status da Conta', placeholder: 'Ativo ou Desativado...' },
   { value: 'id', label: 'ID do Usuário', placeholder: 'Ex: a1b2c3...' },
 ];
-

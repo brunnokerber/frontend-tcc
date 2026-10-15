@@ -4,7 +4,7 @@ import { MatSnackBar, MatSnackBarConfig } from '@angular/material/snack-bar';
 type ToastType = 'success' | 'error' | 'warning' | 'info';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ToastService {
   private readonly snackBar = inject(MatSnackBar);
@@ -19,7 +19,7 @@ export class ToastService {
     this.snackBar.open(message, 'Close', {
       ...this.defaultConfig,
       duration: duration ?? this.defaultConfig.duration,
-      panelClass: [`toast-${type}`] 
+      panelClass: [`toast-${type}`],
     });
   }
 

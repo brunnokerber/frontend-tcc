@@ -93,7 +93,10 @@
     <div class="row g-3 align-items-end">
       <!-- Seleção da Coluna -->
       <div class="col-12 col-md-4 col-lg-3">
-        <label for="usuario-filter-field" class="form-label small fw-semibold text-surface-muted mb-1">
+        <label
+          for="usuario-filter-field"
+          class="form-label small fw-semibold text-surface-muted mb-1"
+        >
           Filtrar por Coluna
         </label>
         <select
@@ -111,7 +114,10 @@
 
       <!-- Termo de Busca / Campo de Valor -->
       <div class="col-12 col-md-5 col-lg-6">
-        <label for="usuario-filter-value" class="form-label small fw-semibold text-surface-muted mb-1">
+        <label
+          for="usuario-filter-value"
+          class="form-label small fw-semibold text-surface-muted mb-1"
+        >
           Termo de Busca / Valor
         </label>
 
@@ -167,7 +173,6 @@
         }
       </div>
 
-
       <!-- Botões de Ação de Filtro -->
       <div class="col-12 col-md-3 col-lg-3 d-flex justify-content-end gap-2">
         <button
@@ -190,12 +195,9 @@
           <mat-icon>filter_list</mat-icon>
           <span>Filtrar</span>
         </button>
-
       </div>
     </div>
   </form>
-
-
 
   <!-- Estado de Carregamento -->
   @if (usuariosService.loading()) {
@@ -247,13 +249,18 @@
                     [class.bg-primary]="usr.role === 'admin'"
                     [class.bg-secondary]="usr.role !== 'admin'"
                   >
-                    <mat-icon>{{ usr.role === 'admin' ? 'admin_panel_settings' : 'person' }}</mat-icon>
+                    <mat-icon>{{
+                      usr.role === 'admin' ? 'admin_panel_settings' : 'person'
+                    }}</mat-icon>
                   </div>
                   <div>
                     <div class="fw-bold d-flex align-items-center gap-2">
                       <span>{{ usr.email || 'Usuário Sem E-mail' }}</span>
                       @if (usr.id === currentUserId()) {
-                        <span class="badge bg-primary-subtle text-primary border border-primary-subtle" style="font-size: 0.68rem">
+                        <span
+                          class="badge bg-primary-subtle text-primary border border-primary-subtle"
+                          style="font-size: 0.68rem"
+                        >
                           Você
                         </span>
                       }
@@ -295,11 +302,19 @@
                       <mat-icon style="font-size: 16px; width: 16px; height: 16px">tune</mat-icon>
                     </button>
                     <mat-menu #roleMenu="matMenu">
-                      <button mat-menu-item (click)="onChangeRole(usr, 'user')" [disabled]="usr.role === 'user'">
+                      <button
+                        mat-menu-item
+                        (click)="onChangeRole(usr, 'user')"
+                        [disabled]="usr.role === 'user'"
+                      >
                         <mat-icon>person</mat-icon>
                         <span>Tornar Operador</span>
                       </button>
-                      <button mat-menu-item (click)="onChangeRole(usr, 'admin')" [disabled]="usr.role === 'admin'">
+                      <button
+                        mat-menu-item
+                        (click)="onChangeRole(usr, 'admin')"
+                        [disabled]="usr.role === 'admin'"
+                      >
                         <mat-icon>admin_panel_settings</mat-icon>
                         <span>Tornar Administrador</span>
                       </button>
@@ -311,12 +326,16 @@
               <!-- Status -->
               <td>
                 @if (usr.ativo !== false) {
-                  <span class="badge bg-success-subtle text-success border border-success-subtle d-inline-flex align-items-center gap-1">
+                  <span
+                    class="badge bg-success-subtle text-success border border-success-subtle d-inline-flex align-items-center gap-1"
+                  >
                     <i class="bi bi-check-circle-fill"></i>
                     <span>Ativo</span>
                   </span>
                 } @else {
-                  <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle d-inline-flex align-items-center gap-1">
+                  <span
+                    class="badge bg-secondary-subtle text-secondary border border-secondary-subtle d-inline-flex align-items-center gap-1"
+                  >
                     <i class="bi bi-dash-circle-fill"></i>
                     <span>Desativado</span>
                   </span>
@@ -331,7 +350,8 @@
               <!-- Data de Cadastro -->
               <td>
                 <span class="text-surface-muted small">
-                  <i class="bi bi-calendar3 me-1"></i>{{ usr.created_at ? (usr.created_at | date: 'dd/MM/yyyy') : 'N/I' }}
+                  <i class="bi bi-calendar3 me-1"></i
+                  >{{ usr.created_at ? (usr.created_at | date: 'dd/MM/yyyy') : 'N/I' }}
                 </span>
               </td>
 
@@ -394,11 +414,17 @@
                     [class.bg-primary]="usr.role === 'admin'"
                     [class.bg-secondary]="usr.role !== 'admin'"
                   >
-                    <mat-icon>{{ usr.role === 'admin' ? 'admin_panel_settings' : 'person' }}</mat-icon>
+                    <mat-icon>{{
+                      usr.role === 'admin' ? 'admin_panel_settings' : 'person'
+                    }}</mat-icon>
                   </div>
                   <div class="overflow-hidden">
-                    <span class="fw-bold text-truncate d-block small">{{ usr.email || 'Usuário #' + usr.id.slice(0, 6) }}</span>
-                    <span class="text-surface-muted" style="font-size: 0.72rem">ID: #{{ usr.id.slice(0, 6) }}</span>
+                    <span class="fw-bold text-truncate d-block small">{{
+                      usr.email || 'Usuário #' + usr.id.slice(0, 6)
+                    }}</span>
+                    <span class="text-surface-muted" style="font-size: 0.72rem"
+                      >ID: #{{ usr.id.slice(0, 6) }}</span
+                    >
                   </div>
                 </div>
 
@@ -409,7 +435,9 @@
                 }
               </div>
 
-              <div class="d-flex align-items-center justify-content-between pt-2 mt-auto border-top gap-2">
+              <div
+                class="d-flex align-items-center justify-content-between pt-2 mt-auto border-top gap-2"
+              >
                 <span
                   class="badge small"
                   [class.bg-warning-subtle]="usr.role === 'admin'"

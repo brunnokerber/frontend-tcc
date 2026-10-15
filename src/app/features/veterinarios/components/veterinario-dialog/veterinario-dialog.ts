@@ -96,7 +96,7 @@ export class VeterinarioDialogComponent implements OnInit {
 
         const updated = await this.veterinariosService.updateVeterinario(
           this.data.veterinario.id,
-          updateDto
+          updateDto,
         );
         if (updated) {
           this.dialogRef.close(updated);

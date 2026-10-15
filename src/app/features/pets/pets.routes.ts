@@ -3,15 +3,15 @@ import { Routes } from '@angular/router';
 export const PETS_ROUTES: Routes = [
   {
     path: '',
-    loadComponent: () => import('./pages/pet-list/pet-list')
+    loadComponent: () => import('./pages/pet-list/pet-list'),
   },
   {
     path: 'novo',
-    loadComponent: () => import('./pages/pet-form/pet-form')
+    loadComponent: () => import('./pages/pet-form/pet-form'),
   },
   {
     path: 'detalhes/:id',
-    loadComponent: () => import('./pages/pet-detail/pet-detail')
+    loadComponent: () => import('./pages/pet-detail/pet-detail'),
   },
   {
     path: ':id/editar',
@@ -32,7 +32,7 @@ export const PETS_ROUTES: Routes = [
   {
     path: ':petId/locais/:petLocalId/editar',
     loadComponent: () => import('./pages/pet-local-form/pet-local-form'),
-  }
+  },
 ];
 
 export default PETS_ROUTES;

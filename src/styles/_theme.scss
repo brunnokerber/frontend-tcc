@@ -2,27 +2,31 @@
 
 /* Material Design 3 Theme Definition - Light Theme */
 html {
-  @include mat.theme((
-    color: (
-      primary: mat.$azure-palette,
-      tertiary: mat.$blue-palette,
-      theme-type: light,
-    ),
-    typography: Roboto,
-    density: 0,
-  ));
+  @include mat.theme(
+    (
+      color: (
+        primary: mat.$azure-palette,
+        tertiary: mat.$blue-palette,
+        theme-type: light,
+      ),
+      typography: Roboto,
+      density: 0,
+    )
+  );
 }
 
 /* Material Design 3 Theme Definition - Dark Theme */
 html.dark-theme,
-[data-bs-theme="dark"] {
-  @include mat.theme((
-    color: (
-      primary: mat.$azure-palette,
-      tertiary: mat.$blue-palette,
-      theme-type: dark,
-    ),
-  ));
+[data-bs-theme='dark'] {
+  @include mat.theme(
+    (
+      color: (
+        primary: mat.$azure-palette,
+        tertiary: mat.$blue-palette,
+        theme-type: dark,
+      ),
+    )
+  );
 }
 
 body {

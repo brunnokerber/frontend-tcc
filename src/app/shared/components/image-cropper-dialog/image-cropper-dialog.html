@@ -12,7 +12,9 @@
   <div class="cropper-workspace d-flex flex-column align-items-center justify-content-center">
     @if (errorMessage()) {
       <div class="text-center py-4 px-3 text-surface-muted">
-        <mat-icon class="text-danger mb-2" style="font-size: 40px; width: 40px; height: 40px;">error_outline</mat-icon>
+        <mat-icon class="text-danger mb-2" style="font-size: 40px; width: 40px; height: 40px"
+          >error_outline</mat-icon
+        >
         <p class="mb-2 fw-medium text-danger">{{ errorMessage() }}</p>
         <button type="button" mat-stroked-button (click)="cancelar()">Fechar</button>
       </div>
@@ -20,9 +22,13 @@
       <!-- Viewport da Imagem com Máscara de Enquadramento -->
       <div class="viewport-wrapper position-relative shadow-sm">
         @if (isLoading()) {
-          <div class="cropper-loading-overlay d-flex flex-column align-items-center justify-content-center">
+          <div
+            class="cropper-loading-overlay d-flex flex-column align-items-center justify-content-center"
+          >
             <mat-spinner diameter="44"></mat-spinner>
-            <span class="small text-surface-muted mt-3">Carregando imagem para enquadramento...</span>
+            <span class="small text-surface-muted mt-3"
+              >Carregando imagem para enquadramento...</span
+            >
           </div>
         }
 
@@ -55,7 +61,11 @@
       </div>
 
       <!-- Barra de Ferramentas / Controles de Enquadramento -->
-      <div class="cropper-controls w-100 mt-3 pt-2" [class.opacity-50]="isLoading()" [class.pe-none]="isLoading()">
+      <div
+        class="cropper-controls w-100 mt-3 pt-2"
+        [class.opacity-50]="isLoading()"
+        [class.pe-none]="isLoading()"
+      >
         <!-- Controle de Zoom Deslizante -->
         <div class="d-flex align-items-center gap-2 mb-2 px-1">
           <button
@@ -93,7 +103,9 @@
         </div>
 
         <!-- Botões de Ação Secundária (Girar, Resetar) -->
-        <div class="d-flex align-items-center justify-content-center gap-2 pt-2 border-top border-surface">
+        <div
+          class="d-flex align-items-center justify-content-center gap-2 pt-2 border-top border-surface"
+        >
           <button
             type="button"
             mat-stroked-button
@@ -122,12 +134,7 @@
 
   <!-- Rodapé com Ações -->
   <div dialog-actions>
-    <button
-      type="button"
-      mat-stroked-button
-      (click)="cancelar()"
-      [disabled]="isExporting()"
-    >
+    <button type="button" mat-stroked-button (click)="cancelar()" [disabled]="isExporting()">
       Cancelar
     </button>
     <button

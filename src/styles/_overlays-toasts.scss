@@ -30,7 +30,7 @@
 
 /* Dark Theme Specific Modal Enhancements */
 html.dark-theme,
-[data-bs-theme="dark"] {
+[data-bs-theme='dark'] {
   .cdk-overlay-backdrop.cdk-overlay-dark-backdrop {
     background-color: rgba(0, 0, 0, 0.78);
     backdrop-filter: blur(5px);
@@ -108,4 +108,3 @@ html.dark-theme,
     }
   }
 }
-

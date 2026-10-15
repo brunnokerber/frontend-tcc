@@ -1,0 +1,12 @@
+dist/
+node_modules/
+.angular/
+coverage/
+package-lock.json
+public/
+docs/assets/
+*.png
+*.jpg
+*.jpeg
+*.webp
+*.drawio

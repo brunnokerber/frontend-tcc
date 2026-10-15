@@ -50,7 +50,6 @@ export interface VacinaPetInfo {
   status?: string | null;
 }
 
-
 export interface VacinaCalendarioItem extends Vacina {
   pet?: VacinaPetInfo | null;
 }
@@ -64,4 +63,3 @@ export interface VacinaCalendarioFiltro {
   status?: VacinaStatusFiltro;
   search?: string;
 }
-

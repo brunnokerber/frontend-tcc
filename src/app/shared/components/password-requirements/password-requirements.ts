@@ -13,7 +13,5 @@ import { evaluatePasswordStrength, PasswordCriteria } from '@shared/validators/p
 export class PasswordRequirementsComponent {
   readonly password = input<string>('');
 
-  readonly criteria = computed<PasswordCriteria>(() =>
-    evaluatePasswordStrength(this.password())
-  );
+  readonly criteria = computed<PasswordCriteria>(() => evaluatePasswordStrength(this.password()));
 }

@@ -34,11 +34,7 @@ export class CustomDateAdapter extends NativeDateAdapter {
 
         if (!isNaN(day) && !isNaN(month) && !isNaN(year)) {
           const date = new Date(year, month, day);
-          if (
-            date.getFullYear() === year &&
-            date.getMonth() === month &&
-            date.getDate() === day
-          ) {
+          if (date.getFullYear() === year && date.getMonth() === month && date.getDate() === day) {
             return date;
           }
         }

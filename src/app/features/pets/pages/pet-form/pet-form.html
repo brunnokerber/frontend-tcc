@@ -45,8 +45,12 @@
         <div class="row g-3">
           <!-- Upload e Pré-visualização da Foto de Perfil -->
           <div class="col-12">
-            <div class="pet-photo-upload-box d-flex flex-column flex-sm-row align-items-center gap-3 p-3 rounded-3 border border-surface bg-surface-subtle">
-              <div class="pet-photo-preview-circle position-relative rounded-circle overflow-hidden shadow-xs">
+            <div
+              class="pet-photo-upload-box d-flex flex-column flex-sm-row align-items-center gap-3 p-3 rounded-3 border border-surface bg-surface-subtle"
+            >
+              <div
+                class="pet-photo-preview-circle position-relative rounded-circle overflow-hidden shadow-xs"
+              >
                 @if (photoPreviewUrl()) {
                   <img
                     [src]="photoPreviewUrl()"
@@ -54,9 +58,11 @@
                     class="pet-photo-preview-img"
                   />
                 } @else {
-                  <div class="pet-photo-placeholder d-flex flex-column align-items-center justify-content-center w-100 h-100">
+                  <div
+                    class="pet-photo-placeholder d-flex flex-column align-items-center justify-content-center w-100 h-100"
+                  >
                     <mat-icon class="text-surface-muted">add_a_photo</mat-icon>
-                    <span class="small text-surface-muted" style="font-size: 0.7rem;">Sem foto</span>
+                    <span class="small text-surface-muted" style="font-size: 0.7rem">Sem foto</span>
                   </div>
                 }
               </div>
@@ -67,7 +73,9 @@
                   Formatos aceitos: JPG, PNG ou WebP. Tamanho máximo: 256 KB.
                 </p>
 
-                <div class="d-flex align-items-center justify-content-center justify-content-sm-start gap-2 flex-wrap">
+                <div
+                  class="d-flex align-items-center justify-content-center justify-content-sm-start gap-2 flex-wrap"
+                >
                   <input
                     #fileInput
                     type="file"
@@ -209,7 +217,11 @@
           <div class="col-12 col-md-6">
             <mat-form-field appearance="outline" class="w-100">
               <mat-label>Fase da Vida / Senioridade</mat-label>
-              <mat-select id="senioridade" formControlName="senioridade" aria-label="Fase da Vida ou Senioridade">
+              <mat-select
+                id="senioridade"
+                formControlName="senioridade"
+                aria-label="Fase da Vida ou Senioridade"
+              >
                 @for (opt of senioridadeOptions; track opt.value) {
                   <mat-option [value]="opt.value">{{ opt.label }}</mat-option>
                 }
@@ -290,7 +302,11 @@
               ) {
                 <mat-error>{{
                   petForm.controls.data_castracao
-                    | formError: { matDatepickerMin: 'A castração não pode ser anterior ao nascimento do pet' }
+                    | formError
+                      : {
+                          matDatepickerMin:
+                            'A castração não pode ser anterior ao nascimento do pet',
+                        }
                 }}</mat-error>
               }
             </mat-form-field>
@@ -392,11 +408,17 @@
           @if (isEditing()) {
             @if (isAdmin()) {
               <span class="badge bg-warning text-dark small fw-semibold">
-                <mat-icon class="align-middle me-1" style="font-size: 14px; height: 14px; width: 14px;">admin_panel_settings</mat-icon>
+                <mat-icon
+                  class="align-middle me-1"
+                  style="font-size: 14px; height: 14px; width: 14px"
+                  >admin_panel_settings</mat-icon
+                >
                 Edição de Entrada Habilitada (Admin)
               </span>
             } @else {
-              <span class="text-surface-muted small">Registrado no cadastro inicial (somente-leitura para operador)</span>
+              <span class="text-surface-muted small"
+                >Registrado no cadastro inicial (somente-leitura para operador)</span
+              >
             }
           }
         </div>
@@ -468,7 +490,8 @@
               @if (petForm.controls.data_entrada.touched && petForm.controls.data_entrada.errors) {
                 <mat-error>{{
                   petForm.controls.data_entrada
-                    | formError: { matDatepickerMin: 'A entrada não pode ser anterior ao nascimento do pet' }
+                    | formError
+                      : { matDatepickerMin: 'A entrada não pode ser anterior ao nascimento do pet' }
                 }}</mat-error>
               }
             </mat-form-field>

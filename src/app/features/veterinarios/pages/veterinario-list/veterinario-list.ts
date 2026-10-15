@@ -14,10 +14,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { ToastService } from '@core/services/toast.service';
 import { formatPhone, onlyDigits } from '@shared/utils/string-utils';
 import { VeterinarioDialogComponent } from '../../components/veterinario-dialog/veterinario-dialog';
-import {
-  Veterinario,
-  VET_SEARCH_FIELDS_OPTIONS,
-} from '../../models/veterinario.model';
+import { Veterinario, VET_SEARCH_FIELDS_OPTIONS } from '../../models/veterinario.model';
 import { VeterinariosService } from '../../services/veterinarios.service';
 
 @Component({
@@ -132,7 +129,6 @@ export default class VeterinarioListComponent implements OnInit {
     this.pageIndex.set(0);
     this.applyFilters(true);
   }
-
 
   openVeterinarioDialog(vet?: Veterinario): void {
     const dialogRef = this.dialog.open(VeterinarioDialogComponent, {

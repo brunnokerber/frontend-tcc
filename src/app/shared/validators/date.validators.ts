@@ -43,7 +43,7 @@ export function normalizeToMidnight(value: unknown): Date | null {
  * Validador que impede a seleção de datas futuras (maiores que a data de hoje).
  */
 export function maxDateTodayValidator(
-  errorMessage: string = 'A data não pode ser posterior a hoje'
+  errorMessage: string = 'A data não pode ser posterior a hoje',
 ): ValidatorFn {
   return (control: AbstractControl): ValidationErrors | null => {
     const val = control.value;
@@ -62,7 +62,6 @@ export function maxDateTodayValidator(
   };
 }
 
-
 /**
  * Validador para formulários que possuem dois campos de data e exigem que
  * a data posterior (`targetControlName`) seja maior ou igual à data anterior (`earlierControlName`).
@@ -71,7 +70,7 @@ export function dateSequenceValidator(
   earlierControlName: string,
   targetControlName: string,
   errorKey: string,
-  errorMessage?: string
+  errorMessage?: string,
 ): ValidatorFn {
   return (control: AbstractControl): ValidationErrors | null => {
     const group = control as FormGroup;
@@ -121,7 +120,7 @@ export function dateSequenceValidator(
 export function dateNotBeforeDateValidator(
   getBaseDate: () => unknown,
   errorKey: string = 'dataAntesNascimento',
-  errorMessage: string = 'A data não pode ser anterior ao nascimento do animal'
+  errorMessage: string = 'A data não pode ser anterior ao nascimento do animal',
 ): ValidatorFn {
   return (control: AbstractControl): ValidationErrors | null => {
     const val = control.value;

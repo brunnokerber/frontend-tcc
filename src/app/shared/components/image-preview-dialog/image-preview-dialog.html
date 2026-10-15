@@ -20,9 +20,13 @@
   </a>
 
   <!-- Corpo com Imagem Ampliada -->
-  <div class="image-preview-body p-2 p-md-3 d-flex align-items-center justify-content-center position-relative">
+  <div
+    class="image-preview-body p-2 p-md-3 d-flex align-items-center justify-content-center position-relative"
+  >
     @if (!isLoaded() && !hasError()) {
-      <div class="loading-overlay d-flex flex-column align-items-center justify-content-center py-5">
+      <div
+        class="loading-overlay d-flex flex-column align-items-center justify-content-center py-5"
+      >
         <div class="spinner-border text-primary" role="status">
           <span class="visually-hidden">Carregando imagem...</span>
         </div>
@@ -34,7 +38,9 @@
       <div class="text-center py-5 text-surface-muted">
         <mat-icon class="text-danger mb-2 error-icon">broken_image</mat-icon>
         <p class="mb-0 fw-medium">Não foi possível carregar a imagem ampliada.</p>
-        <span class="small text-surface-muted">O link temporário pode ter expirado. Tente recarregar a página.</span>
+        <span class="small text-surface-muted"
+          >O link temporário pode ter expirado. Tente recarregar a página.</span
+        >
       </div>
     } @else {
       <img
@@ -50,8 +56,6 @@
 
   <!-- Rodapé com botão Fechar -->
   <div dialog-actions>
-    <button type="button" mat-stroked-button (click)="close()">
-      Fechar
-    </button>
+    <button type="button" mat-stroked-button (click)="close()">Fechar</button>
   </div>
 </app-dialog-layout>

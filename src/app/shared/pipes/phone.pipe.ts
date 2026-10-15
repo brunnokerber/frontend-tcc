@@ -3,10 +3,9 @@ import { Pipe, PipeTransform } from '@angular/core';
 @Pipe({
   name: 'phoneMask',
   standalone: true,
-  pure: true
+  pure: true,
 })
 export class PhonePipe implements PipeTransform {
-
   transform(value: string | number | undefined | null): string {
     // 1. Fail-fast para valores nulos/vazios
     if (value === null || value === undefined || value === '') {

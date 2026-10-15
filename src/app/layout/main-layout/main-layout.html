@@ -10,7 +10,9 @@
   >
     <div class="user-sidenav-inner d-flex flex-column h-100 p-3">
       <!-- Topo Fixo do Sidenav -->
-      <div class="user-sidenav-header flex-shrink-0 d-flex align-items-center justify-content-between pb-2 mb-3 border-bottom">
+      <div
+        class="user-sidenav-header flex-shrink-0 d-flex align-items-center justify-content-between pb-2 mb-3 border-bottom"
+      >
         <div class="d-flex align-items-center gap-2">
           <mat-icon class="text-primary">manage_accounts</mat-icon>
           <span class="fw-bold fs-6">Painel do Usuário</span>
@@ -58,7 +60,13 @@
               <span class="fw-semibold small">Tema e Aparência</span>
             </div>
             <span class="badge bg-surface-subtle text-surface-muted border border-surface small">
-              {{ themeMode() === 'system' ? 'Automático' : themeMode() === 'dark' ? 'Escuro' : 'Claro' }}
+              {{
+                themeMode() === 'system'
+                  ? 'Automático'
+                  : themeMode() === 'dark'
+                    ? 'Escuro'
+                    : 'Claro'
+              }}
             </span>
           </div>
           <p class="text-surface-muted small mb-2" style="font-size: 0.8rem">
@@ -155,12 +163,16 @@
           </button>
 
           <details class="account-advanced-details">
-            <summary class="text-surface-muted small cursor-pointer user-select-none d-flex align-items-center justify-content-between p-2 rounded-2 bg-surface-subtle">
+            <summary
+              class="text-surface-muted small cursor-pointer user-select-none d-flex align-items-center justify-content-between p-2 rounded-2 bg-surface-subtle"
+            >
               <span class="d-inline-flex align-items-center gap-1">
                 <mat-icon style="font-size: 16px; width: 16px; height: 16px">tune</mat-icon>
                 <span>Opções avançadas</span>
               </span>
-              <mat-icon class="expand-icon" style="font-size: 16px; width: 16px; height: 16px">expand_more</mat-icon>
+              <mat-icon class="expand-icon" style="font-size: 16px; width: 16px; height: 16px"
+                >expand_more</mat-icon
+              >
             </summary>
             <div class="pt-2">
               <p class="text-surface-muted small mb-2" style="font-size: 0.75rem">

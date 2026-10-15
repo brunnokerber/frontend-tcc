@@ -1,7 +1,11 @@
 <form [formGroup]="voluntarioForm" (ngSubmit)="onSave()" novalidate>
   <app-dialog-layout
     [title]="isEditing() ? 'Editar Voluntário(a)' : 'Novo Voluntário(a)'"
-    [subtitle]="isEditing() ? 'Atualize as informações cadastrais e disponibilidade' : 'Cadastre um novo colaborador voluntário na ONG'"
+    [subtitle]="
+      isEditing()
+        ? 'Atualize as informações cadastrais e disponibilidade'
+        : 'Cadastre um novo colaborador voluntário na ONG'
+    "
     [icon]="isEditing() ? 'edit' : 'volunteer_activism'"
     iconVariant="primary"
     size="lg"
@@ -41,7 +45,9 @@
             maxlength="15"
           />
           <mat-icon matPrefix class="me-2">call</mat-icon>
-          @if (voluntarioForm.controls.telefone.touched && voluntarioForm.controls.telefone.errors) {
+          @if (
+            voluntarioForm.controls.telefone.touched && voluntarioForm.controls.telefone.errors
+          ) {
             <mat-error>{{ voluntarioForm.controls.telefone | formError }}</mat-error>
           }
         </mat-form-field>
@@ -68,8 +74,12 @@
 
       <!-- Dias da Semana Disponíveis -->
       <div class="col-12">
-        <label class="form-label fw-semibold text-surface-main small mb-2 d-flex align-items-center gap-1">
-          <mat-icon class="small text-primary" style="font-size: 16px; width: 16px; height: 16px;">calendar_month</mat-icon>
+        <label
+          class="form-label fw-semibold text-surface-main small mb-2 d-flex align-items-center gap-1"
+        >
+          <mat-icon class="small text-primary" style="font-size: 16px; width: 16px; height: 16px"
+            >calendar_month</mat-icon
+          >
           Dias da Semana Disponíveis
         </label>
         <div class="d-flex flex-wrap gap-2 p-2 rounded-2 border border-surface bg-surface-subtle">
@@ -81,7 +91,11 @@
               (click)="toggleDia(dia)"
             >
               @if (isDiaSelected(dia)) {
-                <mat-icon class="align-middle me-1" style="font-size: 14px; width: 14px; height: 14px;">check</mat-icon>
+                <mat-icon
+                  class="align-middle me-1"
+                  style="font-size: 14px; width: 14px; height: 14px"
+                  >check</mat-icon
+                >
               }
               {{ dia }}
             </button>
@@ -91,8 +105,12 @@
 
       <!-- Turnos Disponíveis -->
       <div class="col-12">
-        <label class="form-label fw-semibold text-surface-main small mb-2 d-flex align-items-center gap-1">
-          <mat-icon class="small text-primary" style="font-size: 16px; width: 16px; height: 16px;">schedule</mat-icon>
+        <label
+          class="form-label fw-semibold text-surface-main small mb-2 d-flex align-items-center gap-1"
+        >
+          <mat-icon class="small text-primary" style="font-size: 16px; width: 16px; height: 16px"
+            >schedule</mat-icon
+          >
           Turnos Disponíveis
         </label>
         <div class="d-flex flex-wrap gap-2 p-2 rounded-2 border border-surface bg-surface-subtle">
@@ -100,11 +118,17 @@
             <button
               type="button"
               class="btn btn-sm rounded-pill tag-toggle-btn"
-              [ngClass]="isTurnoSelected(turno) ? 'btn-success active-tag' : 'btn-outline-secondary'"
+              [ngClass]="
+                isTurnoSelected(turno) ? 'btn-success active-tag' : 'btn-outline-secondary'
+              "
               (click)="toggleTurno(turno)"
             >
               @if (isTurnoSelected(turno)) {
-                <mat-icon class="align-middle me-1" style="font-size: 14px; width: 14px; height: 14px;">check</mat-icon>
+                <mat-icon
+                  class="align-middle me-1"
+                  style="font-size: 14px; width: 14px; height: 14px"
+                  >check</mat-icon
+                >
               }
               {{ turno }}
             </button>

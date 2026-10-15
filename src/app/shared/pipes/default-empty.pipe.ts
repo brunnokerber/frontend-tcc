@@ -3,10 +3,9 @@ import { Pipe, PipeTransform } from '@angular/core';
 @Pipe({
   name: 'defaultEmpty',
   standalone: true,
-  pure: true
+  pure: true,
 })
 export class DefaultEmptyPipe implements PipeTransform {
-
   transform(value: unknown, fallback = '-'): string {
     if (value === null || value === undefined || value === '') {
       return fallback;

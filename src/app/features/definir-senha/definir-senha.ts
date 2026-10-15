@@ -14,10 +14,7 @@ import { ToastService } from '@core/services/toast.service';
 import { environment } from '@env/environment';
 import { PasswordRequirementsComponent } from '@shared/components/password-requirements/password-requirements';
 import { FormErrorPipe } from '@shared/pipes/form-error.pipe';
-import {
-  SENHA_FORTE_REGEX,
-  strongPasswordValidator,
-} from '@shared/validators/password.validators';
+import { SENHA_FORTE_REGEX, strongPasswordValidator } from '@shared/validators/password.validators';
 
 @Component({
   selector: 'app-definir-senha',
@@ -68,20 +65,17 @@ export default class DefinirSenhaComponent implements OnInit {
       validators: (group) => {
         const pass = group.get('password')?.value;
         const confirm = group.get('confirmPassword')?.value;
-        return pass && confirm && pass !== confirm
-          ? { passwordMismatch: true }
-          : null;
+        return pass && confirm && pass !== confirm ? { passwordMismatch: true } : null;
       },
-    }
+    },
   );
 
   /**
    * Sinal reativo derivado das alterações do campo de senha para alimentar o checklist em tempo real.
    */
-  readonly passwordValue = toSignal(
-    this.passwordForm.controls.password.valueChanges,
-    { initialValue: '' }
-  );
+  readonly passwordValue = toSignal(this.passwordForm.controls.password.valueChanges, {
+    initialValue: '',
+  });
 
   ngOnInit(): void {
     // 1. Tenta capturar sessão vinda do hash da URL se o usuário acabou de clicar no e-mail
@@ -95,7 +89,7 @@ export default class DefinirSenhaComponent implements OnInit {
       } else {
         // Se não há sessão ativa nem token válido, redireciona para login
         this.toast.warning(
-          'Sessão expirada ou link inválido. Faça login ou solicite um novo convite.'
+          'Sessão expirada ou link inválido. Faça login ou solicite um novo convite.',
         );
         this.router.navigate(['/login']);
       }
@@ -122,9 +116,7 @@ export default class DefinirSenhaComponent implements OnInit {
 
     try {
       await this.authService.updatePassword(password);
-      this.toast.success(
-        'Senha cadastrada com sucesso! Bem-vindo(a) à plataforma.'
-      );
+      this.toast.success('Senha cadastrada com sucesso! Bem-vindo(a) à plataforma.');
       this.router.navigate(['/pets']);
     } catch (err: unknown) {
       let msg = 'Erro ao cadastrar nova senha.';

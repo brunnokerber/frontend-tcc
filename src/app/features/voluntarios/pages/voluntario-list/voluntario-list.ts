@@ -75,22 +75,23 @@ export default class VoluntarioListComponent implements OnInit {
 
   public totalVoluntarios = computed(() => this.voluntariosService.voluntarios().length);
 
-  public totalFimDeSemana = computed(() =>
-    this.voluntariosService
-      .voluntarios()
-      .filter((v) => v.dias_semana?.includes('Sábado') || v.dias_semana?.includes('Domingo'))
-      .length
+  public totalFimDeSemana = computed(
+    () =>
+      this.voluntariosService
+        .voluntarios()
+        .filter((v) => v.dias_semana?.includes('Sábado') || v.dias_semana?.includes('Domingo'))
+        .length,
   );
 
-  public totalManha = computed(() =>
-    this.voluntariosService.voluntarios().filter((v) => v.turnos?.includes('Manhã')).length
+  public totalManha = computed(
+    () => this.voluntariosService.voluntarios().filter((v) => v.turnos?.includes('Manhã')).length,
   );
 
-  public totalTardeNoite = computed(() =>
-    this.voluntariosService
-      .voluntarios()
-      .filter((v) => v.turnos?.includes('Tarde') || v.turnos?.includes('Noite'))
-      .length
+  public totalTardeNoite = computed(
+    () =>
+      this.voluntariosService
+        .voluntarios()
+        .filter((v) => v.turnos?.includes('Tarde') || v.turnos?.includes('Noite')).length,
   );
 
   public pagedVoluntarios = computed(() => {

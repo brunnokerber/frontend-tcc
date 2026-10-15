@@ -2,7 +2,12 @@
   <!-- Cabeçalho da Página -->
   <div class="d-flex align-items-center justify-content-between mb-4 pb-1">
     <div class="d-flex align-items-center gap-3">
-      <button mat-icon-button (click)="goBack()" matTooltip="Voltar aos detalhes do pet" type="button">
+      <button
+        mat-icon-button
+        (click)="goBack()"
+        matTooltip="Voltar aos detalhes do pet"
+        type="button"
+      >
         <mat-icon>arrow_back</mat-icon>
       </button>
       <div>
@@ -10,7 +15,11 @@
           {{ isEditing() ? 'Editar Registro Clínico' : 'Novo Procedimento / Consulta / Exame' }}
         </h1>
         <span class="text-surface-muted small">
-          {{ isEditing() ? 'Atualize as informações do atendimento clínico ou medicação' : 'Adicione uma nova consulta, exame ou tratamento para o animal' }}
+          {{
+            isEditing()
+              ? 'Atualize as informações do atendimento clínico ou medicação'
+              : 'Adicione uma nova consulta, exame ou tratamento para o animal'
+          }}
         </span>
       </div>
     </div>
@@ -27,10 +36,7 @@
       <div class="pet-context-card p-3 p-md-4 rounded-3 shadow-xs mb-4">
         <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
           <div class="d-flex align-items-center gap-3">
-            <div
-              class="pet-avatar rounded-circle"
-              [ngClass]="getTipoBadgeClass(p.tipo_pet)"
-            >
+            <div class="pet-avatar rounded-circle" [ngClass]="getTipoBadgeClass(p.tipo_pet)">
               <i [class]="getTipoFaIcon(p.tipo_pet)"></i>
             </div>
             <div>
@@ -48,7 +54,8 @@
                 </span>
               </div>
               <div class="text-surface-muted small">
-                ID #{{ p.id }} &bull; {{ p.tipo_pet }} &bull; {{ p.raca || 'Sem raça definida' }} &bull; {{ p.porte || 'Porte N/I' }}
+                ID #{{ p.id }} &bull; {{ p.tipo_pet }} &bull;
+                {{ p.raca || 'Sem raça definida' }} &bull; {{ p.porte || 'Porte N/I' }}
               </div>
             </div>
           </div>
@@ -80,7 +87,10 @@
                 }
               </mat-select>
               <mat-icon matPrefix class="me-2">category</mat-icon>
-              @if (procedimentoForm.controls.tipo_operacao.touched && procedimentoForm.controls.tipo_operacao.errors) {
+              @if (
+                procedimentoForm.controls.tipo_operacao.touched &&
+                procedimentoForm.controls.tipo_operacao.errors
+              ) {
                 <mat-error>{{ procedimentoForm.controls.tipo_operacao | formError }}</mat-error>
               }
             </mat-form-field>
@@ -104,10 +114,17 @@
               <mat-datepicker-toggle matIconSuffix [for]="pickerRealizacao"></mat-datepicker-toggle>
               <mat-datepicker #pickerRealizacao></mat-datepicker>
               <mat-hint>Data em que o procedimento foi realizado</mat-hint>
-              @if (procedimentoForm.controls.data_realizacao.touched && procedimentoForm.controls.data_realizacao.errors) {
+              @if (
+                procedimentoForm.controls.data_realizacao.touched &&
+                procedimentoForm.controls.data_realizacao.errors
+              ) {
                 <mat-error>{{
                   procedimentoForm.controls.data_realizacao
-                    | formError: { matDatepickerMin: 'A data do procedimento não pode ser anterior ao nascimento do pet' }
+                    | formError
+                      : {
+                          matDatepickerMin:
+                            'A data do procedimento não pode ser anterior ao nascimento do pet',
+                        }
                 }}</mat-error>
               }
             </mat-form-field>
@@ -128,8 +145,13 @@
               <mat-hint align="end">
                 {{ procedimentoForm.controls.operacao_medicamento.value?.length || 0 }} / 300
               </mat-hint>
-              @if (procedimentoForm.controls.operacao_medicamento.touched && procedimentoForm.controls.operacao_medicamento.errors) {
-                <mat-error>{{ procedimentoForm.controls.operacao_medicamento | formError }}</mat-error>
+              @if (
+                procedimentoForm.controls.operacao_medicamento.touched &&
+                procedimentoForm.controls.operacao_medicamento.errors
+              ) {
+                <mat-error>{{
+                  procedimentoForm.controls.operacao_medicamento | formError
+                }}</mat-error>
               }
             </mat-form-field>
           </div>
@@ -149,7 +171,9 @@
               />
               <span matTextPrefix class="me-1 text-muted">R$&nbsp;</span>
               <mat-icon matSuffix class="text-muted">payments</mat-icon>
-              @if (procedimentoForm.controls.custo.touched && procedimentoForm.controls.custo.errors) {
+              @if (
+                procedimentoForm.controls.custo.touched && procedimentoForm.controls.custo.errors
+              ) {
                 <mat-error>{{ procedimentoForm.controls.custo | formError }}</mat-error>
               }
             </mat-form-field>
@@ -202,7 +226,6 @@
               </button>
             </div>
           </div>
-
         </div>
       </div>
 

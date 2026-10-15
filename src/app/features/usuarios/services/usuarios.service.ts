@@ -63,7 +63,7 @@ export class UsuariosService {
       if (error) {
         const msg = await extractFunctionErrorMessage(
           error,
-          `Erro ao ${ativo ? 'reativar' : 'desativar'} conta de usuário.`
+          `Erro ao ${ativo ? 'reativar' : 'desativar'} conta de usuário.`,
         );
         throw new Error(msg);
       }
@@ -75,14 +75,12 @@ export class UsuariosService {
       this.toast.success(
         ativo
           ? 'Conta de usuário reativada com sucesso.'
-          : 'Conta de usuário desativada com sucesso.'
+          : 'Conta de usuário desativada com sucesso.',
       );
       await this.fetchUsuarios();
       return true;
     } catch (err: any) {
-      const msg =
-        err.message ||
-        `Erro ao ${ativo ? 'reativar' : 'desativar'} conta de usuário.`;
+      const msg = err.message || `Erro ao ${ativo ? 'reativar' : 'desativar'} conta de usuário.`;
       this.toast.error(msg);
       return false;
     } finally {
@@ -122,7 +120,9 @@ export class UsuariosService {
         throw error;
       }
 
-      this.toast.success(`Perfil atualizado para "${newRole === 'admin' ? 'Administrador' : 'Operador'}".`);
+      this.toast.success(
+        `Perfil atualizado para "${newRole === 'admin' ? 'Administrador' : 'Operador'}".`,
+      );
       await this.fetchUsuarios();
       return true;
     } catch (err: any) {

@@ -1,7 +1,4 @@
-<div
-  class="app-dialog-container d-flex flex-column"
-  [ngClass]="'dialog-size-' + size"
->
+<div class="app-dialog-container d-flex flex-column" [ngClass]="'dialog-size-' + size">
   <!-- Cabeçalho Customizado (Projetado) ou Cabeçalho Padrão -->
   <header class="dialog-header px-3 py-3 px-md-4 border-bottom border-surface">
     <ng-content select="[dialog-header]">
@@ -64,7 +61,9 @@
 
   <!-- Rodapé / Barra de Ações -->
   <footer class="dialog-footer px-3 py-3 px-md-4 border-top border-surface bg-surface-subtle">
-    <div class="dialog-actions-wrapper d-flex align-items-center justify-content-end gap-2 flex-wrap">
+    <div
+      class="dialog-actions-wrapper d-flex align-items-center justify-content-end gap-2 flex-wrap"
+    >
       <ng-content select="[dialog-actions], [dialog-footer]"></ng-content>
     </div>
   </footer>

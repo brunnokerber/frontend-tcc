@@ -25,7 +25,8 @@ const DEFAULT_ERROR_MESSAGES: Record<string, string | ErrorMessageFn> = {
   mismatch: 'Os valores informados não conferem',
   passwordMismatch: 'As senhas digitadas não coincidem',
   samePassword: 'A nova senha deve ser diferente da senha anterior',
-  strongPassword: 'A senha deve conter ao menos 8 caracteres, com maiúscula, minúscula, número e símbolo',
+  strongPassword:
+    'A senha deve conter ao menos 8 caracteres, com maiúscula, minúscula, número e símbolo',
   pattern: 'Formato inválido ou requisitos de segurança não atendidos',
   cnpjInvalido: 'CNPJ inválido ou inexistente',
 };
@@ -59,10 +60,7 @@ export type FormErrorParam = string | Record<string, string>;
   pure: false,
 })
 export class FormErrorPipe implements PipeTransform {
-  transform(
-    control: AbstractControl | null | undefined,
-    customOverrides?: FormErrorParam
-  ): string {
+  transform(control: AbstractControl | null | undefined, customOverrides?: FormErrorParam): string {
     if (!control || !control.errors || !control.touched) {
       return '';
     }
@@ -84,8 +82,7 @@ export class FormErrorPipe implements PipeTransform {
     // 3. Ordem da lista padrão ou primeira chave presente
     const customKeyWithMessage = errorKeys.find(
       (key) =>
-        typeof errors[key] === 'string' ||
-        (errors[key] && typeof errors[key].message === 'string')
+        typeof errors[key] === 'string' || (errors[key] && typeof errors[key].message === 'string'),
     );
 
     const overrideKey =
@@ -120,12 +117,9 @@ export class FormErrorPipe implements PipeTransform {
     // 3. Mensagem do dicionário padrão genérico
     const defaultProvider = DEFAULT_ERROR_MESSAGES[matchedKey];
     if (defaultProvider) {
-      return typeof defaultProvider === 'function'
-        ? defaultProvider(errValue)
-        : defaultProvider;
+      return typeof defaultProvider === 'function' ? defaultProvider(errValue) : defaultProvider;
     }
 
     return 'Valor inválido';
   }
 }
-

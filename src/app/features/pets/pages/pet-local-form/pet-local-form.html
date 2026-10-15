@@ -36,10 +36,7 @@
       <div class="pet-context-card p-3 p-md-4 rounded-3 shadow-xs mb-4">
         <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
           <div class="d-flex align-items-center gap-3">
-            <div
-              class="pet-avatar rounded-circle"
-              [ngClass]="getTipoBadgeClass(p.tipo_pet)"
-            >
+            <div class="pet-avatar rounded-circle" [ngClass]="getTipoBadgeClass(p.tipo_pet)">
               <i [class]="getTipoFaIcon(p.tipo_pet)"></i>
             </div>
             <div>
@@ -57,7 +54,8 @@
                 </span>
               </div>
               <div class="text-surface-muted small">
-                ID #{{ p.id }} &bull; {{ p.tipo_pet }} &bull; {{ p.raca || 'Sem raça definida' }} &bull; {{ p.porte || 'Porte N/I' }}
+                ID #{{ p.id }} &bull; {{ p.tipo_pet }} &bull;
+                {{ p.raca || 'Sem raça definida' }} &bull; {{ p.porte || 'Porte N/I' }}
               </div>
             </div>
           </div>
@@ -80,14 +78,20 @@
             <div class="d-flex align-items-start gap-2">
               <mat-form-field appearance="outline" class="flex-grow-1">
                 <mat-label>Local / Estabelecimento Parceiro</mat-label>
-                <mat-select id="id_local" formControlName="id_local" aria-label="Local ou Estabelecimento Parceiro">
+                <mat-select
+                  id="id_local"
+                  formControlName="id_local"
+                  aria-label="Local ou Estabelecimento Parceiro"
+                >
                   <mat-option [value]="null">-- Selecione um local cadastrado --</mat-option>
                   @if (loadingLocais()) {
                     <mat-option disabled>Carregando locais parceiros...</mat-option>
                   }
                   @for (loc of locais(); track loc.id) {
                     <mat-option [value]="loc.id">
-                      {{ loc.local }} ({{ loc.tipo_local }}) &bull; {{ loc.cidade }}/{{ loc.estado }}
+                      {{ loc.local }} ({{ loc.tipo_local }}) &bull; {{ loc.cidade }}/{{
+                        loc.estado
+                      }}
                     </mat-option>
                   }
                 </mat-select>
@@ -97,8 +101,7 @@
                 }
                 <mat-hint>Lar temporário, clínica, abrigo ou hotel parceiro</mat-hint>
                 @if (
-                  petLocalForm.controls.id_local.touched &&
-                  petLocalForm.controls.id_local.errors
+                  petLocalForm.controls.id_local.touched && petLocalForm.controls.id_local.errors
                 ) {
                   <mat-error>{{ petLocalForm.controls.id_local | formError }}</mat-error>
                 }
@@ -139,17 +142,19 @@
               <mat-datepicker #pickerSaida></mat-datepicker>
               <mat-hint>Data em que o animal foi transferido para este local</mat-hint>
               @if (
-                petLocalForm.controls.data_saida.touched &&
-                petLocalForm.controls.data_saida.errors
+                petLocalForm.controls.data_saida.touched && petLocalForm.controls.data_saida.errors
               ) {
                 <mat-error>{{
                   petLocalForm.controls.data_saida
-                    | formError: { matDatepickerMin: 'A data de início não pode ser anterior ao nascimento do pet' }
+                    | formError
+                      : {
+                          matDatepickerMin:
+                            'A data de início não pode ser anterior ao nascimento do pet',
+                        }
                 }}</mat-error>
               }
             </mat-form-field>
           </div>
-
 
           <!-- Data de Retorno / Reentrada (Opcional) -->
           <div class="col-12 col-md-6">
@@ -177,7 +182,11 @@
               ) {
                 <mat-error>{{
                   petLocalForm.controls.data_reentrada
-                    | formError: { matDatepickerMin: 'A data de retorno não pode ser anterior à data de início' }
+                    | formError
+                      : {
+                          matDatepickerMin:
+                            'A data de retorno não pode ser anterior à data de início',
+                        }
                 }}</mat-error>
               }
             </mat-form-field>
@@ -254,10 +263,7 @@
               <mat-hint align="end">
                 {{ petLocalForm.controls.obs.value?.length || 0 }}/500 caracteres
               </mat-hint>
-              @if (
-                petLocalForm.controls.obs.touched &&
-                petLocalForm.controls.obs.errors
-              ) {
+              @if (petLocalForm.controls.obs.touched && petLocalForm.controls.obs.errors) {
                 <mat-error>{{ petLocalForm.controls.obs | formError }}</mat-error>
               }
             </mat-form-field>
@@ -267,21 +273,10 @@
 
       <!-- Barra de Ações Inferior -->
       <div class="d-flex align-items-center justify-content-end gap-2 pt-2 mb-5">
-        <button
-          type="button"
-          mat-stroked-button
-          (click)="goBack()"
-          [disabled]="isSaving()"
-        >
+        <button type="button" mat-stroked-button (click)="goBack()" [disabled]="isSaving()">
           Cancelar
         </button>
-        <button
-          type="submit"
-          mat-flat-button
-          color="primary"
-          [disabled]="isSaving()"
-          class="px-4"
-        >
+        <button type="submit" mat-flat-button color="primary" [disabled]="isSaving()" class="px-4">
           @if (isSaving()) {
             <span class="spinner-border spinner-border-sm me-2" role="status"></span>
             <span>Salvando...</span>

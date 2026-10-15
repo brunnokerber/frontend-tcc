@@ -1,7 +1,11 @@
 <form [formGroup]="localForm" (ngSubmit)="onSave()">
   <app-dialog-layout
     [title]="isEditing() ? 'Editar Local / Parceiro' : 'Novo Local / Parceiro'"
-    [subtitle]="isEditing() ? 'Atualize as informações do lar temporário, clínica ou ponto de exposição' : 'Cadastre um novo lar temporário, abrigo, clínica parceira ou ponto de exposição'"
+    [subtitle]="
+      isEditing()
+        ? 'Atualize as informações do lar temporário, clínica ou ponto de exposição'
+        : 'Cadastre um novo lar temporário, abrigo, clínica parceira ou ponto de exposição'
+    "
     [icon]="isEditing() ? 'edit_location' : 'add_location_alt'"
     iconVariant="primary"
     size="xl"
@@ -9,250 +13,249 @@
     (close)="onCancel()"
   >
     <!-- SEÇÃO 1: DADOS DO LOCAL & CONTATO -->
-      <div class="form-section-card">
-        <div class="d-flex align-items-center gap-2 mb-3">
-          <div class="section-icon-badge d-flex align-items-center justify-content-center">
-            <mat-icon style="font-size: 18px; width: 18px; height: 18px">holiday_village</mat-icon>
-          </div>
-          <div>
-            <div class="sub-header-title">1. Dados do Estabelecimento & Responsável</div>
-            <div class="sub-header-desc">Identificação do local e dados para contato direto</div>
-          </div>
+    <div class="form-section-card">
+      <div class="d-flex align-items-center gap-2 mb-3">
+        <div class="section-icon-badge d-flex align-items-center justify-content-center">
+          <mat-icon style="font-size: 18px; width: 18px; height: 18px">holiday_village</mat-icon>
         </div>
-
-        <div class="row g-3">
-          <!-- Tipo de Local -->
-          <div class="col-12 col-md-5">
-            <mat-form-field appearance="outline" class="w-100">
-              <mat-label>Tipo de Local</mat-label>
-              <mat-select id="tipo_local" formControlName="tipo_local" aria-label="Tipo de Local">
-                @for (tipo of tipoLocalOptions; track tipo.value) {
-                  <mat-option [value]="tipo.value">
-                    {{ tipo.label }}
-                  </mat-option>
-                }
-              </mat-select>
-              <mat-icon matPrefix class="me-2">category</mat-icon>
-              @if (localForm.controls.tipo_local.touched && localForm.controls.tipo_local.errors) {
-                <mat-error>{{ localForm.controls.tipo_local | formError }}</mat-error>
-              }
-            </mat-form-field>
-          </div>
-
-          <!-- Nome do Local / Lar -->
-          <div class="col-12 col-md-7">
-            <mat-form-field appearance="outline" class="w-100">
-              <mat-label>Nome do Local / Estabelecimento</mat-label>
-              <input
-                id="nome_local"
-                matInput
-                formControlName="local"
-                placeholder="Ex: Lar da Dona Maria, Clínica VetSul"
-                maxlength="50"
-                cdkFocusInitial
-              />
-              <mat-icon matPrefix class="me-2">home</mat-icon>
-              @if (localForm.controls.local.touched && localForm.controls.local.errors) {
-                <mat-error>{{ localForm.controls.local | formError }}</mat-error>
-              }
-            </mat-form-field>
-          </div>
-
-          <!-- Pessoa de Contato -->
-          <div class="col-12 col-md-7">
-            <mat-form-field appearance="outline" class="w-100">
-              <mat-label>Pessoa de Contato / Responsável</mat-label>
-              <input
-                id="contato_responsavel"
-                matInput
-                formControlName="contato"
-                placeholder="Ex: Maria da Silva"
-                maxlength="50"
-              />
-              <mat-icon matPrefix class="me-2">person</mat-icon>
-              @if (localForm.controls.contato.touched && localForm.controls.contato.errors) {
-                <mat-error>{{ localForm.controls.contato | formError }}</mat-error>
-              }
-            </mat-form-field>
-          </div>
-
-          <!-- Telefone / WhatsApp -->
-          <div class="col-12 col-md-5">
-            <mat-form-field appearance="outline" class="w-100">
-              <mat-label>Telefone / WhatsApp</mat-label>
-              <input
-                id="telefone_local"
-                matInput
-                appPhoneMask
-                formControlName="telefone"
-                placeholder="(51) 99999-9999"
-                maxlength="15"
-              />
-              <mat-icon matPrefix class="me-2">phone</mat-icon>
-              @if (localForm.controls.telefone.touched && localForm.controls.telefone.errors) {
-                <mat-error>{{ localForm.controls.telefone | formError }}</mat-error>
-              }
-            </mat-form-field>
-          </div>
+        <div>
+          <div class="sub-header-title">1. Dados do Estabelecimento & Responsável</div>
+          <div class="sub-header-desc">Identificação do local e dados para contato direto</div>
         </div>
       </div>
 
-      <!-- SEÇÃO 2: ENDEREÇO & LOCALIZAÇÃO -->
-      <div class="form-section-card">
-        <div class="d-flex align-items-center gap-2 mb-3">
-          <div class="section-icon-badge d-flex align-items-center justify-content-center">
-            <mat-icon style="font-size: 18px; width: 18px; height: 18px">place</mat-icon>
-          </div>
-          <div>
-            <div class="sub-header-title">2. Endereço & Localização</div>
-            <div class="sub-header-desc">Informe o CEP para busca automática do endereço</div>
-          </div>
+      <div class="row g-3">
+        <!-- Tipo de Local -->
+        <div class="col-12 col-md-5">
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>Tipo de Local</mat-label>
+            <mat-select id="tipo_local" formControlName="tipo_local" aria-label="Tipo de Local">
+              @for (tipo of tipoLocalOptions; track tipo.value) {
+                <mat-option [value]="tipo.value">
+                  {{ tipo.label }}
+                </mat-option>
+              }
+            </mat-select>
+            <mat-icon matPrefix class="me-2">category</mat-icon>
+            @if (localForm.controls.tipo_local.touched && localForm.controls.tipo_local.errors) {
+              <mat-error>{{ localForm.controls.tipo_local | formError }}</mat-error>
+            }
+          </mat-form-field>
         </div>
 
-        <div class="row g-3">
-          <!-- CEP -->
-          <div class="col-12 col-md-4">
-            <mat-form-field appearance="outline" class="w-100">
-              <mat-label>CEP</mat-label>
-              <input
-                id="cep_local"
-                matInput
-                appCepMask
-                formControlName="cep"
-                (blur)="onSearchCep()"
-                placeholder="93300-000"
-                maxlength="9"
-              />
-              <mat-icon matPrefix class="me-2">pin_drop</mat-icon>
-              @if (loadingCep()) {
-                <mat-spinner matSuffix diameter="18"></mat-spinner>
-              } @else {
-                <button
-                  type="button"
-                  mat-icon-button
-                  matSuffix
-                  (click)="onSearchCep()"
-                  matTooltip="Buscar CEP via ViaCEP"
-                  aria-label="Buscar CEP via ViaCEP"
-                >
-                  <mat-icon style="font-size: 18px; width: 18px; height: 18px">search</mat-icon>
-                </button>
-              }
-              @if (localForm.controls.cep.touched && localForm.controls.cep.errors) {
-                <mat-error>{{ localForm.controls.cep | formError }}</mat-error>
-              }
-            </mat-form-field>
-          </div>
-
-          <!-- Rua / Logradouro -->
-          <div class="col-12 col-md-8">
-            <mat-form-field appearance="outline" class="w-100">
-              <mat-label>Rua / Logradouro</mat-label>
-              <input
-                id="rua_local"
-                matInput
-                formControlName="rua"
-                placeholder="Ex: Av. Maurício Cardoso"
-                maxlength="50"
-              />
-              <mat-icon matPrefix class="me-2">signpost</mat-icon>
-              @if (localForm.controls.rua.touched && localForm.controls.rua.errors) {
-                <mat-error>{{ localForm.controls.rua | formError }}</mat-error>
-              }
-            </mat-form-field>
-          </div>
-
-          <!-- Número -->
-          <div class="col-12 col-sm-4 col-md-3">
-            <mat-form-field appearance="outline" class="w-100">
-              <mat-label>Número</mat-label>
-              <input
-                id="numero_local"
-                matInput
-                type="number"
-                min="0"
-                formControlName="numero"
-                placeholder="123"
-              />
-              <mat-icon matPrefix class="me-2">numbers</mat-icon>
-              @if (localForm.controls.numero.touched && localForm.controls.numero.errors) {
-                <mat-error>{{ localForm.controls.numero | formError }}</mat-error>
-              }
-            </mat-form-field>
-          </div>
-
-          <!-- Complemento -->
-          <div class="col-12 col-sm-8 col-md-5">
-            <mat-form-field appearance="outline" class="w-100">
-              <mat-label>Complemento (Opcional)</mat-label>
-              <input
-                id="complemento_local"
-                matInput
-                formControlName="complemento"
-                placeholder="Ex: Apto 302, Bloco B, Casa dos fundos"
-                maxlength="30"
-              />
-              <mat-icon matPrefix class="me-2">apartment</mat-icon>
-              @if (localForm.controls.complemento.touched && localForm.controls.complemento.errors) {
-                <mat-error>{{ localForm.controls.complemento | formError }}</mat-error>
-              }
-            </mat-form-field>
-          </div>
-
-          <!-- Bairro -->
-          <div class="col-12 col-md-4">
-            <mat-form-field appearance="outline" class="w-100">
-              <mat-label>Bairro</mat-label>
-              <input
-                id="bairro_local"
-                matInput
-                formControlName="bairro"
-                placeholder="Ex: Centro"
-                maxlength="50"
-              />
-              <mat-icon matPrefix class="me-2">map</mat-icon>
-              @if (localForm.controls.bairro.touched && localForm.controls.bairro.errors) {
-                <mat-error>{{ localForm.controls.bairro | formError }}</mat-error>
-              }
-            </mat-form-field>
-          </div>
-
-          <!-- Cidade -->
-          <div class="col-12 col-md-8">
-            <mat-form-field appearance="outline" class="w-100">
-              <mat-label>Cidade</mat-label>
-              <input
-                id="cidade_local"
-                matInput
-                formControlName="cidade"
-                placeholder="Ex: Novo Hamburgo"
-                maxlength="50"
-              />
-              <mat-icon matPrefix class="me-2">location_city</mat-icon>
-              @if (localForm.controls.cidade.touched && localForm.controls.cidade.errors) {
-                <mat-error>{{ localForm.controls.cidade | formError }}</mat-error>
-              }
-            </mat-form-field>
-          </div>
-
-          <!-- Estado / UF -->
-          <div class="col-12 col-md-4">
-            <mat-form-field appearance="outline" class="w-100">
-              <mat-label>UF</mat-label>
-              <mat-select id="uf_local" formControlName="estado" aria-label="UF ou Estado">
-                @for (uf of estadosBrasil; track uf) {
-                  <mat-option [value]="uf">{{ uf }}</mat-option>
-                }
-              </mat-select>
-              <mat-icon matPrefix class="me-2">flag</mat-icon>
-              @if (localForm.controls.estado.touched && localForm.controls.estado.errors) {
-                <mat-error>{{ localForm.controls.estado | formError }}</mat-error>
-              }
-            </mat-form-field>
-          </div>
+        <!-- Nome do Local / Lar -->
+        <div class="col-12 col-md-7">
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>Nome do Local / Estabelecimento</mat-label>
+            <input
+              id="nome_local"
+              matInput
+              formControlName="local"
+              placeholder="Ex: Lar da Dona Maria, Clínica VetSul"
+              maxlength="50"
+              cdkFocusInitial
+            />
+            <mat-icon matPrefix class="me-2">home</mat-icon>
+            @if (localForm.controls.local.touched && localForm.controls.local.errors) {
+              <mat-error>{{ localForm.controls.local | formError }}</mat-error>
+            }
+          </mat-form-field>
         </div>
 
+        <!-- Pessoa de Contato -->
+        <div class="col-12 col-md-7">
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>Pessoa de Contato / Responsável</mat-label>
+            <input
+              id="contato_responsavel"
+              matInput
+              formControlName="contato"
+              placeholder="Ex: Maria da Silva"
+              maxlength="50"
+            />
+            <mat-icon matPrefix class="me-2">person</mat-icon>
+            @if (localForm.controls.contato.touched && localForm.controls.contato.errors) {
+              <mat-error>{{ localForm.controls.contato | formError }}</mat-error>
+            }
+          </mat-form-field>
+        </div>
+
+        <!-- Telefone / WhatsApp -->
+        <div class="col-12 col-md-5">
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>Telefone / WhatsApp</mat-label>
+            <input
+              id="telefone_local"
+              matInput
+              appPhoneMask
+              formControlName="telefone"
+              placeholder="(51) 99999-9999"
+              maxlength="15"
+            />
+            <mat-icon matPrefix class="me-2">phone</mat-icon>
+            @if (localForm.controls.telefone.touched && localForm.controls.telefone.errors) {
+              <mat-error>{{ localForm.controls.telefone | formError }}</mat-error>
+            }
+          </mat-form-field>
+        </div>
       </div>
+    </div>
+
+    <!-- SEÇÃO 2: ENDEREÇO & LOCALIZAÇÃO -->
+    <div class="form-section-card">
+      <div class="d-flex align-items-center gap-2 mb-3">
+        <div class="section-icon-badge d-flex align-items-center justify-content-center">
+          <mat-icon style="font-size: 18px; width: 18px; height: 18px">place</mat-icon>
+        </div>
+        <div>
+          <div class="sub-header-title">2. Endereço & Localização</div>
+          <div class="sub-header-desc">Informe o CEP para busca automática do endereço</div>
+        </div>
+      </div>
+
+      <div class="row g-3">
+        <!-- CEP -->
+        <div class="col-12 col-md-4">
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>CEP</mat-label>
+            <input
+              id="cep_local"
+              matInput
+              appCepMask
+              formControlName="cep"
+              (blur)="onSearchCep()"
+              placeholder="93300-000"
+              maxlength="9"
+            />
+            <mat-icon matPrefix class="me-2">pin_drop</mat-icon>
+            @if (loadingCep()) {
+              <mat-spinner matSuffix diameter="18"></mat-spinner>
+            } @else {
+              <button
+                type="button"
+                mat-icon-button
+                matSuffix
+                (click)="onSearchCep()"
+                matTooltip="Buscar CEP via ViaCEP"
+                aria-label="Buscar CEP via ViaCEP"
+              >
+                <mat-icon style="font-size: 18px; width: 18px; height: 18px">search</mat-icon>
+              </button>
+            }
+            @if (localForm.controls.cep.touched && localForm.controls.cep.errors) {
+              <mat-error>{{ localForm.controls.cep | formError }}</mat-error>
+            }
+          </mat-form-field>
+        </div>
+
+        <!-- Rua / Logradouro -->
+        <div class="col-12 col-md-8">
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>Rua / Logradouro</mat-label>
+            <input
+              id="rua_local"
+              matInput
+              formControlName="rua"
+              placeholder="Ex: Av. Maurício Cardoso"
+              maxlength="50"
+            />
+            <mat-icon matPrefix class="me-2">signpost</mat-icon>
+            @if (localForm.controls.rua.touched && localForm.controls.rua.errors) {
+              <mat-error>{{ localForm.controls.rua | formError }}</mat-error>
+            }
+          </mat-form-field>
+        </div>
+
+        <!-- Número -->
+        <div class="col-12 col-sm-4 col-md-3">
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>Número</mat-label>
+            <input
+              id="numero_local"
+              matInput
+              type="number"
+              min="0"
+              formControlName="numero"
+              placeholder="123"
+            />
+            <mat-icon matPrefix class="me-2">numbers</mat-icon>
+            @if (localForm.controls.numero.touched && localForm.controls.numero.errors) {
+              <mat-error>{{ localForm.controls.numero | formError }}</mat-error>
+            }
+          </mat-form-field>
+        </div>
+
+        <!-- Complemento -->
+        <div class="col-12 col-sm-8 col-md-5">
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>Complemento (Opcional)</mat-label>
+            <input
+              id="complemento_local"
+              matInput
+              formControlName="complemento"
+              placeholder="Ex: Apto 302, Bloco B, Casa dos fundos"
+              maxlength="30"
+            />
+            <mat-icon matPrefix class="me-2">apartment</mat-icon>
+            @if (localForm.controls.complemento.touched && localForm.controls.complemento.errors) {
+              <mat-error>{{ localForm.controls.complemento | formError }}</mat-error>
+            }
+          </mat-form-field>
+        </div>
+
+        <!-- Bairro -->
+        <div class="col-12 col-md-4">
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>Bairro</mat-label>
+            <input
+              id="bairro_local"
+              matInput
+              formControlName="bairro"
+              placeholder="Ex: Centro"
+              maxlength="50"
+            />
+            <mat-icon matPrefix class="me-2">map</mat-icon>
+            @if (localForm.controls.bairro.touched && localForm.controls.bairro.errors) {
+              <mat-error>{{ localForm.controls.bairro | formError }}</mat-error>
+            }
+          </mat-form-field>
+        </div>
+
+        <!-- Cidade -->
+        <div class="col-12 col-md-8">
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>Cidade</mat-label>
+            <input
+              id="cidade_local"
+              matInput
+              formControlName="cidade"
+              placeholder="Ex: Novo Hamburgo"
+              maxlength="50"
+            />
+            <mat-icon matPrefix class="me-2">location_city</mat-icon>
+            @if (localForm.controls.cidade.touched && localForm.controls.cidade.errors) {
+              <mat-error>{{ localForm.controls.cidade | formError }}</mat-error>
+            }
+          </mat-form-field>
+        </div>
+
+        <!-- Estado / UF -->
+        <div class="col-12 col-md-4">
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>UF</mat-label>
+            <mat-select id="uf_local" formControlName="estado" aria-label="UF ou Estado">
+              @for (uf of estadosBrasil; track uf) {
+                <mat-option [value]="uf">{{ uf }}</mat-option>
+              }
+            </mat-select>
+            <mat-icon matPrefix class="me-2">flag</mat-icon>
+            @if (localForm.controls.estado.touched && localForm.controls.estado.errors) {
+              <mat-error>{{ localForm.controls.estado | formError }}</mat-error>
+            }
+          </mat-form-field>
+        </div>
+      </div>
+    </div>
 
     <!-- Ações no rodapé -->
     <div dialog-actions>

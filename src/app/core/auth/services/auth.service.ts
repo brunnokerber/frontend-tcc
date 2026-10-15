@@ -2,7 +2,17 @@ import { HttpClient } from '@angular/common/http';
 import { computed, inject, Injectable, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
-import { catchError, firstValueFrom, from, map, Observable, of, switchMap, tap, throwError } from 'rxjs';
+import {
+  catchError,
+  firstValueFrom,
+  from,
+  map,
+  Observable,
+  of,
+  switchMap,
+  tap,
+  throwError,
+} from 'rxjs';
 
 import { ToastService } from '@core/services/toast.service';
 import { environment } from '@env/environment';
@@ -32,16 +42,12 @@ export class AuthService {
    * Cliente dedicado para consultas de banco e storage (PostgREST), provendo dinamicamente
    * o access token válido recuperado pelo AuthService.
    */
-  private readonly dbClient: SupabaseClient = createClient(
-    environment.apiUrl,
-    environment.apiKey,
-    {
-      accessToken: async () => {
-        const token = await this.getValidToken();
-        return token || '';
-      },
-    }
-  );
+  private readonly dbClient: SupabaseClient = createClient(environment.apiUrl, environment.apiKey, {
+    accessToken: async () => {
+      const token = await this.getValidToken();
+      return token || '';
+    },
+  });
 
   /**
    * Cliente dedicado para o ciclo de vida do Supabase Auth (GoTrue).
@@ -56,7 +62,7 @@ export class AuthService {
         autoRefreshToken: true,
         detectSessionInUrl: false,
       },
-    }
+    },
   );
 
   constructor() {
@@ -207,7 +213,7 @@ export class AuthService {
   private fetchUserRole(
     userId: string,
     accessToken: string,
-    fallbackRole?: AppRole
+    fallbackRole?: AppRole,
   ): Observable<AppRole> {
     return this.http
       .get<{ role: AppRole }[]>(`${environment.apiUrl}/rest/v1/profiles`, {
@@ -222,7 +228,7 @@ export class AuthService {
       })
       .pipe(
         map((profiles) => profiles[0]?.role || fallbackRole || 'user'),
-        catchError(() => of(fallbackRole || ('user' as AppRole)))
+        catchError(() => of(fallbackRole || ('user' as AppRole))),
       );
   }
 
@@ -259,13 +265,13 @@ export class AuthService {
                 ...resp.user,
                 role: role || metaRole || 'user',
               },
-            }))
+            })),
           );
         }),
         tap((resp) => {
           this.saveUserToStorage(resp);
           this.currentUser.set(resp);
-        })
+        }),
       );
   }
 
@@ -293,19 +299,17 @@ export class AuthService {
           params: {
             grant_type: 'refresh_token',
           },
-        }
+        },
       )
       .pipe(
         switchMap((resp) => {
           const userId = resp.user?.id || current.user?.id;
           const accessToken = resp.access_token;
-          const currentMetaRole = (
-            resp.user?.app_metadata?.['role'] ||
+          const currentMetaRole = (resp.user?.app_metadata?.['role'] ||
             resp.user?.user_metadata?.['role'] ||
             current.user?.role ||
             current.user?.app_metadata?.['role'] ||
-            current.user?.user_metadata?.['role']
-          ) as AppRole | undefined;
+            current.user?.user_metadata?.['role']) as AppRole | undefined;
 
           if (!userId || !accessToken) {
             return of({
@@ -321,7 +325,7 @@ export class AuthService {
                 ...resp.user,
                 role: role || currentMetaRole || 'user',
               },
-            }))
+            })),
           );
         }),
         tap((resp) => {
@@ -332,7 +336,7 @@ export class AuthService {
           console.warn('Sessão expirada ou refresh token inválido:', err);
           this.logout('inactivity');
           throw err;
-        })
+        }),
       );
   }
 
@@ -381,15 +385,14 @@ export class AuthService {
   public async inviteUser(
     email: string,
     role: AppRole = 'user',
-    redirectTo?: string
+    redirectTo?: string,
   ): Promise<{ success: boolean; message?: string }> {
     const token = await this.getValidToken();
     if (!token) {
       throw new Error('Sessão inválida ou expirada. Faça login novamente.');
     }
 
-    const targetRedirect =
-      redirectTo || `${window.location.origin}/definir-senha`;
+    const targetRedirect = redirectTo || `${window.location.origin}/definir-senha`;
 
     const body = {
       email: email.trim().toLowerCase(),
@@ -407,24 +410,21 @@ export class AuthService {
               apikey: environment.apiKey,
               Authorization: `Bearer ${token}`,
             },
-          }
+          },
         )
         .pipe(
           map((resp) => resp || { success: true }),
           catchError((err: unknown) => {
-            return from(
-              parseFunctionError(err, 'Erro ao enviar convite para o usuário.')
-            ).pipe(
+            return from(parseFunctionError(err, 'Erro ao enviar convite para o usuário.')).pipe(
               switchMap((parsed) => {
-                const errorObj: AppAuthError = Object.assign(
-                  new Error(parsed.message),
-                  { code: parsed.code }
-                );
+                const errorObj: AppAuthError = Object.assign(new Error(parsed.message), {
+                  code: parsed.code,
+                });
                 return throwError(() => errorObj);
-              })
+              }),
             );
-          })
-        )
+          }),
+        ),
     );
   }
 
@@ -434,15 +434,14 @@ export class AuthService {
    */
   public async sendResetPassword(
     email: string,
-    redirectTo?: string
+    redirectTo?: string,
   ): Promise<{ success: boolean; message?: string }> {
     const token = await this.getValidToken();
     if (!token) {
       throw new Error('Sessão inválida ou expirada. Faça login novamente.');
     }
 
-    const targetRedirect =
-      redirectTo || `${window.location.origin}/definir-senha`;
+    const targetRedirect = redirectTo || `${window.location.origin}/definir-senha`;
 
     const body = {
       email: email.trim().toLowerCase(),
@@ -459,27 +458,23 @@ export class AuthService {
               apikey: environment.apiKey,
               Authorization: `Bearer ${token}`,
             },
-          }
+          },
         )
         .pipe(
           map((resp) => resp || { success: true }),
           catchError((err: unknown) => {
             return from(
-              parseFunctionError(
-                err,
-                'Erro ao disparar e-mail de redefinição de senha.'
-              )
+              parseFunctionError(err, 'Erro ao disparar e-mail de redefinição de senha.'),
             ).pipe(
               switchMap((parsed) => {
-                const errorObj: AppAuthError = Object.assign(
-                  new Error(parsed.message),
-                  { code: parsed.code }
-                );
+                const errorObj: AppAuthError = Object.assign(new Error(parsed.message), {
+                  code: parsed.code,
+                });
                 return throwError(() => errorObj);
-              })
+              }),
             );
-          })
-        )
+          }),
+        ),
     );
   }
 
@@ -489,10 +484,9 @@ export class AuthService {
    */
   public async requestPasswordReset(
     email: string,
-    redirectTo?: string
+    redirectTo?: string,
   ): Promise<{ success: boolean; message?: string }> {
-    const targetRedirect =
-      redirectTo || `${window.location.origin}/definir-senha`;
+    const targetRedirect = redirectTo || `${window.location.origin}/definir-senha`;
     const cleanEmail = email.trim().toLowerCase();
 
     return firstValueFrom(
@@ -507,20 +501,25 @@ export class AuthService {
             params: {
               redirect_to: targetRedirect,
             },
-          }
+          },
         )
         .pipe(
           map(() => ({ success: true })),
-          catchError((err: { error?: { msg?: string; message?: string; error_description?: string }; message?: string }) => {
-            const msg =
-              err.error?.msg ||
-              err.error?.message ||
-              err.error?.error_description ||
-              err.message ||
-              'Erro ao solicitar redefinição de senha.';
-            return throwError(() => new Error(msg));
-          })
-        )
+          catchError(
+            (err: {
+              error?: { msg?: string; message?: string; error_description?: string };
+              message?: string;
+            }) => {
+              const msg =
+                err.error?.msg ||
+                err.error?.message ||
+                err.error?.error_description ||
+                err.message ||
+                'Erro ao solicitar redefinição de senha.';
+              return throwError(() => new Error(msg));
+            },
+          ),
+        ),
     );
   }
 
@@ -544,9 +543,7 @@ export class AuthService {
     const accessToken = params.get('access_token');
     const refreshToken = params.get('refresh_token');
     const expiresIn = Number(params.get('expires_in')) || 3600;
-    const expiresAt =
-      Number(params.get('expires_at')) ||
-      Math.floor(Date.now() / 1000) + expiresIn;
+    const expiresAt = Number(params.get('expires_at')) || Math.floor(Date.now() / 1000) + expiresIn;
     const tokenType = params.get('token_type') || 'bearer';
     const type = params.get('type') || undefined;
 
@@ -562,7 +559,7 @@ export class AuthService {
         atob(base64)
           .split('')
           .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
-          .join('')
+          .join(''),
       );
       const decoded: {
         sub?: string;
@@ -571,10 +568,9 @@ export class AuthService {
         user_metadata?: { role?: AppRole } & Record<string, unknown>;
       } = JSON.parse(jsonPayload);
 
-      const resolvedRole =
-        (decoded.app_metadata?.role ||
-          decoded.user_metadata?.role ||
-          'user') as AppRole;
+      const resolvedRole = (decoded.app_metadata?.role ||
+        decoded.user_metadata?.role ||
+        'user') as AppRole;
 
       const user = {
         id: decoded.sub || '',
@@ -622,7 +618,7 @@ export class AuthService {
     const token = await this.getValidToken();
     if (!token) {
       throw new Error(
-        'Sessão expirada. Por favor, acesse o link de convite novamente ou efetue login.'
+        'Sessão expirada. Por favor, acesse o link de convite novamente ou efetue login.',
       );
     }
 
@@ -636,7 +632,7 @@ export class AuthService {
               apikey: environment.apiKey,
               Authorization: `Bearer ${token}`,
             },
-          }
+          },
         )
         .pipe(
           tap(() => {
@@ -675,7 +671,7 @@ export class AuthService {
               ) {
                 const sameErr: AppAuthError = Object.assign(
                   new Error('A nova senha deve ser diferente da senha anterior.'),
-                  { code: 'same_password', errorCode: 'same_password' }
+                  { code: 'same_password', errorCode: 'same_password' },
                 );
                 return throwError(() => sameErr);
               }
@@ -689,9 +685,9 @@ export class AuthService {
               ) {
                 const weakErr: AppAuthError = Object.assign(
                   new Error(
-                    'A senha informada não atende aos requisitos de segurança: deve conter no mínimo 8 caracteres, incluindo letras maiúsculas, minúsculas, números e caracteres especiais.'
+                    'A senha informada não atende aos requisitos de segurança: deve conter no mínimo 8 caracteres, incluindo letras maiúsculas, minúsculas, números e caracteres especiais.',
                   ),
-                  { code: 'weak_password', errorCode: 'weak_password' }
+                  { code: 'weak_password', errorCode: 'weak_password' },
                 );
                 return throwError(() => weakErr);
               }
@@ -705,22 +701,22 @@ export class AuthService {
               ) {
                 const reauthErr: AppAuthError = Object.assign(
                   new Error(
-                    'Por motivos de segurança, esta operação exige autenticação recente. Por favor, faça login novamente antes de prosseguir.'
+                    'Por motivos de segurança, esta operação exige autenticação recente. Por favor, faça login novamente antes de prosseguir.',
                   ),
                   {
                     code: 'reauthentication_needed',
                     errorCode: 'reauthentication_needed',
                     requiresReauth: true,
-                  }
+                  },
                 );
                 return throwError(() => reauthErr);
               }
 
               const msg = rawMsg || 'Erro ao atualizar a senha.';
               return throwError(() => new Error(msg));
-            }
-          )
-        )
+            },
+          ),
+        ),
     );
   }
 
@@ -738,7 +734,7 @@ export class AuthService {
 
     if (reason === 'inactivity' && hadSession) {
       this.toastService.info(
-        'Sua sessão expirou por inatividade. Por favor, faça login novamente.'
+        'Sua sessão expirou por inatividade. Por favor, faça login novamente.',
       );
     }
   }

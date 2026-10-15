@@ -1,11 +1,12 @@
-
 .form-section-card {
   background-color: var(--mat-sys-surface-container-low, rgba(0, 0, 0, 0.02));
   border: 1px solid var(--mat-sys-outline-variant, rgba(0, 0, 0, 0.08));
   border-radius: 12px;
   padding: 1.25rem 1.5rem;
   margin-bottom: 1.25rem;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
 
   &:hover {
     border-color: var(--mat-sys-outline, rgba(0, 0, 0, 0.16));

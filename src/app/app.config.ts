@@ -1,5 +1,9 @@
 import { provideHttpClient } from '@angular/common/http';
-import { ApplicationConfig, provideBrowserGlobalErrorListeners, provideZonelessChangeDetection } from '@angular/core';
+import {
+  ApplicationConfig,
+  provideBrowserGlobalErrorListeners,
+  provideZonelessChangeDetection,
+} from '@angular/core';
 import { DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE } from '@angular/material/core';
 import { MatPaginatorIntl } from '@angular/material/paginator';
 import { provideRouter } from '@angular/router';
@@ -20,4 +24,3 @@ export const appConfig: ApplicationConfig = {
     { provide: MatPaginatorIntl, useClass: CustomPaginatorIntl },
   ],
 };
-

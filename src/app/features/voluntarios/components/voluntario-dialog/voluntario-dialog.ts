@@ -140,7 +140,7 @@ export class VoluntarioDialogComponent implements OnInit {
         const updateDto: VoluntarioUpdateDto = payload;
         const updated = await this.voluntariosService.updateVoluntario(
           this.data.voluntario.id,
-          updateDto
+          updateDto,
         );
         if (updated) {
           this.dialogRef.close(updated);

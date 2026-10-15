@@ -3,10 +3,9 @@ import { Pipe, PipeTransform } from '@angular/core';
 @Pipe({
   name: 'cepMask',
   standalone: true,
-  pure: true
+  pure: true,
 })
 export class CepPipe implements PipeTransform {
-
   transform(value: string | number | undefined | null): string {
     if (value === null || value === undefined || value === '') {
       return '';

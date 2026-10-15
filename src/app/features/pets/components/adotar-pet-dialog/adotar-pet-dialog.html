@@ -1,27 +1,42 @@
 <form [formGroup]="adocaoForm" (ngSubmit)="onConfirmar()">
-  <app-dialog-layout title="Registrar Adoção" subtitle="Formalize o novo lar e a saída definitiva do animal"
-    icon="volunteer_activism" iconVariant="success" size="md" [closeDisabled]="isSaving()" (close)="onCancelar()">
+  <app-dialog-layout
+    title="Registrar Adoção"
+    subtitle="Formalize o novo lar e a saída definitiva do animal"
+    icon="volunteer_activism"
+    iconVariant="success"
+    size="md"
+    [closeDisabled]="isSaving()"
+    (close)="onCancelar()"
+  >
     <!-- Resumo do Pet Sendo Adotado -->
     <div class="pet-summary-card p-3 rounded-3 mb-3 border border-surface bg-surface-subtle">
       <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
         <div class="d-flex align-items-center gap-3">
-          <div class="pet-avatar rounded-circle d-flex align-items-center justify-content-center"
-            [ngClass]="getTipoBadgeClass(pet.tipo_pet)">
+          <div
+            class="pet-avatar rounded-circle d-flex align-items-center justify-content-center"
+            [ngClass]="getTipoBadgeClass(pet.tipo_pet)"
+          >
             <i [class]="getTipoFaIcon(pet.tipo_pet)"></i>
           </div>
           <div>
             <div class="d-flex align-items-center gap-2">
               <h3 class="h6 fw-bold mb-0 text-surface-main">{{ pet.nome }}</h3>
-              <i [class]="getSexoIcon(pet.sexo)" class="small" [matTooltip]="'Sexo: ' + pet.sexo"></i>
+              <i
+                [class]="getSexoIcon(pet.sexo)"
+                class="small"
+                [matTooltip]="'Sexo: ' + pet.sexo"
+              ></i>
             </div>
             <span class="small text-surface-muted d-block mt-1">
-              #{{ pet.id }} &bull; {{ pet.tipo_pet }} &bull; {{ pet.raca || 'SRD' }} &bull; Porte {{ pet.porte || 'N/I'
-              }}
+              #{{ pet.id }} &bull; {{ pet.tipo_pet }} &bull; {{ pet.raca || 'SRD' }} &bull; Porte
+              {{ pet.porte || 'N/I' }}
             </span>
           </div>
         </div>
 
-        <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1 small rounded-pill">
+        <span
+          class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1 small rounded-pill"
+        >
           <i class="bi bi-heart-fill me-1"></i> Adoção
         </span>
       </div>
@@ -29,10 +44,12 @@
 
     <!-- Mensagem de Erro (se houver rejeição da procedure) -->
     @if (errorMessage()) {
-    <div class="alert alert-danger py-2 px-3 small rounded-3 mb-3 d-flex align-items-center gap-2">
-      <mat-icon class="text-danger flex-shrink-0">error_outline</mat-icon>
-      <div class="flex-grow-1">{{ errorMessage() }}</div>
-    </div>
+      <div
+        class="alert alert-danger py-2 px-3 small rounded-3 mb-3 d-flex align-items-center gap-2"
+      >
+        <mat-icon class="text-danger flex-shrink-0">error_outline</mat-icon>
+        <div class="flex-grow-1">{{ errorMessage() }}</div>
+      </div>
     }
 
     <!-- Campos do Formulário de Adoção -->
@@ -44,27 +61,29 @@
             <mat-label>Adotante / Local de Destino *</mat-label>
             <mat-select formControlName="id_local" [disabled]="loadingLocais() || isSaving()">
               @if (loadingLocais()) {
-              <mat-option disabled>Carregando locais parceiros...</mat-option>
+                <mat-option disabled>Carregando locais parceiros...</mat-option>
               } @else {
-              @for (loc of locais(); track loc.id) {
-              <mat-option [value]="loc.id">
-                {{ loc.local }}
-                @if (loc.tipo_local) {
-                <span class="text-surface-muted small ms-1">({{ loc.tipo_local }})</span>
+                @for (loc of locais(); track loc.id) {
+                  <mat-option [value]="loc.id">
+                    {{ loc.local }}
+                    @if (loc.tipo_local) {
+                      <span class="text-surface-muted small ms-1">({{ loc.tipo_local }})</span>
+                    }
+                    @if (loc.contato) {
+                      <span class="text-surface-muted small ms-1"
+                        >&bull; Contato: {{ loc.contato }}</span
+                      >
+                    }
+                  </mat-option>
                 }
-                @if (loc.contato) {
-                <span class="text-surface-muted small ms-1">&bull; Contato: {{ loc.contato }}</span>
+                @if (locais().length === 0) {
+                  <mat-option disabled>Nenhum local cadastrado. Use o botão ao lado.</mat-option>
                 }
-              </mat-option>
-              }
-              @if (locais().length === 0) {
-              <mat-option disabled>Nenhum local cadastrado. Use o botão ao lado.</mat-option>
-              }
               }
             </mat-select>
             <mat-icon matPrefix class="me-2">home</mat-icon>
             @if (adocaoForm.controls.id_local.touched && adocaoForm.controls.id_local.errors) {
-            <mat-error>{{ adocaoForm.controls.id_local | formError }}</mat-error>
+              <mat-error>{{ adocaoForm.controls.id_local | formError }}</mat-error>
             }
           </mat-form-field>
 
@@ -88,12 +107,17 @@
       <div class="col-12 col-md-6">
         <mat-form-field appearance="outline" class="w-100">
           <mat-label>Data da Adoção *</mat-label>
-          <input matInput [matDatepicker]="pickerAdocao" formControlName="data_saida" placeholder="DD/MM/AAAA"
-            appDateMask />
+          <input
+            matInput
+            [matDatepicker]="pickerAdocao"
+            formControlName="data_saida"
+            placeholder="DD/MM/AAAA"
+            appDateMask
+          />
           <mat-datepicker-toggle matIconSuffix [for]="pickerAdocao"></mat-datepicker-toggle>
           <mat-datepicker #pickerAdocao></mat-datepicker>
           @if (adocaoForm.controls.data_saida.touched && adocaoForm.controls.data_saida.errors) {
-          <mat-error>{{ adocaoForm.controls.data_saida | formError }}</mat-error>
+            <mat-error>{{ adocaoForm.controls.data_saida | formError }}</mat-error>
           }
         </mat-form-field>
       </div>
@@ -102,10 +126,17 @@
       <div class="col-12 col-md-6">
         <mat-form-field appearance="outline" class="w-100">
           <mat-label>Motivo da Saída *</mat-label>
-          <input matInput formControlName="motivo_saida" placeholder="Ex: Adoção Definitiva" maxlength="100" />
+          <input
+            matInput
+            formControlName="motivo_saida"
+            placeholder="Ex: Adoção Definitiva"
+            maxlength="100"
+          />
           <mat-icon matPrefix class="me-2">assignment_turned_in</mat-icon>
-          @if (adocaoForm.controls.motivo_saida.touched && adocaoForm.controls.motivo_saida.errors) {
-          <mat-error>{{ adocaoForm.controls.motivo_saida | formError }}</mat-error>
+          @if (
+            adocaoForm.controls.motivo_saida.touched && adocaoForm.controls.motivo_saida.errors
+          ) {
+            <mat-error>{{ adocaoForm.controls.motivo_saida | formError }}</mat-error>
           }
         </mat-form-field>
       </div>
@@ -114,12 +145,21 @@
       <div class="col-12">
         <mat-form-field appearance="outline" class="w-100">
           <mat-label>Auxílio / Apoio Financeiro Inicial (Opcional)</mat-label>
-          <input matInput type="number" formControlName="valor_auxilio" placeholder="0,00" min="0" step="0.01" />
+          <input
+            matInput
+            type="number"
+            formControlName="valor_auxilio"
+            placeholder="0,00"
+            min="0"
+            step="0.01"
+          />
           <span matTextPrefix class="me-1">R$&nbsp;</span>
           <mat-icon matSuffix>payments</mat-icon>
           <mat-hint>Caso a ONG forneça auxílio para vacinas, castração ou kit inicial</mat-hint>
-          @if (adocaoForm.controls.valor_auxilio.touched && adocaoForm.controls.valor_auxilio.errors) {
-          <mat-error>{{ adocaoForm.controls.valor_auxilio | formError }}</mat-error>
+          @if (
+            adocaoForm.controls.valor_auxilio.touched && adocaoForm.controls.valor_auxilio.errors
+          ) {
+            <mat-error>{{ adocaoForm.controls.valor_auxilio | formError }}</mat-error>
           }
         </mat-form-field>
       </div>
@@ -128,14 +168,16 @@
       <div class="col-12">
         <mat-form-field appearance="outline" class="w-100">
           <mat-label>Observações / Termo de Adoção</mat-label>
-          <textarea matInput formControlName="obs" rows="3"
+          <textarea
+            matInput
+            formControlName="obs"
+            rows="3"
             placeholder="Ex: Termo de adoção responsável assinado pelo tutor. Documentos arquivados..."
-            maxlength="200"></textarea>
-          <mat-hint align="end">
-            {{ adocaoForm.controls.obs.value?.length || 0 }}/200
-          </mat-hint>
+            maxlength="200"
+          ></textarea>
+          <mat-hint align="end"> {{ adocaoForm.controls.obs.value?.length || 0 }}/200 </mat-hint>
           @if (adocaoForm.controls.obs.touched && adocaoForm.controls.obs.errors) {
-          <mat-error>{{ adocaoForm.controls.obs | formError }}</mat-error>
+            <mat-error>{{ adocaoForm.controls.obs | formError }}</mat-error>
           }
         </mat-form-field>
       </div>
@@ -147,15 +189,21 @@
         Cancelar
       </button>
 
-      <button type="submit" mat-flat-button color="primary" [disabled]="adocaoForm.invalid || isSaving()" class="px-3">
+      <button
+        type="submit"
+        mat-flat-button
+        color="primary"
+        [disabled]="adocaoForm.invalid || isSaving()"
+        class="px-3"
+      >
         @if (isSaving()) {
-        <span class="spinner-border spinner-border-sm me-2" role="status"></span>
-        <span>Processando Adoção...</span>
+          <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+          <span>Processando Adoção...</span>
         } @else {
-        <span class="d-inline-flex align-items-center gap-1">
-          <mat-icon>volunteer_activism</mat-icon>
-          <span>Confirmar Adoção</span>
-        </span>
+          <span class="d-inline-flex align-items-center gap-1">
+            <mat-icon>volunteer_activism</mat-icon>
+            <span>Confirmar Adoção</span>
+          </span>
         }
       </button>
     </div>

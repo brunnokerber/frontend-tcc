@@ -98,7 +98,7 @@ export default class ProcedimentoFormComponent implements OnInit {
         dateNotBeforeDateValidator(
           () => this.pet()?.data_nascimento,
           'dataAntesNascimento',
-          'A data de realização não pode ser anterior ao nascimento do pet'
+          'A data de realização não pode ser anterior ao nascimento do pet',
         ),
       ],
     ],
@@ -150,7 +150,8 @@ export default class ProcedimentoFormComponent implements OnInit {
         this.procedimentoId.set(idProc);
 
         // Otimização: Reaproveitar procedimento/consulta passado no state da rota anterior
-        const stateProc = (history.state?.procedimento || history.state?.consulta) as ConsultaExame | undefined;
+        const stateProc = (history.state?.procedimento || history.state?.consulta) as
+          ConsultaExame | undefined;
         if (stateProc && stateProc.id === idProc) {
           this.setProcedimentoData(stateProc);
         } else {
@@ -256,7 +257,7 @@ export default class ProcedimentoFormComponent implements OnInit {
 
         const updated = await this.consultasExamesService.updateConsultaExame(
           this.procedimentoId()!,
-          updateDto
+          updateDto,
         );
         if (updated) {
           this.goBack();

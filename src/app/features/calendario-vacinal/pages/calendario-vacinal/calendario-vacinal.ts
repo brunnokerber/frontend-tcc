@@ -10,14 +10,10 @@ import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { ToastService } from '@core/services/toast.service';
 import { VacinaDialogComponent } from '@features/pets/components/vacina-dialog/vacina-dialog';
 import { getTipoBadgeClass, getTipoFaIcon, Pet } from '@features/pets/models/pet.model';
-import {
-  VacinaCalendarioFiltro,
-  VacinaCalendarioItem,
-} from '@features/pets/models/vacina.model';
+import { VacinaCalendarioFiltro, VacinaCalendarioItem } from '@features/pets/models/vacina.model';
 import { PetsService } from '@features/pets/services/pets.service';
 import { VacinasService } from '@features/pets/services/vacinas.service';
 import { getTodayIso } from '@shared/utils/string-utils';
-
 
 export interface DiaCalendario {
   date: Date;
@@ -74,8 +70,18 @@ export default class CalendarioVacinalComponent implements OnInit {
   public readonly hojeIso = getTodayIso();
 
   public readonly mesesNomes = [
-    'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
-    'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
+    'Janeiro',
+    'Fevereiro',
+    'Março',
+    'Abril',
+    'Maio',
+    'Junho',
+    'Julho',
+    'Agosto',
+    'Setembro',
+    'Outubro',
+    'Novembro',
+    'Dezembro',
   ];
 
   public readonly diasSemana = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];

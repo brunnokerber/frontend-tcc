@@ -1,4 +1,3 @@
-
 import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
 
@@ -10,7 +9,10 @@ export const authGuard: CanActivateFn = async (_route, state) => {
 
   // Se o usuário acabou de abrir um link de convite ou recuperação com tokens no hash da URL
   const hashCapture = authService.captureSessionFromUrlHash();
-  if (hashCapture.hasSession && (hashCapture.type === 'invite' || hashCapture.type === 'recovery')) {
+  if (
+    hashCapture.hasSession &&
+    (hashCapture.type === 'invite' || hashCapture.type === 'recovery')
+  ) {
     router.navigate(['/definir-senha']);
     return false;
   }
@@ -29,4 +31,3 @@ export const authGuard: CanActivateFn = async (_route, state) => {
 
   return true;
 };
-

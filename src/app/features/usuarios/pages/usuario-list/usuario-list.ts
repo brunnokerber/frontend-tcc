@@ -71,9 +71,17 @@ export default class UsuarioListComponent implements OnInit {
 
   // KPIs
   public totalUsuarios = computed(() => this.usuariosService.usuarios().length);
-  public totalAtivos = computed(() => this.usuariosService.usuarios().filter((u) => u.ativo !== false).length);
-  public totalAdmins = computed(() => this.usuariosService.usuarios().filter((u) => u.role === 'admin' && u.ativo !== false).length);
-  public totalOperadores = computed(() => this.usuariosService.usuarios().filter((u) => u.role === 'user' && u.ativo !== false).length);
+  public totalAtivos = computed(
+    () => this.usuariosService.usuarios().filter((u) => u.ativo !== false).length,
+  );
+  public totalAdmins = computed(
+    () =>
+      this.usuariosService.usuarios().filter((u) => u.role === 'admin' && u.ativo !== false).length,
+  );
+  public totalOperadores = computed(
+    () =>
+      this.usuariosService.usuarios().filter((u) => u.role === 'user' && u.ativo !== false).length,
+  );
 
   // Lista Filtrada com base apenas nos filtros APLICADOS via Submit
   public filteredUsuarios = computed(() => {
@@ -181,8 +189,6 @@ export default class UsuarioListComponent implements OnInit {
       replaceUrl: true,
     });
   }
-
-
 
   openInviteUserDialog(): void {
     const dialogRef = this.dialog.open(UsuarioDialogComponent, {

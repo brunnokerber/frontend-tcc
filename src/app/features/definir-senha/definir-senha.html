@@ -9,9 +9,7 @@
 
   <mat-card class="definir-senha-card shadow-sm border">
     <mat-card-header class="text-center pb-2">
-      <mat-card-title class="h5 fw-bold mb-1">
-        Definir Senha de Acesso
-      </mat-card-title>
+      <mat-card-title class="h5 fw-bold mb-1"> Definir Senha de Acesso </mat-card-title>
       <mat-card-subtitle class="small text-surface-muted">
         @if (userEmail()) {
           Configurando credenciais para <strong>{{ userEmail() }}</strong>
@@ -77,7 +75,10 @@
           >
             <mat-icon>{{ hideConfirmPassword() ? 'visibility_off' : 'visibility' }}</mat-icon>
           </button>
-          @if (passwordForm.controls.confirmPassword.touched && passwordForm.errors?.['passwordMismatch']) {
+          @if (
+            passwordForm.controls.confirmPassword.touched &&
+            passwordForm.errors?.['passwordMismatch']
+          ) {
             <mat-error>As senhas digitadas não coincidem.</mat-error>
           }
         </mat-form-field>

@@ -15,11 +15,7 @@ export interface ImageCompressionOptions {
 /**
  * Converte um Canvas HTML para Blob de forma assíncrona.
  */
-function canvasToBlob(
-  canvas: HTMLCanvasElement,
-  format: string,
-  quality: number
-): Promise<Blob> {
+function canvasToBlob(canvas: HTMLCanvasElement, format: string, quality: number): Promise<Blob> {
   return new Promise((resolve, reject) => {
     canvas.toBlob(
       (blob) => {
@@ -36,12 +32,12 @@ function canvasToBlob(
               }
             },
             'image/jpeg',
-            quality
+            quality,
           );
         }
       },
       format,
-      quality
+      quality,
     );
   });
 }
@@ -75,7 +71,7 @@ function loadImageFromFile(file: File): Promise<HTMLImageElement> {
  */
 export async function compressAndResizeImage(
   file: File,
-  options?: ImageCompressionOptions
+  options?: ImageCompressionOptions,
 ): Promise<File> {
   const maxBytes = options?.maxSizeBytes ?? 256 * 1024; // 256 KB
   const maxW = options?.maxWidth ?? 800;

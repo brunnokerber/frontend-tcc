@@ -118,21 +118,24 @@ export class PetReportService {
   ): void {
     const printWindow = window.open('', '_blank', 'width=1100,height=850');
     if (!printWindow) {
-      alert('Por favor, permita pop-ups no navegador para visualizar e imprimir o relatório em PDF.');
+      alert(
+        'Por favor, permita pop-ups no navegador para visualizar e imprimir o relatório em PDF.',
+      );
       return;
     }
 
     const now = new Date();
-    const formattedDate = now.toLocaleDateString('pt-BR') + ' às ' + now.toLocaleTimeString('pt-BR');
+    const formattedDate =
+      now.toLocaleDateString('pt-BR') + ' às ' + now.toLocaleTimeString('pt-BR');
 
     const filterBadgesHtml =
       appliedFilters.length > 0
         ? appliedFilters
-          .map(
-            (f) =>
-              `<span style="display:inline-block;background:#f1f5f9;border:1px solid #cbd5e1;border-radius:4px;padding:3px 8px;margin:2px 4px 2px 0;font-size:12px;color:#334155;"><strong>${this.escapeHtml(f.label)}:</strong> ${this.escapeHtml(f.value)}</span>`,
-          )
-          .join(' ')
+            .map(
+              (f) =>
+                `<span style="display:inline-block;background:#f1f5f9;border:1px solid #cbd5e1;border-radius:4px;padding:3px 8px;margin:2px 4px 2px 0;font-size:12px;color:#334155;"><strong>${this.escapeHtml(f.label)}:</strong> ${this.escapeHtml(f.value)}</span>`,
+            )
+            .join(' ')
         : '<span style="color:#64748b;font-size:13px;font-style:italic;">Todos os animais (Sem filtros restritivos)</span>';
 
     const rowsHtml = pets
@@ -322,11 +325,16 @@ export class PetReportService {
 
   private getStatusStyle(status?: string | null): string {
     const s = (status || '').toLowerCase();
-    if (s.includes('dispon')) return 'background-color: #dcfce7; color: #15803d; border: 1px solid #bbf7d0;';
-    if (s.includes('tratamento')) return 'background-color: #fef3c7; color: #b45309; border: 1px solid #fde68a;';
-    if (s.includes('quarentena')) return 'background-color: #ffedd5; color: #c2410c; border: 1px solid #fed7aa;';
-    if (s.includes('adot')) return 'background-color: #dbeafe; color: #1d4ed8; border: 1px solid #bfdbfe;';
-    if (s.includes('óbit') || s.includes('obit')) return 'background-color: #fee2e2; color: #b91c1c; border: 1px solid #fecaca;';
+    if (s.includes('dispon'))
+      return 'background-color: #dcfce7; color: #15803d; border: 1px solid #bbf7d0;';
+    if (s.includes('tratamento'))
+      return 'background-color: #fef3c7; color: #b45309; border: 1px solid #fde68a;';
+    if (s.includes('quarentena'))
+      return 'background-color: #ffedd5; color: #c2410c; border: 1px solid #fed7aa;';
+    if (s.includes('adot'))
+      return 'background-color: #dbeafe; color: #1d4ed8; border: 1px solid #bfdbfe;';
+    if (s.includes('óbit') || s.includes('obit'))
+      return 'background-color: #fee2e2; color: #b91c1c; border: 1px solid #fecaca;';
     return 'background-color: #f1f5f9; color: #475569; border: 1px solid #e2e8f0;';
   }
 }

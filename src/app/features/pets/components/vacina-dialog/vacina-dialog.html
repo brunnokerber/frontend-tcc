@@ -1,7 +1,11 @@
 <form [formGroup]="vacinaForm" (ngSubmit)="onSalvar()">
   <app-dialog-layout
     [title]="isEditing() ? 'Atualizar Vacina' : 'Agendar Nova Vacina'"
-    [subtitle]="isEditing() ? 'Atualize o agendamento ou confirme a aplicação da dose' : 'Defina o pet e a previsão de aplicação da vacina'"
+    [subtitle]="
+      isEditing()
+        ? 'Atualize o agendamento ou confirme a aplicação da dose'
+        : 'Defina o pet e a previsão de aplicação da vacina'
+    "
     icon="medication"
     iconVariant="primary"
     size="lg"
@@ -23,17 +27,26 @@
               <div class="d-flex align-items-center gap-2">
                 <h3 class="h6 fw-bold mb-0 text-surface-main">{{ p.nome }}</h3>
                 @if (p.sexo) {
-                  <i [class]="getSexoIcon(p.sexo)" class="small" [matTooltip]="'Sexo: ' + p.sexo"></i>
+                  <i
+                    [class]="getSexoIcon(p.sexo)"
+                    class="small"
+                    [matTooltip]="'Sexo: ' + p.sexo"
+                  ></i>
                 }
               </div>
               <span class="small text-surface-muted d-block mt-1">
-                #{{ p.id }} &bull; {{ p.tipo_pet }} @if (p.porte) { &bull; Porte {{ p.porte }} }
+                #{{ p.id }} &bull; {{ p.tipo_pet }}
+                @if (p.porte) {
+                  &bull; Porte {{ p.porte }}
+                }
               </span>
             </div>
           </div>
           @if (p.status) {
             <div>
-              <span class="badge bg-surface-subtle text-surface-muted border border-surface px-2 py-1 small">
+              <span
+                class="badge bg-surface-subtle text-surface-muted border border-surface px-2 py-1 small"
+              >
                 {{ p.status }}
               </span>
             </div>
@@ -51,7 +64,8 @@
             } @else {
               @for (petOpt of petsDisponiveis(); track petOpt.id) {
                 <mat-option [value]="petOpt.id">
-                  #{{ petOpt.id }} - {{ petOpt.nome }} ({{ petOpt.tipo_pet }} &bull; {{ petOpt.status }})
+                  #{{ petOpt.id }} - {{ petOpt.nome }} ({{ petOpt.tipo_pet }} &bull;
+                  {{ petOpt.status }})
                 </mat-option>
               }
             }
@@ -66,18 +80,39 @@
 
     <!-- Status Atual da Vacina (em modo edição) -->
     @if (isEditing()) {
-      <div class="mb-3 p-2 rounded-2 border d-flex align-items-center justify-content-between flex-wrap gap-2"
-        [ngClass]="vacinaForm.controls.data_aplicacao.value ? 'bg-success-subtle border-success' : 'bg-warning-subtle border-warning'">
+      <div
+        class="mb-3 p-2 rounded-2 border d-flex align-items-center justify-content-between flex-wrap gap-2"
+        [ngClass]="
+          vacinaForm.controls.data_aplicacao.value
+            ? 'bg-success-subtle border-success'
+            : 'bg-warning-subtle border-warning'
+        "
+      >
         <div class="d-flex align-items-center gap-2">
-          <mat-icon [class.text-success]="vacinaForm.controls.data_aplicacao.value" [class.text-warning]="!vacinaForm.controls.data_aplicacao.value">
+          <mat-icon
+            [class.text-success]="vacinaForm.controls.data_aplicacao.value"
+            [class.text-warning]="!vacinaForm.controls.data_aplicacao.value"
+          >
             {{ vacinaForm.controls.data_aplicacao.value ? 'verified' : 'schedule' }}
           </mat-icon>
           <div>
-            <span class="fw-semibold small d-block" [class.text-success]="vacinaForm.controls.data_aplicacao.value" [class.text-dark]="!vacinaForm.controls.data_aplicacao.value">
-              {{ vacinaForm.controls.data_aplicacao.value ? 'Vacina Aplicada' : 'Vacina Prevista (Pendente)' }}
+            <span
+              class="fw-semibold small d-block"
+              [class.text-success]="vacinaForm.controls.data_aplicacao.value"
+              [class.text-dark]="!vacinaForm.controls.data_aplicacao.value"
+            >
+              {{
+                vacinaForm.controls.data_aplicacao.value
+                  ? 'Vacina Aplicada'
+                  : 'Vacina Prevista (Pendente)'
+              }}
             </span>
             <span class="small text-muted" style="font-size: 0.75rem">
-              {{ vacinaForm.controls.data_aplicacao.value ? 'Dose já administrada ao animal' : 'Aguardando aplicação na data estipulada' }}
+              {{
+                vacinaForm.controls.data_aplicacao.value
+                  ? 'Dose já administrada ao animal'
+                  : 'Aguardando aplicação na data estipulada'
+              }}
             </span>
           </div>
         </div>
@@ -147,7 +182,9 @@
           />
           <mat-datepicker-toggle matIconSuffix [for]="pickerPrevista"></mat-datepicker-toggle>
           <mat-datepicker #pickerPrevista></mat-datepicker>
-          @if (vacinaForm.controls.data_prevista.touched && vacinaForm.controls.data_prevista.errors) {
+          @if (
+            vacinaForm.controls.data_prevista.touched && vacinaForm.controls.data_prevista.errors
+          ) {
             <mat-error>{{ vacinaForm.controls.data_prevista | formError }}</mat-error>
           }
         </mat-form-field>
@@ -166,7 +203,9 @@
           />
           <mat-datepicker-toggle matIconSuffix [for]="pickerAplicacao"></mat-datepicker-toggle>
           <mat-datepicker #pickerAplicacao></mat-datepicker>
-          @if (vacinaForm.controls.data_aplicacao.touched && vacinaForm.controls.data_aplicacao.errors) {
+          @if (
+            vacinaForm.controls.data_aplicacao.touched && vacinaForm.controls.data_aplicacao.errors
+          ) {
             <mat-error>{{ vacinaForm.controls.data_aplicacao | formError }}</mat-error>
           }
         </mat-form-field>
@@ -184,7 +223,10 @@
               } @else {
                 @for (vet of veterinarios(); track vet.id) {
                   <mat-option [value]="vet.id">
-                    {{ vet.nome }} @if (vet.crmv) { (CRMV: {{ vet.crmv }}) }
+                    {{ vet.nome }}
+                    @if (vet.crmv) {
+                      (CRMV: {{ vet.crmv }})
+                    }
                   </mat-option>
                 }
               }
@@ -233,7 +275,10 @@
     </div>
 
     <!-- Ações no Rodapé -->
-    <div dialog-actions class="d-flex align-items-center justify-content-between w-100 flex-wrap gap-2">
+    <div
+      dialog-actions
+      class="d-flex align-items-center justify-content-between w-100 flex-wrap gap-2"
+    >
       <div>
         @if (isEditing()) {
           <button

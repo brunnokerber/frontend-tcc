@@ -1,7 +1,11 @@
 <form [formGroup]="vetForm" (ngSubmit)="onSave()">
   <app-dialog-layout
     [title]="isEditing() ? 'Editar Veterinário' : 'Novo Veterinário'"
-    [subtitle]="isEditing() ? 'Atualize as informações do profissional' : 'Cadastre rapidamente o profissional'"
+    [subtitle]="
+      isEditing()
+        ? 'Atualize as informações do profissional'
+        : 'Cadastre rapidamente o profissional'
+    "
     [icon]="isEditing() ? 'edit' : 'medical_services'"
     iconVariant="primary"
     size="md"

@@ -57,13 +57,13 @@ export default class LocalListComponent implements OnInit {
 
   public totalLocais = computed(() => this.locaisService.locais().length);
   public totalLares = computed(
-    () => this.locaisService.locais().filter((l) => l.tipo_local === 'Lar Temporário').length
+    () => this.locaisService.locais().filter((l) => l.tipo_local === 'Lar Temporário').length,
   );
   public totalClinicas = computed(
-    () => this.locaisService.locais().filter((l) => l.tipo_local === 'Clínica Veterinária').length
+    () => this.locaisService.locais().filter((l) => l.tipo_local === 'Clínica Veterinária').length,
   );
   public totalExposicoes = computed(
-    () => this.locaisService.locais().filter((l) => l.tipo_local === 'Exposição').length
+    () => this.locaisService.locais().filter((l) => l.tipo_local === 'Exposição').length,
   );
 
   // Lista Paginada
@@ -141,7 +141,6 @@ export default class LocalListComponent implements OnInit {
     this.pageIndex.set(0);
     this.applyFilters(true);
   }
-
 
   openLocalDialog(local?: Local): void {
     const dialogRef = this.dialog.open(LocalDialogComponent, {

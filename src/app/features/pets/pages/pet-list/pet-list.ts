@@ -206,7 +206,6 @@ export default class PetListComponent implements OnInit {
     this.applyFilters(true);
   }
 
-
   readonly getStatusBadgeClass = getStatusBadgeClass;
   readonly getTipoBadgeClass = getTipoBadgeClass;
   readonly getTipoFaIcon = getTipoFaIcon;

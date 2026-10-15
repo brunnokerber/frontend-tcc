@@ -51,12 +51,17 @@ Ao concluir qualquer tarefa que envolva nova feature, alteração de regras de n
 - **Acessibilidade e Design Responsivo:** Garantir conformidade com mobile-first, suporte a tema claro/escuro e acessibilidade (contrastes, labels e tags semânticas).
 - **Boas Práticas de CSS/SCSS:** **Evitar ao máximo o uso de `!important`** em estilizações. Priorize a especificidade correta de seletores, variáveis CSS (`var(--mat-sys-*)`) e herança limpa do Design System.
 
+### 4. Estilo e Formatação de Código (Prettier)
+- **Padronização Automática:** Todo o código TypeScript, HTML, SCSS e JSON do projeto deve seguir estritamente as regras definidas no `.prettierrc`.
+- **Execução Mandatória:** Ao finalizar qualquer modificação e validar o build (`npm run build`), o assistente de IA **deve obrigatoriamente executar `npm run format`** para formatar e padronizar os arquivos antes da entrega ao usuário.
+
 ---
 
 ## 📋 Checklist Obrigatório de Finalização de Tarefa
 
 Antes de considerar uma resposta ou feature concluída, a IA deve verificar:
 - [ ] O código compila sem erros (`npm run build` / typecheck)?
+- [ ] A formatação foi padronizada executando o Prettier (`npm run format`) ao final da execução após a validação do build?
 - [ ] A nova funcionalidade está devidamente tipada sem uso de `any`?
 - [ ] As estilizações respeitam as boas práticas de CSS sem uso desnecessário de `!important`?
 - [ ] A documentação técnica em `docs/` e `README.md` foi atualizada?

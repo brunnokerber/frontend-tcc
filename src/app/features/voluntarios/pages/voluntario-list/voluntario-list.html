@@ -96,7 +96,10 @@
     <div class="row g-3 align-items-end">
       <!-- Coluna 1: Filtrar por Coluna -->
       <div class="col-12 col-sm-6 col-lg-2">
-        <label for="vol-filter-field" class="form-label small fw-semibold text-surface-muted mb-1 text-truncate d-block">
+        <label
+          for="vol-filter-field"
+          class="form-label small fw-semibold text-surface-muted mb-1 text-truncate d-block"
+        >
           Filtrar por Coluna
         </label>
         <select
@@ -114,7 +117,10 @@
 
       <!-- Coluna 2: Termo de Busca -->
       <div class="col-12 col-sm-6 col-lg-3">
-        <label for="vol-filter-value" class="form-label small fw-semibold text-surface-muted mb-1 text-truncate d-block">
+        <label
+          for="vol-filter-value"
+          class="form-label small fw-semibold text-surface-muted mb-1 text-truncate d-block"
+        >
           Termo de Busca / Valor
         </label>
         <div class="input-group">
@@ -145,7 +151,10 @@
 
       <!-- Coluna 3: Dia da Semana -->
       <div class="col-6 col-sm-6 col-lg-2">
-        <label for="vol-filter-dia" class="form-label small fw-semibold text-surface-muted mb-1 text-truncate d-block">
+        <label
+          for="vol-filter-dia"
+          class="form-label small fw-semibold text-surface-muted mb-1 text-truncate d-block"
+        >
           Dia da Semana
         </label>
         <select
@@ -164,7 +173,10 @@
 
       <!-- Coluna 4: Turno -->
       <div class="col-6 col-sm-6 col-lg-2">
-        <label for="vol-filter-turno" class="form-label small fw-semibold text-surface-muted mb-1 text-truncate d-block">
+        <label
+          for="vol-filter-turno"
+          class="form-label small fw-semibold text-surface-muted mb-1 text-truncate d-block"
+        >
           Turno
         </label>
         <select
@@ -188,7 +200,9 @@
           type="button"
           (click)="clearFilters()"
           class="btn-clear flex-grow-1 flex-lg-grow-0"
-          [disabled]="voluntariosService.loading() || (!searchValue() && !selectedDia() && !selectedTurno())"
+          [disabled]="
+            voluntariosService.loading() || (!searchValue() && !selectedDia() && !selectedTurno())
+          "
         >
           <mat-icon>filter_alt_off</mat-icon>
           <span>Limpar</span>
@@ -230,9 +244,11 @@
         <h4 class="fw-semibold mb-1">Nenhum voluntário encontrado</h4>
         <p class="text-surface-muted small mb-4" style="max-width: 420px; margin: 0 auto">
           @if (searchValue() || selectedDia() || selectedTurno()) {
-            Nenhum voluntário corresponde aos critérios informados. Tente ajustar os parâmetros ou limpar os filtros.
+            Nenhum voluntário corresponde aos critérios informados. Tente ajustar os parâmetros ou
+            limpar os filtros.
           } @else {
-            Nenhum colaborador voluntário foi cadastrado na base ainda. Cadastre o primeiro para montar escalas.
+            Nenhum colaborador voluntário foi cadastrado na base ainda. Cadastre o primeiro para
+            montar escalas.
           }
         </p>
         <button
@@ -266,7 +282,9 @@
                 <!-- Nome e ID -->
                 <td class="ps-4">
                   <div class="d-flex align-items-center gap-3">
-                    <div class="vol-avatar rounded-circle d-flex align-items-center justify-content-center">
+                    <div
+                      class="vol-avatar rounded-circle d-flex align-items-center justify-content-center"
+                    >
                       <mat-icon>volunteer_activism</mat-icon>
                     </div>
                     <div>
@@ -318,7 +336,9 @@
                   @if (vol.dias_semana && vol.dias_semana.length > 0) {
                     <div class="d-flex flex-wrap gap-1" style="max-width: 240px">
                       @for (dia of vol.dias_semana; track dia) {
-                        <span class="badge bg-surface-subtle text-surface-main border border-surface small">
+                        <span
+                          class="badge bg-surface-subtle text-surface-main border border-surface small"
+                        >
                           {{ dia }}
                         </span>
                       }
@@ -394,7 +414,9 @@
             <!-- Cabeçalho do Card -->
             <div class="d-flex align-items-center justify-content-between mb-2">
               <div class="d-flex align-items-center gap-2">
-                <div class="vol-avatar rounded-circle d-flex align-items-center justify-content-center">
+                <div
+                  class="vol-avatar rounded-circle d-flex align-items-center justify-content-center"
+                >
                   <mat-icon>volunteer_activism</mat-icon>
                 </div>
                 <div>
@@ -462,7 +484,9 @@
               <div class="small fw-semibold text-surface-muted">Disponibilidade:</div>
               <div class="d-flex flex-wrap gap-1 mb-1">
                 @for (dia of vol.dias_semana; track dia) {
-                  <span class="badge bg-surface-subtle text-surface-main border border-surface small">
+                  <span
+                    class="badge bg-surface-subtle text-surface-main border border-surface small"
+                  >
                     {{ dia }}
                   </span>
                 }
@@ -492,7 +516,9 @@
             }
 
             <!-- Rodapé do Card -->
-            <div class="d-flex align-items-center justify-content-between pt-2 mt-2 border-top border-surface small text-surface-muted">
+            <div
+              class="d-flex align-items-center justify-content-between pt-2 mt-2 border-top border-surface small text-surface-muted"
+            >
               <span>Cadastrado em:</span>
               <span>{{ vol.created_at | date: 'dd/MM/yyyy' }}</span>
             </div>

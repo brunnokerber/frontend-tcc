@@ -147,7 +147,9 @@ export class VacinasService {
     try {
       let query = this.supabase.client
         .from('vacinas')
-        .select('*, pet:id_pet(id, nome, foto_url, tipo_pet, porte, status), veterinario:id_veterinario(*)');
+        .select(
+          '*, pet:id_pet(id, nome, foto_url, tipo_pet, porte, status), veterinario:id_veterinario(*)',
+        );
 
       if (filtro?.petId) {
         query = query.eq('id_pet', filtro.petId);
@@ -191,7 +193,7 @@ export class VacinasService {
     id: number,
     dataAplicacao?: string,
     idVeterinario?: number | null,
-    custo?: number | null
+    custo?: number | null,
   ): Promise<Vacina | null> {
     const updatePayload: VacinaUpdateDto = {
       data_aplicacao: dataAplicacao || getTodayIso(),
@@ -208,10 +210,7 @@ export class VacinasService {
   async deleteVacina(id: number): Promise<boolean> {
     this.loadingSignal.set(true);
     try {
-      const { error } = await this.supabase.client
-        .from('vacinas')
-        .delete()
-        .eq('id', id);
+      const { error } = await this.supabase.client.from('vacinas').delete().eq('id', id);
 
       if (error) {
         throw error;
@@ -234,4 +233,3 @@ export class VacinasService {
     this.vacinasSignal.set([]);
   }
 }
-

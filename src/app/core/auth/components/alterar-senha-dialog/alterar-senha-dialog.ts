@@ -14,10 +14,7 @@ import { ToastService } from '@core/services/toast.service';
 import { DialogLayoutComponent } from '@shared/components/dialog-layout/dialog-layout';
 import { PasswordRequirementsComponent } from '@shared/components/password-requirements/password-requirements';
 import { FormErrorPipe } from '@shared/pipes/form-error.pipe';
-import {
-  SENHA_FORTE_REGEX,
-  strongPasswordValidator,
-} from '@shared/validators/password.validators';
+import { SENHA_FORTE_REGEX, strongPasswordValidator } from '@shared/validators/password.validators';
 
 @Component({
   selector: 'app-alterar-senha-dialog',
@@ -68,17 +65,14 @@ export class AlterarSenhaDialogComponent {
       validators: (group) => {
         const pass = group.get('password')?.value;
         const confirm = group.get('confirmPassword')?.value;
-        return pass && confirm && pass !== confirm
-          ? { passwordMismatch: true }
-          : null;
+        return pass && confirm && pass !== confirm ? { passwordMismatch: true } : null;
       },
-    }
+    },
   );
 
-  readonly passwordValue = toSignal(
-    this.passwordForm.controls.password.valueChanges,
-    { initialValue: '' }
-  );
+  readonly passwordValue = toSignal(this.passwordForm.controls.password.valueChanges, {
+    initialValue: '',
+  });
 
   async onSubmit(): Promise<void> {
     if (this.passwordForm.invalid) {

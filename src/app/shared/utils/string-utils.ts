@@ -89,4 +89,3 @@ export function formatCep(val?: string | null): string {
   }
   return val;
 }
-

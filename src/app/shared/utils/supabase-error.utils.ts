@@ -13,7 +13,7 @@ export interface FunctionErrorResponse {
  */
 export async function parseFunctionError(
   error: any,
-  fallbackMessage = 'Erro ao processar solicitação no servidor.'
+  fallbackMessage = 'Erro ao processar solicitação no servidor.',
 ): Promise<FunctionErrorResponse> {
   if (!error) {
     return { message: fallbackMessage };
@@ -60,7 +60,7 @@ export async function parseFunctionError(
  */
 export async function extractFunctionErrorMessage(
   error: any,
-  fallbackMessage = 'Erro ao processar solicitação no servidor.'
+  fallbackMessage = 'Erro ao processar solicitação no servidor.',
 ): Promise<string> {
   const parsed = await parseFunctionError(error, fallbackMessage);
   return parsed.message;

@@ -4,7 +4,12 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDatepickerModule } from '@angular/material/datepicker';
-import { MAT_DIALOG_DATA, MatDialog, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
+import {
+  MAT_DIALOG_DATA,
+  MatDialog,
+  MatDialogModule,
+  MatDialogRef,
+} from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
@@ -42,7 +47,6 @@ export interface VacinaDialogData {
   pet?: VacinaPetInfo | Pet | null;
   defaultDataPrevista?: string;
 }
-
 
 @Component({
   selector: 'app-vacina-dialog',
@@ -97,7 +101,10 @@ export class VacinaDialogComponent implements OnInit {
   });
 
   public vacinaForm = this.fb.group({
-    id_pet: [this.data?.petId || this.data?.vacina?.id_pet || null as number | null, [Validators.required]],
+    id_pet: [
+      this.data?.petId || this.data?.vacina?.id_pet || (null as number | null),
+      [Validators.required],
+    ],
     nome_vacina: ['', [Validators.required, Validators.maxLength(100)]],
     data_prevista: [null as Date | string | null, [Validators.required]],
     data_aplicacao: [null as Date | string | null, [maxDateTodayValidator()]],
@@ -122,7 +129,7 @@ export class VacinaDialogComponent implements OnInit {
         .toLowerCase()
         .normalize('NFD')
         .replace(/[\u0300-\u036f]/g, '')
-        .includes(query)
+        .includes(query),
     );
   });
 
@@ -139,14 +146,17 @@ export class VacinaDialogComponent implements OnInit {
       this.vacinaForm.patchValue({
         id_pet: v.id_pet,
         nome_vacina: v.nome_vacina,
-        data_prevista: v.data_prevista ? (parseIsoToDate(v.data_prevista) || v.data_prevista) : '',
-        data_aplicacao: v.data_aplicacao ? (parseIsoToDate(v.data_aplicacao) || v.data_aplicacao) : null,
+        data_prevista: v.data_prevista ? parseIsoToDate(v.data_prevista) || v.data_prevista : '',
+        data_aplicacao: v.data_aplicacao
+          ? parseIsoToDate(v.data_aplicacao) || v.data_aplicacao
+          : null,
         custo: v.custo != null ? Number(v.custo) : null,
         id_veterinario: v.id_veterinario || null,
       });
     } else if (this.data?.defaultDataPrevista) {
       this.vacinaForm.patchValue({
-        data_prevista: parseIsoToDate(this.data.defaultDataPrevista) || this.data.defaultDataPrevista,
+        data_prevista:
+          parseIsoToDate(this.data.defaultDataPrevista) || this.data.defaultDataPrevista,
       });
     }
   }

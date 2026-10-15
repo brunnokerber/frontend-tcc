@@ -37,9 +37,17 @@ export interface LocalFilter {
 }
 
 export const SEARCH_FIELDS_OPTIONS = [
-  { label: 'Nome do Local / Estabelecimento', value: 'local', placeholder: 'Ex: Lar Esperança, Clínica Vet...' },
+  {
+    label: 'Nome do Local / Estabelecimento',
+    value: 'local',
+    placeholder: 'Ex: Lar Esperança, Clínica Vet...',
+  },
   { label: 'Tipo de Local', value: 'tipo_local', placeholder: 'Selecione o tipo de local...' },
-  { label: 'Pessoa de Contato / Responsável', value: 'contato', placeholder: 'Ex: Dra. Mariana, João Silva...' },
+  {
+    label: 'Pessoa de Contato / Responsável',
+    value: 'contato',
+    placeholder: 'Ex: Dra. Mariana, João Silva...',
+  },
   { label: 'Telefone / WhatsApp', value: 'telefone', placeholder: 'Ex: (51) 99999-9999' },
   { label: 'Cidade', value: 'cidade', placeholder: 'Ex: Novo Hamburgo, São Leopoldo...' },
   { label: 'Bairro', value: 'bairro', placeholder: 'Ex: Centro, Rio Branco...' },

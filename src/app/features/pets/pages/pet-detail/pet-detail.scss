@@ -151,7 +151,9 @@
 .pet-hero-avatar-btn {
   cursor: pointer;
   outline: none;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
 
   &:hover {
     transform: scale(1.04);
@@ -192,7 +194,9 @@
 .btn-adotar-destaque {
   background-color: var(--mat-sys-primary, #198754);
   color: var(--mat-sys-on-primary, #ffffff);
-  transition: transform 0.2s ease, filter 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    filter 0.2s ease;
 
   &:hover {
     transform: translateY(-1px);

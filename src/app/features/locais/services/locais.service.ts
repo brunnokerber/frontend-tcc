@@ -2,12 +2,7 @@ import { inject, Injectable, signal } from '@angular/core';
 import { SupabaseService } from '@core/services/supabase';
 import { ToastService } from '@core/services/toast.service';
 import { onlyDigits } from '@shared/utils/string-utils';
-import {
-  Local,
-  LocalCreateDto,
-  LocalFilter,
-  LocalUpdateDto,
-} from '../models/local.model';
+import { Local, LocalCreateDto, LocalFilter, LocalUpdateDto } from '../models/local.model';
 
 @Injectable({
   providedIn: 'root',
@@ -30,10 +25,7 @@ export class LocaisService {
     this.errorSignal.set(null);
 
     try {
-      let query = this.supabase.client
-        .from('locais')
-        .select('*')
-        .order('id', { ascending: false });
+      let query = this.supabase.client.from('locais').select('*').order('id', { ascending: false });
 
       if (filter && filter.searchField && filter.searchValue && filter.searchValue.trim()) {
         const field = filter.searchField;
@@ -148,7 +140,7 @@ export class LocaisService {
    * Consulta o CEP no serviço ViaCEP para autopreenchimento de endereço.
    */
   async fetchAddressByCep(
-    cep: string
+    cep: string,
   ): Promise<{ rua?: string; bairro?: string; cidade?: string; estado?: string } | null> {
     const cleanCep = onlyDigits(cep);
     if (cleanCep.length !== 8) {

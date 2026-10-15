@@ -2,7 +2,12 @@ import { CommonModule } from '@angular/common';
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
-import { MAT_DIALOG_DATA, MatDialog, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
+import {
+  MAT_DIALOG_DATA,
+  MatDialog,
+  MatDialogModule,
+  MatDialogRef,
+} from '@angular/material/dialog';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
@@ -80,16 +85,13 @@ export class AdotarPetDialogComponent implements OnInit {
         dateNotBeforeDateValidator(
           () => this.pet?.data_nascimento,
           'dataAntesNascimento',
-          'A data da adoção não pode ser anterior ao nascimento do animal'
+          'A data da adoção não pode ser anterior ao nascimento do animal',
         ),
       ],
     ],
     motivo_saida: ['Adoção Definitiva', [Validators.required, Validators.maxLength(100)]],
     valor_auxilio: [null as number | null, [Validators.min(0)]],
-    obs: [
-      'Termo de adoção responsável assinado pelo tutor.',
-      [Validators.maxLength(200)],
-    ],
+    obs: ['Termo de adoção responsável assinado pelo tutor.', [Validators.maxLength(200)]],
   });
 
   async ngOnInit(): Promise<void> {

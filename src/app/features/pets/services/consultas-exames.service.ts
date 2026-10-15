@@ -108,7 +108,7 @@ export class ConsultasExamesService {
 
   async updateConsultaExame(
     id: number,
-    dto: ConsultaExameUpdateDto
+    dto: ConsultaExameUpdateDto,
   ): Promise<ConsultaExame | null> {
     this.loadingSignal.set(true);
     try {

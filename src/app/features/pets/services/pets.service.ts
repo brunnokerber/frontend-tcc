@@ -158,12 +158,10 @@ export class PetsService {
     const fileName = `${petId || uniqueId}-${Date.now()}.${fileExt}`;
     const filePath = `avatars/${fileName}`;
 
-    const { error } = await this.supabase.client.storage
-      .from('pets')
-      .upload(filePath, file, {
-        upsert: true,
-        contentType: file.type,
-      });
+    const { error } = await this.supabase.client.storage.from('pets').upload(filePath, file, {
+      upsert: true,
+      contentType: file.type,
+    });
 
     if (error) {
       console.error('Erro ao subir imagem para o storage:', error);
@@ -181,7 +179,7 @@ export class PetsService {
    */
   async getSignedFotoUrl(
     caminhoFoto: string | null | undefined,
-    expiresIn = 3600
+    expiresIn = 3600,
   ): Promise<string | null> {
     if (!caminhoFoto || !caminhoFoto.trim()) {
       return null;
@@ -264,7 +262,7 @@ export class PetsService {
     id: number,
     dto: PetUpdateDto,
     entradaDto?: EntradaUpdateDto,
-    _entradaId?: number
+    _entradaId?: number,
   ): Promise<Pet | null> {
     this.loadingSignal.set(true);
     try {
@@ -320,7 +318,7 @@ export class PetsService {
 
       // Atualiza o estado reativo localmente
       this.petsSignal.update((list) =>
-        list.map((p) => (p.id === petId ? { ...p, status: 'Adotado' } : p))
+        list.map((p) => (p.id === petId ? { ...p, status: 'Adotado' } : p)),
       );
       if (this.cachedPetSignal()?.id === petId) {
         this.cachedPetSignal.update((p) => (p ? { ...p, status: 'Adotado' } : null));

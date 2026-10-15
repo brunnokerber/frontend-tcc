@@ -61,14 +61,16 @@ export class UsuarioDialogComponent {
       value: 'user',
       label: 'Operador',
       badge: 'Padrão',
-      description: 'Acesso para cadastrar e acompanhar pets, vacinas, procedimentos clínicos e locais parceiros.',
+      description:
+        'Acesso para cadastrar e acompanhar pets, vacinas, procedimentos clínicos e locais parceiros.',
       icon: 'person',
     },
     {
       value: 'admin',
       label: 'Administrador',
       badge: 'Acesso Total',
-      description: 'Acesso irrestrito a todos os módulos, com permissão para convidar novos usuários e gerenciar a plataforma.',
+      description:
+        'Acesso irrestrito a todos os módulos, com permissão para convidar novos usuários e gerenciar a plataforma.',
       icon: 'admin_panel_settings',
     },
   ];
@@ -97,7 +99,8 @@ export class UsuarioDialogComponent {
       this.toast.success(`Convite de acesso enviado com sucesso para "${email}"!`);
       this.dialogRef.close({ email, role });
     } catch (err: unknown) {
-      const errorMsg = err instanceof Error ? err.message : 'Erro ao enviar convite para o usuário.';
+      const errorMsg =
+        err instanceof Error ? err.message : 'Erro ao enviar convite para o usuário.';
       const isRegistered =
         errorMsg.toLowerCase().includes('já está cadastrado') ||
         errorMsg.toLowerCase().includes('already') ||
@@ -106,7 +109,9 @@ export class UsuarioDialogComponent {
       if (isRegistered) {
         this.userAlreadyExists.set(true);
         this.existingUserEmail.set(email);
-        this.toast.warning('Este e-mail já possui cadastro. Você pode enviar um link de redefinição se desejar.');
+        this.toast.warning(
+          'Este e-mail já possui cadastro. Você pode enviar um link de redefinição se desejar.',
+        );
       } else {
         this.toast.error(errorMsg);
       }
@@ -116,7 +121,8 @@ export class UsuarioDialogComponent {
   }
 
   async onSendPasswordReset(): Promise<void> {
-    const email = this.existingUserEmail() || this.inviteForm.get('email')?.value?.trim().toLowerCase();
+    const email =
+      this.existingUserEmail() || this.inviteForm.get('email')?.value?.trim().toLowerCase();
     const role = this.inviteForm.get('role')?.value || 'user';
 
     if (!email) return;
@@ -124,7 +130,9 @@ export class UsuarioDialogComponent {
     this.isSubmitting.set(true);
     try {
       await this.authService.sendResetPassword(email);
-      this.toast.success(`E-mail com link de redefinição de senha enviado com sucesso para "${email}"!`);
+      this.toast.success(
+        `E-mail com link de redefinição de senha enviado com sucesso para "${email}"!`,
+      );
       this.dialogRef.close({ email, role, action: 'reset_password' });
     } catch (err: unknown) {
       const errorMsg = err instanceof Error ? err.message : 'Erro ao enviar e-mail de redefinição.';

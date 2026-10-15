@@ -8,7 +8,7 @@ import { environment } from '@env/environment';
   selector: 'app-root',
   imports: [RouterOutlet],
   templateUrl: './app.html',
-  styleUrl: './app.scss'
+  styleUrl: './app.scss',
 })
 export class App implements OnInit {
   private titleService = inject(Title);

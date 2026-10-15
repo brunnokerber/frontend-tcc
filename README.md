@@ -165,13 +165,29 @@ npm run start-remote
 | `npm run start-remote` | Inicia o servidor local apontando para as configurações de produção. |
 | `npm run build` | Compila os artefatos de produção otimizados na pasta `dist/`. |
 | `npm run test` | Executa a suíte de testes unitários com Karma e Jasmine. |
+| `npm run format` | Executa a formatação e padronização automática de código com Prettier em todos os arquivos (`.ts`, `.html`, `.scss`, `.json`). |
+| `npm run format:check` | Valida se todos os arquivos do projeto seguem o padrão do Prettier sem alterá-los. |
+
+### 🎨 Padronização de Código (Prettier)
+
+O projeto utiliza o **Prettier** para assegurar consistência sintática e visual em todo o código-fonte:
+* **Configuração Centralizada:** Gerenciada no arquivo [`.prettierrc`](./.prettierrc), definindo largura máxima de 100 caracteres, aspas simples (`singleQuote`), ponto-e-vírgula obrigatório (`semi`), indentação de 2 espaços (`tabWidth`), fim de linha compatível com Windows/Linux (`endOfLine: 'auto'`) e parser específico do Angular para templates HTML.
+* **Arquivos Ignorados:** Especificados em [`.prettierignore`](./.prettierignore) para isolar artefatos de build (`dist/`), dependências (`node_modules/`) e binários.
+* **Execução:**
+  ```bash
+  # Formatar e reescrever arquivos automaticamente
+  npm run format
+
+  # Apenas checar se há arquivos fora do padrão
+  npm run format:check
+  ```
 
 ---
 
 ## 🧩 Módulos e Principais Funcionalidades
 
 ### 1. Módulo de Pets (`/pets`)
-* **Listagem com Filtros Dinâmicos:** Pesquisa por nome, espécie (Cachorro, Gato, Outro), sexo, status, senioridade e porte.
+* **Listagem com Filtros Dinâmicos e Cards Responsivos:** Pesquisa por nome, espécie (Cachorro, Gato, Outro), sexo, status, senioridade e porte, com tabela desktop e cards móveis adaptáveis dotados de botão primário e menu contextual de ações.
 * **Formulário de Cadastro/Edição:** Registro com cálculo de senioridade em tempo real a partir da data de nascimento.
 * **Prontuário Individual:** Painel consolidado contendo histórico de vacinação, histórico clínico/cirúrgico, histórico de estadias e somatório financeiro total investido no animal.
 

@@ -33,11 +33,7 @@ import {
   getTipoFaIcon,
   Pet,
 } from '../../models/pet.model';
-import {
-  PetLocal,
-  PetLocalCreateDto,
-  PetLocalUpdateDto,
-} from '../../models/pet-local.model';
+import { PetLocal, PetLocalCreateDto, PetLocalUpdateDto } from '../../models/pet-local.model';
 import { PetsLocaisService } from '../../services/pets-locais.service';
 import { PetsService } from '../../services/pets.service';
 
@@ -130,7 +126,7 @@ export default class PetLocalFormComponent implements OnInit {
           dateNotBeforeDateValidator(
             () => this.pet()?.data_nascimento,
             'dataAntesNascimento',
-            'A data de início/saída não pode ser anterior ao nascimento do pet'
+            'A data de início/saída não pode ser anterior ao nascimento do pet',
           ),
         ],
       ],
@@ -141,7 +137,7 @@ export default class PetLocalFormComponent implements OnInit {
           dateNotBeforeDateValidator(
             () => this.pet()?.data_nascimento,
             'dataAntesNascimento',
-            'A data de término/reentrada não pode ser anterior ao nascimento do pet'
+            'A data de término/reentrada não pode ser anterior ao nascimento do pet',
           ),
         ],
       ],
@@ -155,12 +151,11 @@ export default class PetLocalFormComponent implements OnInit {
           'data_saida',
           'data_reentrada',
           'dataReentradaAntesSaida',
-          'A data de retorno não pode ser anterior à data de início'
+          'A data de retorno não pode ser anterior à data de início',
         ),
       ],
-    }
+    },
   );
-
 
   // Helpers de visualização do Pet
   public getTipoBadgeClass = getTipoBadgeClass;
@@ -328,10 +323,7 @@ export default class PetLocalFormComponent implements OnInit {
           obs: sanitize(formValues.obs) || null,
         };
 
-        const updated = await this.petsLocaisService.updatePetLocal(
-          this.petLocalId()!,
-          updateDto
-        );
+        const updated = await this.petsLocaisService.updatePetLocal(this.petLocalId()!, updateDto);
         if (updated) {
           this.goBack();
         }

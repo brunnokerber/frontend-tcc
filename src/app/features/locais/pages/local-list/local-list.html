@@ -97,7 +97,10 @@
     <div class="row g-3 align-items-end">
       <!-- Campo a Filtrar -->
       <div class="col-12 col-md-4 col-lg-3">
-        <label for="local-filter-field" class="form-label small fw-semibold text-surface-muted mb-1">
+        <label
+          for="local-filter-field"
+          class="form-label small fw-semibold text-surface-muted mb-1"
+        >
           Filtrar por Coluna
         </label>
         <select
@@ -115,7 +118,10 @@
 
       <!-- Termo ou Seleção de Valor -->
       <div class="col-12 col-md-5 col-lg-6">
-        <label for="local-filter-value" class="form-label small fw-semibold text-surface-muted mb-1">
+        <label
+          for="local-filter-value"
+          class="form-label small fw-semibold text-surface-muted mb-1"
+        >
           Termo de Busca / Valor
         </label>
 
@@ -160,7 +166,6 @@
         }
       </div>
 
-
       <!-- Botões de Ação de Filtro -->
       <div class="col-12 col-md-3 col-lg-3 d-flex justify-content-end gap-2">
         <button
@@ -190,11 +195,9 @@
             </span>
           }
         </button>
-
       </div>
     </div>
   </form>
-
 
   <!-- FEEDBACK DE CARREGAMENTO -->
   @if (locaisService.loading()) {
@@ -212,12 +215,7 @@
       <p class="text-surface-muted small mb-4" style="max-width: 440px; margin: 0 auto">
         Não encontramos nenhum estabelecimento ou lar cadastrado com os critérios pesquisados.
       </p>
-      <button
-        mat-flat-button
-        color="primary"
-        (click)="openLocalDialog()"
-        class="rounded-pill px-4"
-      >
+      <button mat-flat-button color="primary" (click)="openLocalDialog()" class="rounded-pill px-4">
         <mat-icon>add_location_alt</mat-icon>
         <span>Cadastrar Novo Local</span>
       </button>
@@ -247,7 +245,9 @@
                   </div>
                   <div>
                     <div class="fw-bold">{{ loc.local }}</div>
-                    <span class="text-surface-muted" style="font-size: 0.75rem">ID: #{{ loc.id }}</span>
+                    <span class="text-surface-muted" style="font-size: 0.75rem"
+                      >ID: #{{ loc.id }}</span
+                    >
                   </div>
                 </div>
               </td>
@@ -299,7 +299,8 @@
                       <span class="text-surface-muted"> ({{ loc.complemento }})</span>
                     }
                     <div class="text-surface-muted" style="font-size: 0.75rem">
-                      {{ loc.bairro }} &bull; {{ loc.cidade }}/{{ loc.estado }} &bull; CEP: {{ formatCep(loc.cep) }}
+                      {{ loc.bairro }} &bull; {{ loc.cidade }}/{{ loc.estado }} &bull; CEP:
+                      {{ formatCep(loc.cep) }}
                     </div>
                   </div>
                   <button
@@ -348,7 +349,10 @@
                   </div>
                   <div>
                     <h5 class="fw-bold mb-0 fs-6">{{ loc.local }}</h5>
-                    <span class="badge bg-surface-subtle text-surface-main border border-surface mt-1" style="font-size: 0.7rem">
+                    <span
+                      class="badge bg-surface-subtle text-surface-main border border-surface mt-1"
+                      style="font-size: 0.7rem"
+                    >
                       {{ loc.tipo_local }}
                     </span>
                   </div>
@@ -367,12 +371,16 @@
               <!-- Detalhes de Endereço & Contato -->
               <div class="local-card-details rounded-2 p-2 my-2 small">
                 <div class="mb-1">
-                  <span class="text-surface-muted d-block" style="font-size: 0.72rem">Responsável:</span>
+                  <span class="text-surface-muted d-block" style="font-size: 0.72rem"
+                    >Responsável:</span
+                  >
                   <strong>{{ loc.contato }}</strong>
                 </div>
 
                 <div class="mb-1">
-                  <span class="text-surface-muted d-block" style="font-size: 0.72rem">Telefone:</span>
+                  <span class="text-surface-muted d-block" style="font-size: 0.72rem"
+                    >Telefone:</span
+                  >
                   <div class="d-flex align-items-center gap-1">
                     <a
                       [href]="getWhatsAppLink(loc.telefone)"
@@ -398,9 +406,13 @@
                 </div>
 
                 <div>
-                  <span class="text-surface-muted d-block" style="font-size: 0.72rem">Endereço:</span>
+                  <span class="text-surface-muted d-block" style="font-size: 0.72rem"
+                    >Endereço:</span
+                  >
                   <span>{{ loc.rua }}, {{ loc.numero }} - {{ loc.bairro }}</span>
-                  <div class="text-surface-muted">{{ loc.cidade }}/{{ loc.estado }} &bull; {{ formatCep(loc.cep) }}</div>
+                  <div class="text-surface-muted">
+                    {{ loc.cidade }}/{{ loc.estado }} &bull; {{ formatCep(loc.cep) }}
+                  </div>
                 </div>
               </div>
             </div>

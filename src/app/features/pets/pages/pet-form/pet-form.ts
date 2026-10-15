@@ -122,16 +122,16 @@ export default class PetFormComponent implements OnInit {
           'data_nascimento',
           'data_castracao',
           'dataCastracaoAntesNascimento',
-          'A castração não pode ser anterior ao nascimento do pet'
+          'A castração não pode ser anterior ao nascimento do pet',
         ),
         dateSequenceValidator(
           'data_nascimento',
           'data_entrada',
           'dataEntradaAntesNascimento',
-          'A entrada não pode ser anterior ao nascimento do pet'
+          'A entrada não pode ser anterior ao nascimento do pet',
         ),
       ],
-    }
+    },
   );
 
   ngOnInit() {
@@ -253,18 +253,17 @@ export default class PetFormComponent implements OnInit {
       ImageCropperDialogData,
       ImageCropperResult | null
     >(ImageCropperDialogComponent, {
-        data: {
-          imageFile: isFile ? source : undefined,
-          imageUrl: !isFile ? source : undefined,
-          title: 'Enquadrar Foto do Pet',
-          outputSize: 600,
-          maxFileSizeKB: 256,
-        },
-        width: '100%',
-        maxWidth: '480px',
-        disableClose: true,
-      }
-    );
+      data: {
+        imageFile: isFile ? source : undefined,
+        imageUrl: !isFile ? source : undefined,
+        title: 'Enquadrar Foto do Pet',
+        outputSize: 600,
+        maxFileSizeKB: 256,
+      },
+      width: '100%',
+      maxWidth: '480px',
+      disableClose: true,
+    });
 
     dialogRef.afterClosed().subscribe((result) => {
       if (result) {
@@ -276,7 +275,6 @@ export default class PetFormComponent implements OnInit {
       }
     });
   }
-
 
   removePhoto(fileInput?: HTMLInputElement): void {
     this.selectedPhotoFile.set(null);
@@ -318,7 +316,7 @@ export default class PetFormComponent implements OnInit {
       if (this.selectedPhotoFile()) {
         fotoUrlPayload = await this.petsService.uploadPetFoto(
           this.selectedPhotoFile()!,
-          this.petId() || undefined
+          this.petId() || undefined,
         );
         // Remove a foto antiga do bucket para preservar a cota de storage
         const oldFoto = this.existingPhotoPath();
@@ -363,8 +361,7 @@ export default class PetFormComponent implements OnInit {
         if (this.isAdmin()) {
           entradaUpdateDto = {
             local_origem: formValues.local_origem?.trim() || 'Não informado',
-            data_entrada:
-              dateToIsoString(formValues.data_entrada) || getTodayIso(),
+            data_entrada: dateToIsoString(formValues.data_entrada) || getTodayIso(),
             resgatante: formValues.resgatante?.trim() || 'Não informado',
             observacoes: sanitize(formValues.observacoes),
           };
@@ -374,7 +371,7 @@ export default class PetFormComponent implements OnInit {
           this.petId()!,
           updateDto,
           entradaUpdateDto,
-          firstEntrada?.id
+          firstEntrada?.id,
         );
 
         if (updated) {
@@ -399,8 +396,7 @@ export default class PetFormComponent implements OnInit {
           link_documentos: sanitize(formValues.link_documentos),
           foto_url: fotoUrlPayload,
           local_origem: formValues.local_origem?.trim() || 'Não informado',
-          data_entrada:
-            dateToIsoString(formValues.data_entrada) || getTodayIso(),
+          data_entrada: dateToIsoString(formValues.data_entrada) || getTodayIso(),
           resgatante: formValues.resgatante?.trim() || 'Não informado',
           observacoes: sanitize(formValues.observacoes),
         };

@@ -124,7 +124,7 @@ export class ImageCropperDialogComponent implements OnInit, AfterViewInit, OnDes
     img.onerror = () => {
       this.isLoading.set(false);
       this.errorMessage.set(
-        'Falha ao carregar a imagem selecionada. Verifique se o formato é válido ou selecione outro arquivo.'
+        'Falha ao carregar a imagem selecionada. Verifique se o formato é válido ou selecione outro arquivo.',
       );
       this.cdr.detectChanges();
     };
@@ -197,7 +197,7 @@ export class ImageCropperDialogComponent implements OnInit, AfterViewInit, OnDes
       -this.imageWidth / 2,
       -this.imageHeight / 2,
       this.imageWidth,
-      this.imageHeight
+      this.imageHeight,
     );
 
     ctx.restore();
@@ -336,7 +336,7 @@ export class ImageCropperDialogComponent implements OnInit, AfterViewInit, OnDes
       outCtx.save();
       outCtx.translate(
         this.outputSize / 2 + this.offsetX * ratio,
-        this.outputSize / 2 + this.offsetY * ratio
+        this.outputSize / 2 + this.offsetY * ratio,
       );
       outCtx.rotate((this.rotation() * Math.PI) / 180);
       outCtx.scale(currentScale * ratio, currentScale * ratio);
@@ -345,7 +345,7 @@ export class ImageCropperDialogComponent implements OnInit, AfterViewInit, OnDes
         -this.imageWidth / 2,
         -this.imageHeight / 2,
         this.imageWidth,
-        this.imageHeight
+        this.imageHeight,
       );
       outCtx.restore();
 
@@ -393,7 +393,7 @@ export class ImageCropperDialogComponent implements OnInit, AfterViewInit, OnDes
   private canvasToBlobAsync(
     canvas: HTMLCanvasElement,
     format: string,
-    quality: number
+    quality: number,
   ): Promise<Blob> {
     return new Promise((resolve, reject) => {
       canvas.toBlob(
@@ -411,12 +411,12 @@ export class ImageCropperDialogComponent implements OnInit, AfterViewInit, OnDes
                 }
               },
               'image/jpeg',
-              quality
+              quality,
             );
           }
         },
         format,
-        quality
+        quality,
       );
     });
   }

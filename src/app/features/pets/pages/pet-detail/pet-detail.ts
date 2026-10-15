@@ -54,7 +54,6 @@ import { VacinasService } from '../../services/vacinas.service';
   templateUrl: './pet-detail.html',
   styleUrls: ['./pet-detail.scss'],
 })
-
 export default class PetDetailComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
@@ -166,19 +165,19 @@ export default class PetDetailComponent implements OnInit {
 
   // Métricas financeiras e de saúde
   public totalCustoVacinas = computed(() =>
-    this.vacinas().reduce((acc, v) => acc + (Number(v.custo) || 0), 0)
+    this.vacinas().reduce((acc, v) => acc + (Number(v.custo) || 0), 0),
   );
 
   public totalCustoConsultas = computed(() =>
-    this.consultasExames().reduce((acc, c) => acc + (Number(c.custo) || 0), 0)
+    this.consultasExames().reduce((acc, c) => acc + (Number(c.custo) || 0), 0),
   );
 
   public totalCustoAuxilio = computed(() =>
-    this.petsLocais().reduce((acc, l) => acc + (Number(l.valor_auxilio) || 0), 0)
+    this.petsLocais().reduce((acc, l) => acc + (Number(l.valor_auxilio) || 0), 0),
   );
 
   public totalInvestidoGeral = computed(
-    () => this.totalCustoVacinas() + this.totalCustoConsultas() + this.totalCustoAuxilio()
+    () => this.totalCustoVacinas() + this.totalCustoConsultas() + this.totalCustoAuxilio(),
   );
 
   public diasNoAbrigo = computed(() => {
@@ -289,7 +288,6 @@ export default class PetDetailComponent implements OnInit {
       });
     }
   }
-
 
   openAddProcedimento() {
     const p = this.pet();
