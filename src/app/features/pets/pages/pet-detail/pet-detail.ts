@@ -10,11 +10,12 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { NavigationService } from '@core/services/navigation.service';
 import { ToastService } from '@core/services/toast.service';
 import { ImagePreviewDialogComponent } from '@shared/components/image-preview-dialog/image-preview-dialog';
 import { AdotarPetDialogComponent } from '../../components/adotar-pet-dialog/adotar-pet-dialog';
+import { VacinaDialogComponent } from '../../components/vacina-dialog/vacina-dialog';
 import {
   ConsultaExame,
   getSexoIcon,
@@ -36,6 +37,7 @@ import { VacinasService } from '../../services/vacinas.service';
   standalone: true,
   imports: [
     CommonModule,
+    RouterModule,
     DatePipe,
     CurrencyPipe,
     MatCardModule,
@@ -52,6 +54,7 @@ import { VacinasService } from '../../services/vacinas.service';
   templateUrl: './pet-detail.html',
   styleUrls: ['./pet-detail.scss'],
 })
+
 export default class PetDetailComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
@@ -247,18 +250,46 @@ export default class PetDetailComponent implements OnInit {
   openAddVacina() {
     const p = this.pet();
     if (p) {
-      this.router.navigate(['/pets', p.id, 'vacinas', 'nova'], { state: { pet: p } });
+      const dialogRef = this.dialog.open(VacinaDialogComponent, {
+        width: '640px',
+        maxWidth: '95vw',
+        disableClose: true,
+        data: {
+          petId: p.id,
+          pet: p,
+        },
+      });
+
+      dialogRef.afterClosed().subscribe((res) => {
+        if (res && (res.action === 'saved' || res.action === 'deleted')) {
+          this.vacinasService.getVacinasByPetId(p.id, true);
+        }
+      });
     }
   }
 
   openEditVacina(vacina: Vacina) {
     const p = this.pet();
     if (p && vacina.id) {
-      this.router.navigate(['/pets', p.id, 'vacinas', vacina.id, 'editar'], {
-        state: { pet: p, vacina },
+      const dialogRef = this.dialog.open(VacinaDialogComponent, {
+        width: '640px',
+        maxWidth: '95vw',
+        disableClose: true,
+        data: {
+          petId: p.id,
+          pet: p,
+          vacina,
+        },
+      });
+
+      dialogRef.afterClosed().subscribe((res) => {
+        if (res && (res.action === 'saved' || res.action === 'deleted')) {
+          this.vacinasService.getVacinasByPetId(p.id, true);
+        }
       });
     }
   }
+
 
   openAddProcedimento() {
     const p = this.pet();

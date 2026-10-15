@@ -219,7 +219,7 @@
           </a>
 
           <!-- Navegação Desktop -->
-          <nav class="d-none d-md-flex align-items-center gap-1 nav-links-desktop">
+          <nav class="d-none d-xl-flex align-items-center gap-1 nav-links-desktop">
             <a
               routerLink="/pets"
               routerLinkActive="active"
@@ -227,6 +227,14 @@
             >
               <mat-icon class="fs-5">pets</mat-icon>
               <span>Pets</span>
+            </a>
+            <a
+              routerLink="/calendario-vacinal"
+              routerLinkActive="active"
+              class="nav-btn d-flex align-items-center gap-2 text-decoration-none px-3 py-2 rounded-3"
+            >
+              <mat-icon class="fs-5">calendar_month</mat-icon>
+              <span>Calendário</span>
             </a>
             <a
               routerLink="/veterinarios"
@@ -282,10 +290,10 @@
               <mat-icon class="text-surface-muted d-none d-sm-inline fs-6">expand_more</mat-icon>
             </button>
 
-            <!-- Botão Hamburger Mobile -->
+            <!-- Botão Hamburger Mobile / Tablet -->
             <button
               mat-icon-button
-              class="d-md-none ms-1"
+              class="d-xl-none ms-1"
               (click)="toggleMobileMenu()"
               aria-label="Abrir menu de navegação"
             >
@@ -295,9 +303,9 @@
         </div>
       </div>
 
-      <!-- Menu Mobile Dropdown / Collapse -->
+      <!-- Menu Mobile / Tablet Dropdown -->
       @if (mobileMenuOpen()) {
-        <div class="mobile-menu d-md-none border-top px-3 py-3 animate-fade-in">
+        <div class="mobile-menu d-xl-none border-top px-3 py-3 animate-fade-in">
           <div class="d-flex flex-column gap-2 mb-3">
             <a
               routerLink="/pets"
@@ -307,6 +315,15 @@
             >
               <mat-icon>pets</mat-icon>
               <span class="fw-medium">Lista de Pets</span>
+            </a>
+            <a
+              routerLink="/calendario-vacinal"
+              routerLinkActive="active"
+              class="mobile-nav-link d-flex align-items-center gap-3 p-2 rounded-3 text-decoration-none"
+              (click)="closeMobileMenu()"
+            >
+              <mat-icon>calendar_month</mat-icon>
+              <span class="fw-medium">Calendário Vacinal</span>
             </a>
             <a
               routerLink="/veterinarios"

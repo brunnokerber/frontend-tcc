@@ -1,0 +1,20 @@
+.pet-summary-card {
+  transition: border-color 0.2s ease;
+}
+
+.pet-avatar {
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  font-size: 1.25rem;
+}
+
+// Botão de cadastro rápido de veterinário
+.btn-new-vet {
+  height: 56px;
+  padding: 0 1rem;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}

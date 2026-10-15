@@ -39,3 +39,29 @@ export const VACINAS_SUGESTOES = [
 ] as const;
 
 export type SortOrderMode = 'cronologico' | 'valor';
+
+export interface VacinaPetInfo {
+  id: number;
+  nome: string;
+  foto_url?: string | null;
+  tipo_pet: string;
+  porte?: string | null;
+  sexo?: string | null;
+  status?: string | null;
+}
+
+
+export interface VacinaCalendarioItem extends Vacina {
+  pet?: VacinaPetInfo | null;
+}
+
+export type VacinaStatusFiltro = 'todas' | 'previstas' | 'aplicadas';
+
+export interface VacinaCalendarioFiltro {
+  startDate?: string;
+  endDate?: string;
+  petId?: number | null;
+  status?: VacinaStatusFiltro;
+  search?: string;
+}
+

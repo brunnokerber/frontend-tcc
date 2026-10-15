@@ -19,19 +19,40 @@ export function dateToIsoString(val: unknown): string | null {
     return `${year}-${month}-${day}`;
   }
   if (typeof val === 'string' && val.trim()) {
-    return val.split('T')[0];
+    const trimmed = val.trim();
+    if (trimmed.includes('/')) {
+      const parts = trimmed.split('/');
+      if (parts.length === 3) {
+        const day = parts[0].padStart(2, '0');
+        const month = parts[1].padStart(2, '0');
+        const year = parts[2];
+        return `${year}-${month}-${day}`;
+      }
+    }
+    return trimmed.split('T')[0];
   }
   return null;
 }
 
 /**
- * Converte uma string ISO 'yyyy-MM-dd' em um objeto Date do JavaScript ou null.
+ * Retorna a data de hoje no formato ISO 'yyyy-MM-dd' respeitando o fuso horário local.
+ */
+export function getTodayIso(): string {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, '0');
+  const day = String(now.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
+/**
+ * Converte uma string ISO 'yyyy-MM-dd' em um objeto Date do JavaScript ou null no fuso local.
  */
 export function parseIsoToDate(dateStr?: string | null): Date | null {
   if (!dateStr) return null;
-  const [year, month, day] = dateStr.split('-').map(Number);
-  if (!year || !month || !day) return null;
-  return new Date(year, month - 1, day);
+  const parts = dateStr.split('T')[0].split('-').map(Number);
+  if (parts.length !== 3 || !parts[0] || !parts[1] || !parts[2]) return null;
+  return new Date(parts[0], parts[1] - 1, parts[2]);
 }
 
 /**

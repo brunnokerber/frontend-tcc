@@ -213,6 +213,11 @@ O processo metodológico de Engenharia de Requisitos adotado no presente TCC bas
   * **Prioridade:** Must Have (Essencial)
   * **Regras Associadas:** RN08, RN15, RN16, RN21
 
+* **[RF30] Calendário Vacinal Interativo e Gestão de Protocolos de Imunização**
+  * **Descrição:** O sistema deve disponibilizar um módulo interativo de Calendário Vacinal (`/calendario-vacinal`) construído com arquitetura nativa em Angular Signals, permitindo a visualização consolidada de todas as doses vacinais previstas para os animais sob tutela da ONG. O calendário adota navegação focada exclusivamente no Mês selecionado (controles de mês anterior, mês atual e próximo mês, evitando sobrecarga cognitiva de múltiplos seletores de período e filtros redundantes), provendo visualizações em Grade Mensal (com células destacadas para hoje, doses do dia e badges coloridas) e Lista/Agenda cronológica do mês, além de suporte a filtro contextual por animal específico via query param (`?petId=X`). Ao clicar em qualquer vacina da grade ou da lista, o sistema abre a modal padronizada `VacinaDialogComponent`, possibilitando a rápida confirmação de aplicação da dose (ação "Aplicar Hoje" com atribuição imediata de data), alteração de data prevista/custo ou exclusão. Uma vez registrada a aplicação, o item adquire instantaneamente uma badge verde de "Aplicada". O calendário também é acessível de forma contextual diretamente a partir da aba de vacinas do prontuário do animal (`pet-detail`).
+  * **Prioridade:** Must Have (Essencial)
+  * **Regras Associadas:** RN11, RN12, RN14, RN22
+
 ---
 
 ## 4. Regras de Negócio (RN)
@@ -312,6 +317,11 @@ O processo metodológico de Engenharia de Requisitos adotado no presente TCC bas
   - **Atomicidade Transacional:** A transição de status do animal para `'Adotado'` e a inserção do registro de saída na tabela `pets_locais` ocorrem dentro de uma única transação atômica ACID no banco de dados, garantindo que não existam animais adotados sem vínculo com o adotante/local de destino ou passagens de adoção sem a devida atualização do status do pet.
   - **Cadastro Inline de Novo Adotante:** A interface de adoção permite pesquisar adotantes existentes ou invocar o modal de cadastro de novo local/tutor em tempo de execução sem perda dos dados preenchidos no formulário de adoção.
 
+* **[RN22] Regra de Controle de Status e Aplicação Efetiva de Vacinas:**  
+  - **Diferenciação Visual e Operacional:** Toda vacina cadastrada possui `data_prevista` mandatória. Vacinas cuja `data_aplicacao` seja nula constam como **Previstas / Pendentes** (se `data_prevista < data_atual`, são computadas e sinalizadas como **Atrasadas** em destaque de alerta). Quando o campo `data_aplicacao` é preenchido, a vacina adquire o status **Aplicada**, sendo visualmente identificada por uma badge verde e ícone de verificação.
+  - **Ação Rápida de Aplicação:** A interface do calendário e do prontuário deve disponibilizar mecanismo de aplicação rápida ("Aplicar Hoje"), atribuindo automaticamente a data corrente à `data_aplicacao` e persistindo a alteração no banco de dados.
+  - **Atualização Reativa de Calendário:** A confirmação ou desmarcação de aplicação de uma vacina via `VacinaDialogComponent` ou ação rápida deve refletir instantaneamente nas métricas (KPIs de previstas, aplicadas e atrasadas) e nos chips visuais do calendário sem recarga de página.
+
 ---
 
 ## 5. Requisitos Não-Funcionais (RNF)
@@ -347,7 +357,7 @@ O processo metodológico de Engenharia de Requisitos adotado no presente TCC bas
 | **RF10** | Edição de pet, reajuste de enquadramento e foto | RN07, RN17, RN20 | RNF01, RNF08 | `pets`, `Storage ('pets')` | `PetFormComponent`, `ImageCropperDialogComponent`, `PetsService` |
 | **RF11** | Listagem e filtros de pets | RN07, RN08 | RNF01, RNF03, RNF04 | `pets`, `entradas` | `PetListComponent`, `PetsService` |
 | **RF12** | Prontuário consolidado e visualização/expansão de foto | RN11, RN15, RN20 | RNF01, RNF04 | `pets`, `vacinas`, `consultas_exames`, `pets_locais`, `Storage ('pets')` | `PetDetailComponent`, `ImagePreviewDialogComponent`, `PetsService` |
-| **RF13** | Cadastro/Gestão de vacinas | RN11, RN12, RN14 | RNF01, RNF04 | `vacinas` | `VacinaFormComponent`, `VacinasService` |
+| **RF13** | Cadastro/Gestão de vacinas | RN11, RN12, RN14 | RNF01, RNF04 | `vacinas` | `VacinaDialogComponent`, `VacinasService` |
 | **RF14** | Procedimentos clínicos e exames | RN11, RN13, RN14 | RNF01, RNF04 | `consultas_exames` | `ProcedimentoFormComponent`, `ConsultasExamesService` |
 | **RF15** | Ordenação de prontuário | RN11 | RNF04 | `vacinas`, `consultas_exames` | `PetDetailComponent (Signals)` |
 | **RF16** | Edição/Exclusão clínica | RN17 | RNF08 | `vacinas`, `consultas_exames` | `PetDetailComponent`, `ConfirmationDialog` |
@@ -364,6 +374,7 @@ O processo metodológico de Engenharia de Requisitos adotado no presente TCC bas
 | **RF27** | Edição e exclusão de voluntários | RN17, RN19 | RNF01, RNF08 | `voluntarios` | `VoluntarioDialogComponent`, `VoluntarioListComponent` |
 | **RF28** | Relatórios gerenciais de pets (Excel/PDF) | RN07, RN08 | RNF01, RNF04, RNF10 | `pets`, `entradas` | `PetReportService`, `PetListComponent` |
 | **RF29** | Fluxo de Adoção Definitiva e Transferência Atômica | RN08, RN15, RN16, RN21 | RNF01, RNF04, RNF06, RNF08 | `pets`, `pets_locais`, `RPC ('adotar_pet')` | `AdotarPetDialogComponent`, `PetDetailComponent`, `PetListComponent`, `PetsService` |
+| **RF30** | Calendário Vacinal e Gestão de Imunizações | RN11, RN12, RN14, RN22 | RNF01, RNF03, RNF04, RNF08 | `vacinas`, `pets`, `veterinarios` | `CalendarioVacinalComponent`, `VacinaDialogComponent`, `PetDetailComponent`, `VacinasService` |
 
 ---
 

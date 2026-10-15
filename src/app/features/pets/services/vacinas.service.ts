@@ -1,7 +1,14 @@
 import { inject, Injectable, signal } from '@angular/core';
 import { SupabaseService } from '@core/services/supabase';
 import { ToastService } from '@core/services/toast.service';
-import { Vacina, VacinaCreateDto, VacinaUpdateDto } from '../models/vacina.model';
+import {
+  Vacina,
+  VacinaCalendarioFiltro,
+  VacinaCalendarioItem,
+  VacinaCreateDto,
+  VacinaUpdateDto,
+} from '../models/vacina.model';
+import { getTodayIso } from '@shared/utils/string-utils';
 
 @Injectable({
   providedIn: 'root',
@@ -123,10 +130,100 @@ export class VacinasService {
       this.toast.success(`Vacina "${updated.nome_vacina}" atualizada com sucesso!`);
       this.vacinasSignal.update((list) => list.map((v) => (v.id === id ? updated : v)));
       return updated;
-    } catch (err: any) {
-      const msg = err.message || 'Erro ao atualizar a vacina.';
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Erro ao atualizar a vacina.';
       this.toast.error(msg);
       throw err;
+    } finally {
+      this.loadingSignal.set(false);
+    }
+  }
+
+  /**
+   * Consulta vacinas para o Calendário Vacinal com dados do pet e veterinário.
+   */
+  async getVacinasCalendario(filtro?: VacinaCalendarioFiltro): Promise<VacinaCalendarioItem[]> {
+    this.loadingSignal.set(true);
+    try {
+      let query = this.supabase.client
+        .from('vacinas')
+        .select('*, pet:id_pet(id, nome, foto_url, tipo_pet, porte, status), veterinario:id_veterinario(*)');
+
+      if (filtro?.petId) {
+        query = query.eq('id_pet', filtro.petId);
+      }
+
+      if (filtro?.startDate) {
+        query = query.gte('data_prevista', filtro.startDate);
+      }
+
+      if (filtro?.endDate) {
+        query = query.lte('data_prevista', filtro.endDate);
+      }
+
+      if (filtro?.status === 'previstas') {
+        query = query.is('data_aplicacao', null);
+      } else if (filtro?.status === 'aplicadas') {
+        query = query.not('data_aplicacao', 'is', null);
+      }
+
+      query = query.order('data_prevista', { ascending: true });
+
+      const { data, error } = await query;
+      if (error) {
+        console.warn('Erro ao carregar calendário de vacinas:', error.message);
+        return [];
+      }
+
+      return (data as VacinaCalendarioItem[]) || [];
+    } catch (err: unknown) {
+      console.warn('Erro ao carregar calendário de vacinas:', err);
+      return [];
+    } finally {
+      this.loadingSignal.set(false);
+    }
+  }
+
+  /**
+   * Registro rápido de aplicação de vacina prevista
+   */
+  async aplicarVacinaRapida(
+    id: number,
+    dataAplicacao?: string,
+    idVeterinario?: number | null,
+    custo?: number | null
+  ): Promise<Vacina | null> {
+    const updatePayload: VacinaUpdateDto = {
+      data_aplicacao: dataAplicacao || getTodayIso(),
+    };
+    if (idVeterinario !== undefined) updatePayload.id_veterinario = idVeterinario;
+    if (custo !== undefined) updatePayload.custo = custo;
+
+    return this.updateVacina(id, updatePayload);
+  }
+
+  /**
+   * Remove um agendamento ou registro de vacina
+   */
+  async deleteVacina(id: number): Promise<boolean> {
+    this.loadingSignal.set(true);
+    try {
+      const { error } = await this.supabase.client
+        .from('vacinas')
+        .delete()
+        .eq('id', id);
+
+      if (error) {
+        throw error;
+      }
+
+      this.toast.success('Vacina removida com sucesso!');
+      this.vacinasSignal.update((list) => list.filter((v) => v.id !== id));
+      return true;
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Erro ao remover a vacina.';
+      this.toast.error(msg);
+      return false;
     } finally {
       this.loadingSignal.set(false);
     }
@@ -137,3 +234,4 @@ export class VacinasService {
     this.vacinasSignal.set([]);
   }
 }
+

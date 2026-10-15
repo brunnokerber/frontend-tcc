@@ -117,6 +117,21 @@
   z-index: 1030;
 }
 
+.brand-link {
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.nav-links-desktop {
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.user-profile-btn {
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
 .brand-icon-wrapper {
   background-color: var(--mat-sys-primary);
   color: var(--mat-sys-on-primary);

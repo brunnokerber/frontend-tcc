@@ -41,11 +41,6 @@
         <span class="fw-semibold">Registrar Adoção</span>
       </button>
       }
-      <button mat-flat-button color="primary" (click)="goToEdit()"
-        class="d-flex align-items-center gap-2 py-2 px-3 rounded-3 shadow-sm">
-        <mat-icon>edit</mat-icon>
-        <span class="fw-semibold">Editar Cadastro</span>
-      </button>
     </div>
   </div>
 
@@ -169,8 +164,8 @@
             <mat-icon class="text-primary">info</mat-icon>
             <h2 class="h5 fw-bold mb-0">Cadastro & Entrada</h2>
           </div>
-          <button mat-icon-button (click)="goToEdit()" matTooltip="Editar cadastro" class="btn-sm">
-            <mat-icon>edit</mat-icon>
+          <button mat-stroked-button color="primary" (click)="goToEdit()" matTooltip="Editar dados cadastrais" class="btn-sm rounded-3">
+            <mat-icon>edit</mat-icon> <span>Editar</span>
           </button>
         </div>
 
@@ -361,7 +356,20 @@
                 </mat-button-toggle>
               </mat-button-toggle-group>
 
-              <!-- Botão Adicionar Vacina (Stub) -->
+              <!-- Link para o Calendário Vacinal do Pet -->
+              @if (pet(); as petObj) {
+                <a
+                  [routerLink]="['/calendario-vacinal']"
+                  [queryParams]="{ petId: petObj.id }"
+                  mat-stroked-button
+                  class="btn-sm rounded-3"
+                  matTooltip="Ver calendário de vacinação deste animal"
+                >
+                  <mat-icon>calendar_month</mat-icon> Calendário
+                </a>
+              }
+
+              <!-- Botão Adicionar Vacina -->
               <button mat-stroked-button color="primary" (click)="openAddVacina()" class="btn-sm rounded-3">
                 <mat-icon>add</mat-icon> Adicionar
               </button>
@@ -567,11 +575,6 @@
             </div>
 
             <div class="d-flex align-items-center gap-2 flex-wrap">
-              @if (p.status === 'Disponível') {
-              <button mat-stroked-button color="primary" (click)="openAdotarModal()" class="btn-sm rounded-3 text-success border-success">
-                <mat-icon>volunteer_activism</mat-icon> Registrar Adoção
-              </button>
-              }
               <button mat-stroked-button color="primary" (click)="openAddLocal()" class="btn-sm rounded-3">
                 <mat-icon>add</mat-icon> Adicionar Local
               </button>
@@ -636,11 +639,6 @@
             <p class="text-surface-muted small mb-2">Registre quando o animal for encaminhado a lares temporários ou
               clínicas.</p>
             <div class="d-flex align-items-center justify-content-center gap-2 flex-wrap">
-              @if (p.status === 'Disponível') {
-              <button mat-flat-button color="primary" (click)="openAdotarModal()" class="btn-sm rounded-3">
-                <mat-icon>volunteer_activism</mat-icon> Registrar Adoção
-              </button>
-              }
               <button mat-stroked-button color="primary" (click)="openAddLocal()" class="btn-sm rounded-3">
                 <mat-icon>add</mat-icon> Registrar Passagem
               </button>

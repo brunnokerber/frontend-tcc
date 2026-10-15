@@ -22,7 +22,7 @@ import {
 import { DateMaskDirective } from '@shared/directives/date-mask.directive';
 import { FormErrorPipe } from '@shared/pipes/form-error.pipe';
 import { dateSequenceValidator, maxDateTodayValidator } from '@shared/validators/date.validators';
-import { dateToIsoString, parseIsoToDate, sanitize } from '@shared/utils/string-utils';
+import { dateToIsoString, getTodayIso, parseIsoToDate, sanitize } from '@shared/utils/string-utils';
 import {
   calculateSenioridade,
   EntradaUpdateDto,
@@ -364,7 +364,7 @@ export default class PetFormComponent implements OnInit {
           entradaUpdateDto = {
             local_origem: formValues.local_origem?.trim() || 'Não informado',
             data_entrada:
-              dateToIsoString(formValues.data_entrada) || new Date().toISOString().split('T')[0],
+              dateToIsoString(formValues.data_entrada) || getTodayIso(),
             resgatante: formValues.resgatante?.trim() || 'Não informado',
             observacoes: sanitize(formValues.observacoes),
           };
@@ -400,7 +400,7 @@ export default class PetFormComponent implements OnInit {
           foto_url: fotoUrlPayload,
           local_origem: formValues.local_origem?.trim() || 'Não informado',
           data_entrada:
-            dateToIsoString(formValues.data_entrada) || new Date().toISOString().split('T')[0],
+            dateToIsoString(formValues.data_entrada) || getTodayIso(),
           resgatante: formValues.resgatante?.trim() || 'Não informado',
           observacoes: sanitize(formValues.observacoes),
         };

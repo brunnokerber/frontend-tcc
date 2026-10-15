@@ -26,6 +26,11 @@ export const routes: Routes = [
         loadChildren: () => import('./features/pets/pets.routes'),
       },
       {
+        path: 'calendario-vacinal',
+        loadComponent: () =>
+          import('./features/calendario-vacinal/pages/calendario-vacinal/calendario-vacinal'),
+      },
+      {
         path: 'veterinarios',
         loadChildren: () => import('./features/veterinarios/veterinarios.routes'),
       },
