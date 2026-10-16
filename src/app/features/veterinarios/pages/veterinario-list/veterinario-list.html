@@ -1,134 +1,93 @@
 <div class="container-fluid px-3 px-md-4">
   <!-- Cabeçalho da Página -->
-  <div class="row align-items-center mb-4 g-3">
-    <div class="col-12 col-md-7">
-      <div class="d-flex align-items-center gap-3">
-        <div class="header-icon-box d-flex align-items-center justify-content-center">
-          <mat-icon>medical_services</mat-icon>
-        </div>
-        <div>
-          <h1 class="h3 fw-bold mb-1">Gestão de Veterinários</h1>
-          <p class="text-surface-muted small mb-0">
-            Consulte, cadastre e gerencie a equipe médica e veterinária cadastrada no sistema.
-          </p>
-        </div>
-      </div>
-    </div>
-    <div class="col-12 col-md-5 d-flex justify-content-md-end gap-2">
-      <button
-        mat-flat-button
-        color="primary"
-        type="button"
-        (click)="openVeterinarioDialog()"
-        class="btn-create d-flex align-items-center gap-2 py-2 px-3 rounded-3 shadow-sm"
-      >
-        <mat-icon>add</mat-icon>
-        <span class="fw-semibold">Cadastrar Novo Veterinário</span>
-      </button>
-    </div>
-  </div>
+  <app-page-header
+    title="Gestão de Veterinários"
+    description="Consulte, cadastre e gerencie a equipe médica e veterinária cadastrada no sistema."
+    icon="medical_services"
+  >
+    <button
+      mat-flat-button
+      color="primary"
+      type="button"
+      (click)="openVeterinarioDialog()"
+      class="btn-create flex-fill flex-sm-grow-0 py-2 px-2 px-sm-3 rounded-3 shadow-sm"
+    >
+      <mat-icon>add</mat-icon>
+      <span class="fw-semibold">
+        <span class="d-none d-sm-inline">Cadastrar </span>Novo Veterinário
+      </span>
+    </button>
+  </app-page-header>
 
   <!-- Cards de Estatísticas Rápidas -->
   <div class="row g-3 mb-4">
     <div class="col-12 col-sm-6 col-md-4 col-xl-3">
-      <div class="stat-card p-3 rounded-3 shadow-xs">
-        <div class="d-flex align-items-center justify-content-between">
-          <div>
-            <span class="text-surface-muted small d-block mb-1">Total de Veterinários</span>
-            <span class="fs-4 fw-bold">{{ totalVeterinarios() }}</span>
-          </div>
-          <div class="stat-icon-wrapper bg-status-primary">
-            <mat-icon>health_and_safety</mat-icon>
-          </div>
-        </div>
-      </div>
+      <app-stat-card
+        label="Total de Veterinários"
+        [value]="totalVeterinarios()"
+        icon="health_and_safety"
+        variant="primary"
+      />
     </div>
   </div>
 
   <!-- Painel de Busca com Formulário Explícito de Submit -->
-  <form (ngSubmit)="applyFilters()" class="filter-panel p-3 p-md-4 rounded-3 shadow-xs mb-4">
-    <div class="row g-3 align-items-end">
-      <!-- Seleção da Coluna -->
-      <div class="col-12 col-md-4 col-lg-3">
-        <label for="vet-filter-field" class="form-label small fw-semibold text-surface-muted mb-1">
-          Filtrar por Coluna
-        </label>
-        <select
-          id="vet-filter-field"
-          class="form-select bg-surface-card text-surface-main border-surface"
-          [ngModel]="searchField()"
-          (ngModelChange)="onSearchFieldChange($event)"
-          name="searchField"
-        >
-          @for (field of searchFields; track field.value) {
-            <option [value]="field.value">{{ field.label }}</option>
-          }
-        </select>
-      </div>
+  <app-filter-panel
+    (search)="applyFilters()"
+    (clear)="clearFilters()"
+    [loading]="veterinariosService.loading()"
+    [clearDisabled]="!searchValue()"
+    actionsColClass="col-12 col-md-3 col-lg-3"
+  >
+    <!-- Seleção da Coluna -->
+    <div class="col-12 col-md-4 col-lg-3">
+      <label for="vet-filter-field" class="form-label small fw-semibold text-surface-muted mb-1">
+        Filtrar por Coluna
+      </label>
+      <select
+        id="vet-filter-field"
+        class="form-select bg-surface-card text-surface-main border-surface"
+        [ngModel]="searchField()"
+        (ngModelChange)="onSearchFieldChange($event)"
+        name="searchField"
+      >
+        @for (field of searchFields; track field.value) {
+          <option [value]="field.value">{{ field.label }}</option>
+        }
+      </select>
+    </div>
 
-      <!-- Termo de Busca -->
-      <div class="col-12 col-md-5 col-lg-6">
-        <label for="vet-filter-value" class="form-label small fw-semibold text-surface-muted mb-1">
-          Termo de Busca / Valor
-        </label>
-        <div class="input-group">
-          <span class="input-group-text bg-surface-subtle border-end-0 border-surface">
-            <i class="bi bi-search"></i>
-          </span>
-          <input
-            id="vet-filter-value"
-            type="text"
-            class="form-control border-start-0 border-surface bg-surface-card text-surface-main"
-            [placeholder]="getSearchPlaceholder()"
-            [ngModel]="searchValue()"
-            (ngModelChange)="searchValue.set($event)"
-            name="searchValue"
-          />
-          @if (searchValue()) {
-            <button
-              class="btn btn-outline-secondary border-start-0 border-surface"
-              type="button"
-              (click)="searchValue.set('')"
-              matTooltip="Limpar texto"
-            >
-              <mat-icon style="font-size: 18px; width: 18px; height: 18px">clear</mat-icon>
-            </button>
-          }
-        </div>
-      </div>
-
-      <!-- Botões de Ação de Filtro -->
-      <div class="col-12 col-md-3 col-lg-3 d-flex justify-content-end gap-2">
-        <button
-          mat-stroked-button
-          type="button"
-          (click)="clearFilters()"
-          class="btn-clear flex-grow-1 flex-md-grow-0"
-          [disabled]="veterinariosService.loading() || !searchValue()"
-        >
-          <mat-icon>filter_alt_off</mat-icon>
-          <span>Limpar</span>
-        </button>
-        <button
-          mat-flat-button
-          color="primary"
-          type="submit"
-          [disabled]="veterinariosService.loading()"
-          class="flex-grow-1 flex-md-grow-0 px-3"
-        >
-          @if (veterinariosService.loading()) {
-            <span class="spinner-border spinner-border-sm me-2" role="status"></span>
-            <span>Filtrando...</span>
-          } @else {
-            <span class="d-inline-flex align-items-center gap-1">
-              <mat-icon>filter_list</mat-icon>
-              <span>Filtrar</span>
-            </span>
-          }
-        </button>
+    <!-- Termo de Busca -->
+    <div class="col-12 col-md-5 col-lg-6">
+      <label for="vet-filter-value" class="form-label small fw-semibold text-surface-muted mb-1">
+        Termo de Busca / Valor
+      </label>
+      <div class="input-group">
+        <span class="input-group-text bg-surface-subtle border-end-0 border-surface">
+          <i class="bi bi-search"></i>
+        </span>
+        <input
+          id="vet-filter-value"
+          type="text"
+          class="form-control border-start-0 border-surface bg-surface-card text-surface-main"
+          [placeholder]="getSearchPlaceholder()"
+          [ngModel]="searchValue()"
+          (ngModelChange)="searchValue.set($event)"
+          name="searchValue"
+        />
+        @if (searchValue()) {
+          <button
+            class="btn btn-outline-secondary border-start-0 border-surface"
+            type="button"
+            (click)="searchValue.set('')"
+            matTooltip="Limpar texto"
+          >
+            <mat-icon style="font-size: 18px; width: 18px; height: 18px">clear</mat-icon>
+          </button>
+        }
       </div>
     </div>
-  </form>
+  </app-filter-panel>
 
   <!-- Loading State -->
   @if (veterinariosService.loading()) {

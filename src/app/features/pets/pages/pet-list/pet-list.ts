@@ -31,6 +31,9 @@ import {
 } from '../../models/pet.model';
 import { PetReportFilterItem, PetReportService } from '../../services/pet-report.service';
 import { PetsService } from '../../services/pets.service';
+import { PageHeaderComponent } from '../../../../shared/components/page-header/page-header';
+import { StatCardComponent } from '../../../../shared/components/stat-card/stat-card';
+import { FilterPanelComponent } from '../../../../shared/components/filter-panel/filter-panel';
 
 @Component({
   selector: 'app-pet-list',
@@ -39,6 +42,9 @@ import { PetsService } from '../../services/pets.service';
     CommonModule,
     FormsModule,
     RouterLink,
+    PageHeaderComponent,
+    StatCardComponent,
+    FilterPanelComponent,
     MatCardModule,
     MatButtonModule,
     MatIconModule,

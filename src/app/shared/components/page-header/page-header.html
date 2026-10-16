@@ -1,0 +1,28 @@
+<header class="row align-items-center mb-4 g-3 page-header">
+  <div class="col-12 col-md-6 col-xl-7">
+    <div class="d-flex align-items-center gap-3">
+      <div
+        class="header-icon-box d-flex align-items-center justify-content-center flex-shrink-0"
+        aria-hidden="true"
+      >
+        <mat-icon>{{ icon() }}</mat-icon>
+      </div>
+      <div>
+        <h1 class="h3 fw-bold mb-1 page-header-title">{{ title() }}</h1>
+        @if (description()) {
+          <p class="text-surface-muted small mb-0 page-header-desc">
+            {{ description() }}
+          </p>
+        }
+      </div>
+    </div>
+  </div>
+
+  <div class="col-12 col-md-6 col-xl-5">
+    <div
+      class="d-flex flex-row justify-content-sm-end align-items-center gap-2 page-header-actions"
+    >
+      <ng-content></ng-content>
+    </div>
+  </div>
+</header>

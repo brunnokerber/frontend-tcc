@@ -1,337 +1,248 @@
 <div class="container-fluid px-3 px-md-4">
   <!-- Cabeçalho da Página -->
-  <div class="row align-items-center mb-4 g-3">
-    <div class="col-12 col-md-6 col-xl-7">
-      <div class="d-flex align-items-center gap-3">
-        <div class="header-icon-box d-flex align-items-center justify-content-center">
-          <mat-icon>pets</mat-icon>
-        </div>
-        <div>
-          <h1 class="h3 fw-bold mb-1">Gestão de Pets</h1>
-          <p class="text-surface-muted small mb-0">
-            Consulte, filtre e gerencie todos os animais cadastrados no sistema.
-          </p>
-        </div>
-      </div>
-    </div>
-    <div class="col-12 col-md-6 col-xl-5">
-      <div class="d-flex flex-row justify-content-sm-end align-items-center gap-2">
-        <!-- Menu de Exportação / Relatórios -->
-        <button
-          mat-stroked-button
-          [matMenuTriggerFor]="exportMenu"
-          [disabled]="petsService.loading() || petsService.pets().length === 0"
-          class="btn-export flex-fill flex-sm-grow-0 py-2 px-2 px-sm-3 rounded-3 shadow-xs"
-        >
-          <mat-icon>file_download</mat-icon>
-          <span class="fw-semibold"
-            ><span class="d-none d-sm-inline">Exportar </span>Relatório</span
-          >
-          <mat-icon iconPositionEnd>expand_more</mat-icon>
-        </button>
+  <app-page-header
+    title="Gestão de Pets"
+    description="Consulte, filtre e gerencie todos os animais cadastrados no sistema."
+    icon="pets"
+  >
+    <!-- Menu de Exportação / Relatórios -->
+    <button
+      mat-stroked-button
+      [matMenuTriggerFor]="exportMenu"
+      [disabled]="petsService.loading() || petsService.pets().length === 0"
+      class="btn-export flex-fill flex-sm-grow-0 py-2 px-2 px-sm-3 rounded-3 shadow-xs"
+    >
+      <mat-icon>file_download</mat-icon>
+      <span class="fw-semibold"> <span class="d-none d-sm-inline">Exportar </span>Relatório </span>
+      <mat-icon iconPositionEnd>expand_more</mat-icon>
+    </button>
 
-        <mat-menu #exportMenu="matMenu" class="custom-export-menu shadow-sm">
-          <button mat-menu-item (click)="exportExcel()">
-            <mat-icon class="text-success">table_chart</mat-icon>
-            <span>Planilha Excel</span>
-          </button>
-          <button mat-menu-item (click)="exportPdf()">
-            <mat-icon class="text-danger">picture_as_pdf</mat-icon>
-            <span>Relatório em PDF</span>
-          </button>
-        </mat-menu>
+    <mat-menu #exportMenu="matMenu" class="custom-export-menu shadow-sm">
+      <button mat-menu-item (click)="exportExcel()">
+        <mat-icon class="text-success">table_chart</mat-icon>
+        <span>Planilha Excel</span>
+      </button>
+      <button mat-menu-item (click)="exportPdf()">
+        <mat-icon class="text-danger">picture_as_pdf</mat-icon>
+        <span>Relatório em PDF</span>
+      </button>
+    </mat-menu>
 
-        <button
-          mat-flat-button
-          color="primary"
-          routerLink="/pets/novo"
-          class="btn-create flex-fill flex-sm-grow-0 py-2 px-2 px-sm-3 rounded-3 shadow-sm"
-        >
-          <mat-icon>add</mat-icon>
-          <span class="fw-semibold"
-            ><span class="d-none d-sm-inline">Cadastrar </span>Novo Pet</span
-          >
-        </button>
-      </div>
-    </div>
-  </div>
+    <button
+      mat-flat-button
+      color="primary"
+      routerLink="/pets/novo"
+      class="btn-create flex-fill flex-sm-grow-0 py-2 px-2 px-sm-3 rounded-3 shadow-sm"
+    >
+      <mat-icon>add</mat-icon>
+      <span class="fw-semibold"> <span class="d-none d-sm-inline">Cadastrar </span>Novo Pet </span>
+    </button>
+  </app-page-header>
 
   <!-- Cards de Estatísticas Rápidas -->
   <div class="row g-3 mb-4">
     <div class="col-6 col-md-4 col-xl">
-      <div class="stat-card p-3 rounded-3 shadow-xs">
-        <div class="d-flex align-items-center justify-content-between">
-          <div>
-            <span class="text-surface-muted small d-block mb-1">Total de Animais</span>
-            <span class="fs-4 fw-bold">{{ totalPets() }}</span>
-          </div>
-          <div class="stat-icon-wrapper bg-status-primary">
-            <mat-icon>pets</mat-icon>
-          </div>
-        </div>
-      </div>
+      <app-stat-card label="Total de Animais" [value]="totalPets()" icon="pets" variant="primary" />
     </div>
     <div class="col-6 col-md-4 col-xl">
-      <div class="stat-card p-3 rounded-3 shadow-xs">
-        <div class="d-flex align-items-center justify-content-between">
-          <div>
-            <span class="text-surface-muted small d-block mb-1">Disponíveis</span>
-            <span class="fs-4 fw-bold text-status-success">{{ totalDisponiveis() }}</span>
-          </div>
-          <div class="stat-icon-wrapper bg-status-success">
-            <mat-icon>check_circle</mat-icon>
-          </div>
-        </div>
-      </div>
+      <app-stat-card
+        label="Disponíveis"
+        [value]="totalDisponiveis()"
+        icon="check_circle"
+        variant="success"
+      />
     </div>
     <div class="col-6 col-md-4 col-xl">
-      <div class="stat-card p-3 rounded-3 shadow-xs">
-        <div class="d-flex align-items-center justify-content-between">
-          <div>
-            <span class="text-surface-muted small d-block mb-1">Em Tratamento</span>
-            <span class="fs-4 fw-bold text-status-warning">{{ totalTratamento() }}</span>
-          </div>
-          <div class="stat-icon-wrapper bg-status-warning">
-            <mat-icon>medical_services</mat-icon>
-          </div>
-        </div>
-      </div>
+      <app-stat-card
+        label="Em Tratamento"
+        [value]="totalTratamento()"
+        icon="medical_services"
+        variant="warning"
+      />
     </div>
     <div class="col-6 col-md-6 col-xl">
-      <div class="stat-card p-3 rounded-3 shadow-xs">
-        <div class="d-flex align-items-center justify-content-between">
-          <div>
-            <span class="text-surface-muted small d-block mb-1">Adotados</span>
-            <span class="fs-4 fw-bold text-status-adopted">{{ totalAdotados() }}</span>
-          </div>
-          <div class="stat-icon-wrapper bg-status-adopted">
-            <mat-icon>favorite</mat-icon>
-          </div>
-        </div>
-      </div>
+      <app-stat-card label="Adotados" [value]="totalAdotados()" icon="favorite" variant="adopted" />
     </div>
     <div class="col-12 col-md-6 col-xl">
-      <div class="stat-card p-3 rounded-3 shadow-xs">
-        <div class="d-flex align-items-center justify-content-between">
-          <div>
-            <span class="text-surface-muted small d-block mb-1">Óbitos</span>
-            <span class="fs-4 fw-bold text-status-obito">{{ totalObitos() }}</span>
-          </div>
-          <div class="stat-icon-wrapper bg-status-obito">
-            <mat-icon>heart_broken</mat-icon>
-          </div>
-        </div>
-      </div>
+      <app-stat-card label="Óbitos" [value]="totalObitos()" icon="heart_broken" variant="obito" />
     </div>
   </div>
 
   <!-- Painel de Filtros e Busca com Formulário Explícito de Submit -->
-  <form (ngSubmit)="applyFilters()" class="filter-panel p-3 p-md-4 rounded-3 shadow-xs mb-4">
-    <!-- LINHA 1: Identificação, Termo de Busca, Espécie, Sexo e Status -->
-    <div class="row g-3 align-items-end mb-3">
-      <!-- Seleção do Campo de Identificação / Registro -->
-      <div class="col-12 col-sm-6 col-md-2 col-xl-2">
-        <label
-          for="pet-filter-field"
-          class="form-label small fw-semibold text-surface-muted mb-1 text-truncate d-block"
-        >
-          Identificação
-        </label>
-        <select
-          id="pet-filter-field"
-          class="form-select bg-surface-card text-surface-main border-surface"
-          [ngModel]="searchField()"
-          (ngModelChange)="onSearchFieldChange($event)"
-          name="searchField"
-        >
-          @for (field of searchFields; track field.value) {
-            <option [value]="field.value">{{ field.label }}</option>
-          }
-        </select>
-      </div>
+  <app-filter-panel
+    (search)="applyFilters()"
+    (clear)="clearFilters()"
+    [loading]="petsService.loading()"
+    [clearDisabled]="
+      !searchValue() &&
+      !tipoFilter() &&
+      !sexoFilter() &&
+      !statusFilter() &&
+      !porteFilter() &&
+      !senioridadeFilter()
+    "
+    actionsColClass="col-12 col-md-6 col-xl-8 ms-auto"
+  >
+    <!-- Seleção do Campo de Identificação / Registro -->
+    <div class="col-12 col-sm-6 col-md-2 col-xl-2">
+      <label
+        for="pet-filter-field"
+        class="form-label small fw-semibold text-surface-muted mb-1 text-truncate d-block"
+      >
+        Identificação
+      </label>
+      <select
+        id="pet-filter-field"
+        class="form-select bg-surface-card text-surface-main border-surface"
+        [ngModel]="searchField()"
+        (ngModelChange)="onSearchFieldChange($event)"
+        name="searchField"
+      >
+        @for (field of searchFields; track field.value) {
+          <option [value]="field.value">{{ field.label }}</option>
+        }
+      </select>
+    </div>
 
-      <!-- Termo de Busca / Valor -->
-      <div class="col-12 col-sm-6 col-md-4 col-xl-4">
-        <label
-          for="pet-filter-value"
-          class="form-label small fw-semibold text-surface-muted mb-1 text-truncate d-block"
-        >
-          Termo de Busca / Valor
-        </label>
-        <div class="input-group">
-          <span class="input-group-text bg-surface-subtle border-end-0 border-surface">
-            <i class="bi bi-search"></i>
-          </span>
-          <input
-            id="pet-filter-value"
-            type="text"
-            class="form-control border-start-0 border-surface bg-surface-card text-surface-main"
-            [placeholder]="getSearchPlaceholder()"
-            [ngModel]="searchValue()"
-            (ngModelChange)="searchValue.set($event)"
-            name="searchValue"
-          />
-          @if (searchValue()) {
-            <button
-              class="btn btn-outline-secondary border-start-0 border-surface"
-              type="button"
-              (click)="searchValue.set('')"
-              matTooltip="Limpar busca"
-            >
-              <mat-icon style="font-size: 18px; width: 18px; height: 18px">clear</mat-icon>
-            </button>
-          }
-        </div>
-      </div>
-
-      <!-- Filtro Tipo de Pet / Espécie -->
-      <div class="col-6 col-sm-4 col-md-2 col-xl-2">
-        <label
-          for="pet-filter-tipo"
-          class="form-label small fw-semibold text-surface-muted mb-1 text-truncate d-block"
-          >Espécie</label
-        >
-        <select
-          id="pet-filter-tipo"
-          class="form-select bg-surface-card text-surface-main border-surface"
-          [ngModel]="tipoFilter()"
-          (ngModelChange)="tipoFilter.set($event)"
-          name="tipoFilter"
-        >
-          <option value="">Todas</option>
-          @for (tipo of tipoOptions; track tipo.value) {
-            <option [value]="tipo.value">{{ tipo.label }}</option>
-          }
-        </select>
-      </div>
-
-      <!-- Filtro Sexo -->
-      <div class="col-6 col-sm-4 col-md-2 col-xl-2">
-        <label
-          for="pet-filter-sexo"
-          class="form-label small fw-semibold text-surface-muted mb-1 text-truncate d-block"
-          >Sexo</label
-        >
-        <select
-          id="pet-filter-sexo"
-          class="form-select bg-surface-card text-surface-main border-surface"
-          [ngModel]="sexoFilter()"
-          (ngModelChange)="sexoFilter.set($event)"
-          name="sexoFilter"
-        >
-          <option value="">Todos</option>
-          @for (sex of sexoOptions; track sex.value) {
-            <option [value]="sex.value">{{ sex.label }}</option>
-          }
-        </select>
-      </div>
-
-      <!-- Filtro Status -->
-      <div class="col-12 col-sm-4 col-md-2 col-xl-2">
-        <label
-          for="pet-filter-status"
-          class="form-label small fw-semibold text-surface-muted mb-1 text-truncate d-block"
-          >Status</label
-        >
-        <select
-          id="pet-filter-status"
-          class="form-select bg-surface-card text-surface-main border-surface"
-          [ngModel]="statusFilter()"
-          (ngModelChange)="statusFilter.set($event)"
-          name="statusFilter"
-        >
-          <option value="">Todos</option>
-          @for (st of statusOptions; track st.value) {
-            <option [value]="st.value">{{ st.label }}</option>
-          }
-        </select>
+    <!-- Termo de Busca / Valor -->
+    <div class="col-12 col-sm-6 col-md-4 col-xl-4">
+      <label
+        for="pet-filter-value"
+        class="form-label small fw-semibold text-surface-muted mb-1 text-truncate d-block"
+      >
+        Termo de Busca / Valor
+      </label>
+      <div class="input-group">
+        <span class="input-group-text bg-surface-subtle border-end-0 border-surface">
+          <i class="bi bi-search"></i>
+        </span>
+        <input
+          id="pet-filter-value"
+          type="text"
+          class="form-control border-start-0 border-surface bg-surface-card text-surface-main"
+          [placeholder]="getSearchPlaceholder()"
+          [ngModel]="searchValue()"
+          (ngModelChange)="searchValue.set($event)"
+          name="searchValue"
+        />
+        @if (searchValue()) {
+          <button
+            class="btn btn-outline-secondary border-start-0 border-surface"
+            type="button"
+            (click)="searchValue.set('')"
+            matTooltip="Limpar busca"
+          >
+            <mat-icon style="font-size: 18px; width: 18px; height: 18px">clear</mat-icon>
+          </button>
+        }
       </div>
     </div>
 
-    <!-- LINHA 2: Fase da Vida, Porte e Botões de Ação -->
-    <div class="row g-3 align-items-end">
-      <!-- Filtro Senioridade / Fase da Vida -->
-      <div class="col-6 col-sm-6 col-md-3 col-xl-2">
-        <label
-          for="pet-filter-senioridade"
-          class="form-label small fw-semibold text-surface-muted mb-1 text-truncate d-block"
-          >Fase da Vida</label
-        >
-        <select
-          id="pet-filter-senioridade"
-          class="form-select bg-surface-card text-surface-main border-surface"
-          [ngModel]="senioridadeFilter()"
-          (ngModelChange)="senioridadeFilter.set($event)"
-          name="senioridadeFilter"
-        >
-          <option value="">Todas</option>
-          @for (sen of senioridadeOptions; track sen.value) {
-            <option [value]="sen.value">{{ sen.label }}</option>
-          }
-        </select>
-      </div>
-
-      <!-- Filtro Porte -->
-      <div class="col-6 col-sm-6 col-md-3 col-xl-2">
-        <label
-          for="pet-filter-porte"
-          class="form-label small fw-semibold text-surface-muted mb-1 text-truncate d-block"
-          >Porte</label
-        >
-        <select
-          id="pet-filter-porte"
-          class="form-select bg-surface-card text-surface-main border-surface"
-          [ngModel]="porteFilter()"
-          (ngModelChange)="porteFilter.set($event)"
-          name="porteFilter"
-        >
-          <option value="">Todos</option>
-          @for (porte of porteOptions; track porte.value) {
-            <option [value]="porte.value">{{ porte.label }}</option>
-          }
-        </select>
-      </div>
-
-      <!-- Botões de Ação de Filtro -->
-      <div class="col-12 col-md-6 col-xl-8 d-flex justify-content-end align-items-end gap-2">
-        <button
-          mat-stroked-button
-          type="button"
-          (click)="clearFilters()"
-          class="btn-clear flex-grow-1 flex-md-grow-0"
-          [disabled]="
-            petsService.loading() ||
-            (!searchValue() &&
-              !tipoFilter() &&
-              !sexoFilter() &&
-              !statusFilter() &&
-              !porteFilter() &&
-              !senioridadeFilter())
-          "
-        >
-          <mat-icon>filter_alt_off</mat-icon>
-          <span>Limpar</span>
-        </button>
-        <button
-          mat-flat-button
-          color="primary"
-          type="submit"
-          [disabled]="petsService.loading()"
-          class="btn-submit-filter flex-grow-1 flex-md-grow-0 px-3"
-        >
-          @if (petsService.loading()) {
-            <span class="spinner-border spinner-border-sm me-1" role="status"></span>
-            <span>Filtrando...</span>
-          } @else {
-            <span class="d-inline-flex align-items-center gap-1">
-              <mat-icon>search</mat-icon>
-              <span>Filtrar</span>
-            </span>
-          }
-        </button>
-      </div>
+    <!-- Filtro Tipo de Pet / Espécie -->
+    <div class="col-6 col-sm-4 col-md-2 col-xl-2">
+      <label
+        for="pet-filter-tipo"
+        class="form-label small fw-semibold text-surface-muted mb-1 text-truncate d-block"
+        >Espécie</label
+      >
+      <select
+        id="pet-filter-tipo"
+        class="form-select bg-surface-card text-surface-main border-surface"
+        [ngModel]="tipoFilter()"
+        (ngModelChange)="tipoFilter.set($event)"
+        name="tipoFilter"
+      >
+        <option value="">Todas</option>
+        @for (tipo of tipoOptions; track tipo.value) {
+          <option [value]="tipo.value">{{ tipo.label }}</option>
+        }
+      </select>
     </div>
-  </form>
+
+    <!-- Filtro Sexo -->
+    <div class="col-6 col-sm-4 col-md-2 col-xl-2">
+      <label
+        for="pet-filter-sexo"
+        class="form-label small fw-semibold text-surface-muted mb-1 text-truncate d-block"
+        >Sexo</label
+      >
+      <select
+        id="pet-filter-sexo"
+        class="form-select bg-surface-card text-surface-main border-surface"
+        [ngModel]="sexoFilter()"
+        (ngModelChange)="sexoFilter.set($event)"
+        name="sexoFilter"
+      >
+        <option value="">Todos</option>
+        @for (sex of sexoOptions; track sex.value) {
+          <option [value]="sex.value">{{ sex.label }}</option>
+        }
+      </select>
+    </div>
+
+    <!-- Filtro Status -->
+    <div class="col-12 col-sm-4 col-md-2 col-xl-2">
+      <label
+        for="pet-filter-status"
+        class="form-label small fw-semibold text-surface-muted mb-1 text-truncate d-block"
+        >Status</label
+      >
+      <select
+        id="pet-filter-status"
+        class="form-select bg-surface-card text-surface-main border-surface"
+        [ngModel]="statusFilter()"
+        (ngModelChange)="statusFilter.set($event)"
+        name="statusFilter"
+      >
+        <option value="">Todos</option>
+        @for (st of statusOptions; track st.value) {
+          <option [value]="st.value">{{ st.label }}</option>
+        }
+      </select>
+    </div>
+
+    <!-- Filtro Senioridade / Fase da Vida -->
+    <div class="col-6 col-sm-6 col-md-3 col-xl-2">
+      <label
+        for="pet-filter-senioridade"
+        class="form-label small fw-semibold text-surface-muted mb-1 text-truncate d-block"
+        >Fase da Vida</label
+      >
+      <select
+        id="pet-filter-senioridade"
+        class="form-select bg-surface-card text-surface-main border-surface"
+        [ngModel]="senioridadeFilter()"
+        (ngModelChange)="senioridadeFilter.set($event)"
+        name="senioridadeFilter"
+      >
+        <option value="">Todas</option>
+        @for (sen of senioridadeOptions; track sen.value) {
+          <option [value]="sen.value">{{ sen.label }}</option>
+        }
+      </select>
+    </div>
+
+    <!-- Filtro Porte -->
+    <div class="col-6 col-sm-6 col-md-3 col-xl-2">
+      <label
+        for="pet-filter-porte"
+        class="form-label small fw-semibold text-surface-muted mb-1 text-truncate d-block"
+        >Porte</label
+      >
+      <select
+        id="pet-filter-porte"
+        class="form-select bg-surface-card text-surface-main border-surface"
+        [ngModel]="porteFilter()"
+        (ngModelChange)="porteFilter.set($event)"
+        name="porteFilter"
+      >
+        <option value="">Todos</option>
+        @for (porte of porteOptions; track porte.value) {
+          <option [value]="porte.value">{{ porte.label }}</option>
+        }
+      </select>
+    </div>
+  </app-filter-panel>
 
   <!-- Loading State -->
   @if (petsService.loading()) {

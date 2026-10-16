@@ -132,22 +132,25 @@
   white-space: nowrap;
 }
 
-.brand-icon-wrapper {
-  background-color: var(--mat-sys-primary);
-  color: var(--mat-sys-on-primary);
-  width: 38px;
-  height: 38px;
-  min-width: 38px;
-  border-radius: 10px;
+.brand-logo-wrapper {
+  width: 40px;
+  height: 40px;
+  min-width: 40px;
+  border-radius: 50%;
+  overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
+  background-color: #ffffff;
+  border: 1px solid var(--mat-sys-outline-variant);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  flex-shrink: 0;
 
-  mat-icon {
-    font-size: 22px;
-    width: 22px;
-    height: 22px;
-    line-height: 22px;
+  .brand-logo {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
   }
 }
 
@@ -218,6 +221,17 @@
 
 .main-footer {
   color: var(--mat-sys-on-surface-variant);
+  background-color: var(--mat-sys-surface);
+  border-color: var(--mat-sys-outline-variant);
+
+  .version-badge {
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--mat-sys-on-surface-variant);
+    background-color: var(--mat-sys-surface-container);
+    border-color: var(--mat-sys-outline-variant);
+    letter-spacing: 0.03em;
+  }
 }
 
 .account-advanced-details {

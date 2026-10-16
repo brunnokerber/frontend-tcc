@@ -16,6 +16,9 @@ import { formatPhone, onlyDigits } from '@shared/utils/string-utils';
 import { VeterinarioDialogComponent } from '../../components/veterinario-dialog/veterinario-dialog';
 import { Veterinario, VET_SEARCH_FIELDS_OPTIONS } from '../../models/veterinario.model';
 import { VeterinariosService } from '../../services/veterinarios.service';
+import { PageHeaderComponent } from '../../../../shared/components/page-header/page-header';
+import { StatCardComponent } from '../../../../shared/components/stat-card/stat-card';
+import { FilterPanelComponent } from '../../../../shared/components/filter-panel/filter-panel';
 
 @Component({
   selector: 'app-veterinario-list',
@@ -23,6 +26,9 @@ import { VeterinariosService } from '../../services/veterinarios.service';
   imports: [
     CommonModule,
     FormsModule,
+    PageHeaderComponent,
+    StatCardComponent,
+    FilterPanelComponent,
     MatCardModule,
     MatButtonModule,
     MatIconModule,

@@ -26,6 +26,9 @@ import {
   VoluntarioFilter,
 } from '../../models/voluntario.model';
 import { VoluntariosService } from '../../services/voluntarios.service';
+import { PageHeaderComponent } from '../../../../shared/components/page-header/page-header';
+import { StatCardComponent } from '../../../../shared/components/stat-card/stat-card';
+import { FilterPanelComponent } from '../../../../shared/components/filter-panel/filter-panel';
 
 @Component({
   selector: 'app-voluntario-list',
@@ -33,6 +36,9 @@ import { VoluntariosService } from '../../services/voluntarios.service';
   imports: [
     CommonModule,
     FormsModule,
+    PageHeaderComponent,
+    StatCardComponent,
+    FilterPanelComponent,
     MatCardModule,
     MatButtonModule,
     MatIconModule,

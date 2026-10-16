@@ -1,0 +1,15 @@
+<div class="stat-card p-3 rounded-3 shadow-xs h-100">
+  <div class="d-flex align-items-center justify-content-between">
+    <div>
+      <span class="text-surface-muted small d-block mb-1">{{ label() }}</span>
+      <span class="fs-4 fw-bold" [ngClass]="resolvedValueClass()">{{ value() }}</span>
+    </div>
+    <div
+      class="stat-icon-wrapper flex-shrink-0"
+      [ngClass]="resolvedIconWrapperClass()"
+      aria-hidden="true"
+    >
+      <mat-icon>{{ icon() }}</mat-icon>
+    </div>
+  </div>
+</div>

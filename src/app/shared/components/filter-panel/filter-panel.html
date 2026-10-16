@@ -1,0 +1,53 @@
+<form
+  (submit)="onSubmit($event)"
+  action="javascript:void(0);"
+  class="filter-panel p-3 p-md-4 rounded-3 shadow-xs mb-4"
+  role="search"
+>
+  <div class="row g-3 align-items-end">
+    <!-- Campos projetados com suas respectivas colunas de grid -->
+    <ng-content></ng-content>
+
+    <!-- Botões de Ação Padronizados -->
+    @if (!customActions()) {
+      <div [class]="actionsColClass() + ' d-flex justify-content-end align-items-end gap-2'">
+        <button
+          mat-stroked-button
+          type="button"
+          (click)="onClear()"
+          class="btn-clear flex-grow-1 flex-md-grow-0"
+          [disabled]="loading() || clearDisabled()"
+        >
+          <mat-icon>filter_alt_off</mat-icon>
+          <span>{{ clearLabel() }}</span>
+        </button>
+
+        <button
+          mat-flat-button
+          color="primary"
+          type="button"
+          (click)="onSubmit($event)"
+          [disabled]="loading() || submitDisabled()"
+          class="flex-grow-1 flex-md-grow-0 px-3"
+        >
+          @if (loading()) {
+            <span
+              class="spinner-border spinner-border-sm me-1"
+              role="status"
+              aria-hidden="true"
+            ></span>
+            <span>{{ loadingLabel() }}</span>
+          } @else {
+            <span class="d-inline-flex align-items-center gap-1">
+              <mat-icon>filter_list</mat-icon>
+              <span>{{ submitLabel() }}</span>
+            </span>
+          }
+        </button>
+      </div>
+    } @else {
+      <!-- Slot de Ações Customizadas -->
+      <ng-content select="[filter-actions]"></ng-content>
+    }
+  </div>
+</form>

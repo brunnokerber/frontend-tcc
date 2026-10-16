@@ -40,6 +40,7 @@ export class MainLayoutComponent {
   private dialog = inject(MatDialog);
 
   public readonly ongName = environment.ongName;
+  public readonly appVersion = environment.appVersion;
   public user = this.authService.getUser();
   public isAdmin = this.authService.isAdmin;
   public mobileMenuOpen = signal(false);

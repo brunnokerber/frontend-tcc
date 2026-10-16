@@ -14,6 +14,8 @@ import { VacinaCalendarioFiltro, VacinaCalendarioItem } from '@features/pets/mod
 import { PetsService } from '@features/pets/services/pets.service';
 import { VacinasService } from '@features/pets/services/vacinas.service';
 import { getTodayIso } from '@shared/utils/string-utils';
+import { PageHeaderComponent } from '@shared/components/page-header/page-header';
+import { StatCardComponent } from '@shared/components/stat-card/stat-card';
 
 export interface DiaCalendario {
   date: Date;
@@ -46,6 +48,8 @@ export interface GrupoDataAgenda {
     MatButtonToggleModule,
     MatProgressSpinnerModule,
     MatTooltipModule,
+    PageHeaderComponent,
+    StatCardComponent,
   ],
   templateUrl: './calendario-vacinal.html',
   styleUrls: ['./calendario-vacinal.scss'],

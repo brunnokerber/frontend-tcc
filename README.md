@@ -2,6 +2,7 @@
 ### Trabalho de Conclusão de Curso (TCC) — Engenharia da Computação | Universidade Feevale
 
 > **Projeto:** DESENVOLVIMENTO E VALIDAÇÃO DE SOFTWARE DE GERENCIAMENTO DE DADOS CADASTRAIS DE ANIMAIS DE ONGS DE ACOLHIMENTO E TRATAMENTO DE ANIMAIS DE RUA  
+> **Versão Atual:** `0.1.0` (Outubro de 2026)  
 > **Frontend:** Single Page Application (SPA) reativa desenvolvida em **Angular 20**, **Signals**, **Angular Material 20** e **Supabase**.  
 > **Backend:** Infraestrutura de banco de dados, migrações SQL, Edge Functions e RLS disponíveis no repositório [backend-supabase](https://github.com/brunnokerber/backend-supabase).
 
@@ -67,7 +68,7 @@ frontend-tcc/
 │   │   ├── core/                # Serviços singleton, auth, guards, interceptors, supabase client
 │   │   │   ├── audit/           # Modelos de auditoria (created_at, updated_at)
 │   │   │   ├── auth/            # AuthService, login/reset models, guards (authGuard, adminGuard)
-│   │   │   ├── config/          # Configurações globais
+│   │   │   ├── config/          # Configurações globais (app-version.config centralizado)
 │   │   │   └── services/        # SupabaseService, ThemeService, ToastService, NavigationService
 │   │   ├── features/            # Módulos de negócio da aplicação
 │   │   │   ├── definir-senha/   # Fluxo de primeiro acesso e recuperação de senha
@@ -80,7 +81,7 @@ frontend-tcc/
 │   │   ├── layout/              # Shell da aplicação (MainLayout, Sidenav, Header, alternância de tema)
 │   │   └── shared/              # Utilitários, pipes, diretivas e componentes reutilizáveis
 │   │       ├── adapters/        # CustomDateAdapter (formatação brasileira DD/MM/YYYY)
-│   │       ├── components/      # DialogLayout padronizado, ConfirmationDialog e modais utilitários
+│   │       ├── components/      # PageHeaderComponent, StatCardComponent (KPIs), FilterPanelComponent, DialogLayout padronizado, ConfirmationDialog e modais utilitários
 │   │       ├── directives/      # Máscaras de data e formulários
 │   │       ├── pipes/           # FormErrorPipe e pipes de formatação
 │   │       └── utils/           # Manipulação de strings e tratamento de erros do Supabase
@@ -122,6 +123,7 @@ Verifique o arquivo `src/environments/environment.ts` com as credenciais do Supa
 ```typescript
 export const environment = {
   production: false,
+  appVersion: '0.1.0',
   ongName: 'Peludinhos do Vale',
   apiUrl: 'http://127.0.0.1:54321', // URL do Supabase local ou cloud
   apiKey: 'sua-anon-key-aqui'

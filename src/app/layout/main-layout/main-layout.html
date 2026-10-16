@@ -205,6 +205,9 @@
           <mat-icon>logout</mat-icon>
           <span>Sair da Plataforma</span>
         </button>
+        <div class="text-center mt-2 text-surface-muted" style="font-size: 0.72rem">
+          {{ ongName }} &bull; v{{ appVersion }}
+        </div>
       </div>
     </div>
   </mat-sidenav>
@@ -221,8 +224,14 @@
             class="brand-link d-flex align-items-center gap-2 text-decoration-none"
             (click)="closeMobileMenu()"
           >
-            <div class="brand-icon-wrapper">
-              <mat-icon class="brand-icon">pets</mat-icon>
+            <div class="brand-logo-wrapper">
+              <img
+                src="/logo_ong.jpg"
+                [alt]="ongName + ' Logo'"
+                class="brand-logo"
+                width="40"
+                height="40"
+              />
             </div>
             <div class="d-flex flex-column">
               <span class="brand-title fw-bold">{{ ongName }}</span>
@@ -409,9 +418,14 @@
     </main>
 
     <!-- Rodapé -->
-    <footer class="main-footer py-3 text-center small border-top mt-auto">
-      <div class="container">
+    <footer class="main-footer py-3 small border-top mt-auto">
+      <div
+        class="container-fluid px-3 px-md-4 d-flex flex-column flex-sm-row align-items-center justify-content-between gap-2 text-center text-sm-start"
+      >
         <span>{{ ongName }} &bull; Sistema de Gestão de Animais e Resgates</span>
+        <span class="version-badge px-2 py-0-5 rounded-pill border font-monospace">
+          v{{ appVersion }}
+        </span>
       </div>
     </footer>
   </mat-sidenav-content>

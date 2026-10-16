@@ -1,69 +1,54 @@
-<div class="calendario-page container-fluid px-3 px-md-4 py-3">
-  <!-- Topo: Título, KPIs e Botão de Ação -->
-  <div
-    class="d-flex flex-column flex-lg-row align-items-lg-center justify-content-between gap-3 mb-4"
+<div class="container-fluid px-3 px-md-4">
+  <!-- Cabeçalho da Página -->
+  <app-page-header
+    title="Calendário Vacinal"
+    description="Acompanhe as vacinas previstas para o mês e registre as aplicações"
+    icon="calendar_month"
   >
-    <div>
-      <div class="d-flex align-items-center gap-2">
-        <div
-          class="p-2 rounded-3 bg-primary-subtle text-primary d-inline-flex align-items-center justify-content-center"
-        >
-          <mat-icon>calendar_month</mat-icon>
-        </div>
-        <div>
-          <h1 class="h4 fw-bold mb-0 text-surface-main">Calendário Vacinal</h1>
-          <p class="text-surface-muted small mb-0">
-            Acompanhe as vacinas previstas para o mês e registre as aplicações
-          </p>
-        </div>
-      </div>
+    <button
+      mat-flat-button
+      color="primary"
+      type="button"
+      (click)="abrirModalVacina()"
+      class="btn-create flex-fill flex-sm-grow-0 py-2 px-2 px-sm-3 rounded-3 shadow-sm"
+      matTooltip="Agendar nova vacina para qualquer pet"
+    >
+      <mat-icon>add</mat-icon>
+      <span class="fw-semibold"> <span class="d-none d-sm-inline">Agendar </span>Nova Vacina </span>
+    </button>
+  </app-page-header>
+
+  <!-- Cards de Indicadores (KPIs) -->
+  <div class="row g-3 mb-4">
+    <!-- Doses Previstas -->
+    <div class="col-12 col-sm-4">
+      <app-stat-card
+        label="Doses Previstas"
+        [value]="kpis().previstas"
+        icon="schedule"
+        variant="warning"
+        valueClass="text-surface-main"
+      />
     </div>
 
-    <!-- KPIs Resumidos do Mês -->
-    <div class="d-flex align-items-center gap-2 flex-wrap">
-      <div
-        class="kpi-chip px-3 py-2 rounded-3 border bg-surface-subtle d-flex align-items-center gap-2"
-      >
-        <mat-icon class="text-warning kpi-icon">schedule</mat-icon>
-        <div>
-          <span class="d-block fw-bold small text-surface-main">{{ kpis().previstas }}</span>
-          <span class="text-surface-muted" style="font-size: 0.72rem">Previstas</span>
-        </div>
-      </div>
+    <!-- Doses Aplicadas -->
+    <div class="col-12 col-sm-4">
+      <app-stat-card
+        label="Doses Aplicadas"
+        [value]="kpis().aplicadas"
+        icon="check_circle"
+        variant="success"
+      />
+    </div>
 
-      <div
-        class="kpi-chip px-3 py-2 rounded-3 border bg-surface-subtle d-flex align-items-center gap-2"
-      >
-        <mat-icon class="text-success kpi-icon">check_circle</mat-icon>
-        <div>
-          <span class="d-block fw-bold small text-success">{{ kpis().aplicadas }}</span>
-          <span class="text-surface-muted" style="font-size: 0.72rem">Aplicadas</span>
-        </div>
-      </div>
-
-      @if (kpis().atrasadas > 0) {
-        <div
-          class="kpi-chip px-3 py-2 rounded-3 border border-danger-subtle bg-danger-subtle d-flex align-items-center gap-2"
-        >
-          <mat-icon class="text-danger kpi-icon">warning</mat-icon>
-          <div>
-            <span class="d-block fw-bold small text-danger">{{ kpis().atrasadas }}</span>
-            <span class="text-danger" style="font-size: 0.72rem">Atrasadas</span>
-          </div>
-        </div>
-      }
-
-      <button
-        type="button"
-        mat-flat-button
-        color="primary"
-        (click)="abrirModalVacina()"
-        class="btn-agendar px-3 ms-auto ms-lg-2"
-        matTooltip="Agendar nova vacina para qualquer pet"
-      >
-        <mat-icon class="me-1">add</mat-icon>
-        <span>Agendar Vacina</span>
-      </button>
+    <!-- Doses Atrasadas -->
+    <div class="col-12 col-sm-4">
+      <app-stat-card
+        label="Doses Atrasadas"
+        [value]="kpis().atrasadas"
+        icon="warning"
+        variant="danger"
+      />
     </div>
   </div>
 
@@ -115,6 +100,7 @@
       (change)="viewMode.set($event.value)"
       aria-label="Modo de visualização"
       class="border rounded-3"
+      hideSingleSelectionIndicator
     >
       <mat-button-toggle value="grade" matTooltip="Visão em Grade Mensal">
         <mat-icon>calendar_view_month</mat-icon>

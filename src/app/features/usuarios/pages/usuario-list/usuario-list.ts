@@ -23,6 +23,9 @@ import {
 import { AuthService } from '@core/auth/services/auth.service';
 import { ToastService } from '@core/services/toast.service';
 import { ConfirmationDialogComponent } from '@shared/components/confirmation-dialog/confirmation-dialog';
+import { PageHeaderComponent } from '../../../../shared/components/page-header/page-header';
+import { StatCardComponent } from '../../../../shared/components/stat-card/stat-card';
+import { FilterPanelComponent } from '../../../../shared/components/filter-panel/filter-panel';
 import { UsuariosService } from '../../services/usuarios.service';
 
 @Component({
@@ -31,6 +34,9 @@ import { UsuariosService } from '../../services/usuarios.service';
   imports: [
     CommonModule,
     FormsModule,
+    PageHeaderComponent,
+    StatCardComponent,
+    FilterPanelComponent,
     MatButtonModule,
     MatIconModule,
     MatCardModule,

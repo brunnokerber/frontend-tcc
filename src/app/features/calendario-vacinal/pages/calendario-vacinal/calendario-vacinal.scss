@@ -1,19 +1,9 @@
-.calendario-page {
-  max-width: 1440px;
-  margin: 0 auto;
-}
-
-.kpi-chip,
 .navigation-card,
 .calendar-grid-wrapper,
 .agenda-group-card,
 .day-cell {
   background-color: var(--mat-sys-surface-container-lowest);
   border-color: var(--mat-sys-outline-variant);
-}
-
-.kpi-chip {
-  min-width: 100px;
 }
 
 // Grupo de Navegação Mensal
@@ -23,34 +13,75 @@
   height: 38px;
   display: inline-flex;
   align-items: center;
+}
 
-  .month-nav-btn {
-    border: none;
-    background: transparent;
-    color: var(--mat-sys-on-surface);
+.month-nav-btn {
+  border: none;
+  background: transparent;
+  color: var(--mat-sys-on-surface);
+  height: 100%;
+  min-width: 38px;
+  padding: 0 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease;
+  user-select: none;
+
+  &:hover {
+    background-color: var(--mat-sys-surface-container-high);
+    color: var(--mat-sys-primary);
+  }
+
+  &:active {
+    background-color: var(--mat-sys-surface-container-highest);
+  }
+
+  &:not(:last-child) {
+    border-right: 1px solid var(--mat-sys-outline-variant);
+  }
+
+  mat-icon {
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+  }
+
+  &.month-nav-btn-today {
+    padding: 0 16px;
+    font-size: 0.875rem;
+    font-weight: 600;
+  }
+}
+
+mat-button-toggle-group {
+  border-color: var(--mat-sys-outline-variant);
+  height: 38px;
+  display: inline-flex;
+  align-items: center;
+
+  mat-button-toggle {
     height: 100%;
-    min-width: 38px;
-    padding: 0 10px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition:
-      background-color 0.15s ease,
-      color 0.15s ease;
-    user-select: none;
 
-    &:hover {
-      background-color: var(--mat-sys-surface-container-high);
-      color: var(--mat-sys-primary);
-    }
+    ::ng-deep {
+      .mat-button-toggle-button {
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
 
-    &:active {
-      background-color: var(--mat-sys-surface-container-highest);
-    }
-
-    &:not(:last-child) {
-      border-right: 1px solid var(--mat-sys-outline-variant);
+      .mat-button-toggle-label-content {
+        line-height: 1;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        padding: 0 10px;
+      }
     }
 
     mat-icon {
@@ -61,34 +92,9 @@
       align-items: center;
       justify-content: center;
     }
-
-    &.month-nav-btn-today {
-      padding: 0 16px;
-      font-size: 0.875rem;
-      font-weight: 600;
-    }
   }
 }
 
-mat-button-toggle-group {
-  border-color: var(--mat-sys-outline-variant);
-  height: 38px;
-  align-items: center;
-
-  mat-button-toggle {
-    height: 100%;
-    display: inline-flex;
-    align-items: center;
-
-    mat-icon {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-    }
-  }
-}
-
-.kpi-icon,
 .date-header-icon {
   font-size: 20px;
   width: 20px;

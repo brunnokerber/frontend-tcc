@@ -1,232 +1,169 @@
 <div class="container-fluid px-3 px-md-4">
   <!-- Cabeçalho da Página -->
-  <div class="row align-items-center mb-4 g-3">
-    <div class="col-12 col-md-7">
-      <div class="d-flex align-items-center gap-3">
-        <div class="header-icon-box d-flex align-items-center justify-content-center">
-          <mat-icon>volunteer_activism</mat-icon>
-        </div>
-        <div>
-          <h1 class="h3 fw-bold mb-1">Quadro de Voluntários</h1>
-          <p class="text-surface-muted small mb-0">
-            Consulte, cadastre e gerencie as escalas e disponibilidades dos colaboradores da ONG.
-          </p>
-        </div>
-      </div>
-    </div>
-    <div class="col-12 col-md-5 d-flex justify-content-md-end gap-2">
-      <button
-        mat-flat-button
-        color="primary"
-        type="button"
-        (click)="openVoluntarioDialog()"
-        class="btn-create d-flex align-items-center gap-2 py-2 px-3 rounded-3 shadow-sm"
-      >
-        <mat-icon>add</mat-icon>
-        <span class="fw-semibold">Cadastrar Novo Voluntário</span>
-      </button>
-    </div>
-  </div>
+  <app-page-header
+    title="Quadro de Voluntários"
+    description="Consulte, cadastre e gerencie as escalas e disponibilidades dos colaboradores da ONG."
+    icon="volunteer_activism"
+  >
+    <button
+      mat-flat-button
+      color="primary"
+      type="button"
+      (click)="openVoluntarioDialog()"
+      class="btn-create flex-fill flex-sm-grow-0 py-2 px-2 px-sm-3 rounded-3 shadow-sm"
+    >
+      <mat-icon>add</mat-icon>
+      <span class="fw-semibold">
+        <span class="d-none d-sm-inline">Cadastrar </span>Novo Voluntário
+      </span>
+    </button>
+  </app-page-header>
 
   <!-- Cards de Estatísticas Rápidas -->
   <div class="row g-3 mb-4">
     <!-- Total Voluntários -->
     <div class="col-6 col-md-3">
-      <div class="stat-card p-3 rounded-3 shadow-xs">
-        <div class="d-flex align-items-center justify-content-between">
-          <div>
-            <span class="text-surface-muted small d-block mb-1">Total de Voluntários</span>
-            <span class="fs-4 fw-bold">{{ totalVoluntarios() }}</span>
-          </div>
-          <div class="stat-icon-wrapper bg-status-primary">
-            <mat-icon>volunteer_activism</mat-icon>
-          </div>
-        </div>
-      </div>
+      <app-stat-card
+        label="Total de Voluntários"
+        [value]="totalVoluntarios()"
+        icon="volunteer_activism"
+        variant="primary"
+      />
     </div>
 
     <!-- Finais de Semana -->
     <div class="col-6 col-md-3">
-      <div class="stat-card p-3 rounded-3 shadow-xs">
-        <div class="d-flex align-items-center justify-content-between">
-          <div>
-            <span class="text-surface-muted small d-block mb-1">Finais de Semana</span>
-            <span class="fs-4 fw-bold text-status-success">{{ totalFimDeSemana() }}</span>
-          </div>
-          <div class="stat-icon-wrapper bg-status-success">
-            <mat-icon>event_available</mat-icon>
-          </div>
-        </div>
-      </div>
+      <app-stat-card
+        label="Finais de Semana"
+        [value]="totalFimDeSemana()"
+        icon="event_available"
+        variant="success"
+      />
     </div>
 
     <!-- Turno Manhã -->
     <div class="col-6 col-md-3">
-      <div class="stat-card p-3 rounded-3 shadow-xs">
-        <div class="d-flex align-items-center justify-content-between">
-          <div>
-            <span class="text-surface-muted small d-block mb-1">Turno Manhã</span>
-            <span class="fs-4 fw-bold text-status-warning">{{ totalManha() }}</span>
-          </div>
-          <div class="stat-icon-wrapper bg-status-warning">
-            <mat-icon>wb_sunny</mat-icon>
-          </div>
-        </div>
-      </div>
+      <app-stat-card label="Turno Manhã" [value]="totalManha()" icon="wb_sunny" variant="warning" />
     </div>
 
     <!-- Turno Tarde / Noite -->
     <div class="col-6 col-md-3">
-      <div class="stat-card p-3 rounded-3 shadow-xs">
-        <div class="d-flex align-items-center justify-content-between">
-          <div>
-            <span class="text-surface-muted small d-block mb-1">Tarde / Noite</span>
-            <span class="fs-4 fw-bold text-status-info">{{ totalTardeNoite() }}</span>
-          </div>
-          <div class="stat-icon-wrapper bg-status-info">
-            <mat-icon>nights_stay</mat-icon>
-          </div>
-        </div>
-      </div>
+      <app-stat-card
+        label="Tarde / Noite"
+        [value]="totalTardeNoite()"
+        icon="nights_stay"
+        variant="info"
+      />
     </div>
   </div>
 
   <!-- Painel de Busca com Formulário Explícito de Submit -->
-  <form (ngSubmit)="applyFilters()" class="filter-panel p-3 p-md-4 rounded-3 shadow-xs mb-4">
-    <div class="row g-3 align-items-end">
-      <!-- Coluna 1: Filtrar por Coluna -->
-      <div class="col-12 col-sm-6 col-lg-2">
-        <label
-          for="vol-filter-field"
-          class="form-label small fw-semibold text-surface-muted mb-1 text-truncate d-block"
-        >
-          Filtrar por Coluna
-        </label>
-        <select
-          id="vol-filter-field"
-          class="form-select bg-surface-card text-surface-main border-surface"
-          [ngModel]="searchField()"
-          (ngModelChange)="onSearchFieldChange($event)"
-          name="searchField"
-        >
-          @for (field of searchFields; track field.value) {
-            <option [value]="field.value">{{ field.label }}</option>
-          }
-        </select>
-      </div>
+  <app-filter-panel
+    (search)="applyFilters()"
+    (clear)="clearFilters()"
+    [loading]="voluntariosService.loading()"
+    [clearDisabled]="!searchValue() && !selectedDia() && !selectedTurno()"
+    actionsColClass="col-12 col-lg-3"
+  >
+    <!-- Coluna 1: Filtrar por Coluna -->
+    <div class="col-12 col-sm-6 col-lg-2">
+      <label
+        for="vol-filter-field"
+        class="form-label small fw-semibold text-surface-muted mb-1 text-truncate d-block"
+      >
+        Filtrar por Coluna
+      </label>
+      <select
+        id="vol-filter-field"
+        class="form-select bg-surface-card text-surface-main border-surface"
+        [ngModel]="searchField()"
+        (ngModelChange)="onSearchFieldChange($event)"
+        name="searchField"
+      >
+        @for (field of searchFields; track field.value) {
+          <option [value]="field.value">{{ field.label }}</option>
+        }
+      </select>
+    </div>
 
-      <!-- Coluna 2: Termo de Busca -->
-      <div class="col-12 col-sm-6 col-lg-3">
-        <label
-          for="vol-filter-value"
-          class="form-label small fw-semibold text-surface-muted mb-1 text-truncate d-block"
-        >
-          Termo de Busca / Valor
-        </label>
-        <div class="input-group">
-          <span class="input-group-text bg-surface-subtle border-end-0 border-surface">
-            <i class="bi bi-search"></i>
-          </span>
-          <input
-            id="vol-filter-value"
-            type="text"
-            class="form-control border-start-0 border-surface bg-surface-card text-surface-main"
-            [placeholder]="getSearchPlaceholder()"
-            [ngModel]="searchValue()"
-            (ngModelChange)="searchValue.set($event)"
-            name="searchValue"
-          />
-          @if (searchValue()) {
-            <button
-              class="btn btn-outline-secondary border-start-0 border-surface"
-              type="button"
-              (click)="searchValue.set('')"
-              matTooltip="Limpar busca"
-            >
-              <mat-icon style="font-size: 18px; width: 18px; height: 18px">clear</mat-icon>
-            </button>
-          }
-        </div>
-      </div>
-
-      <!-- Coluna 3: Dia da Semana -->
-      <div class="col-6 col-sm-6 col-lg-2">
-        <label
-          for="vol-filter-dia"
-          class="form-label small fw-semibold text-surface-muted mb-1 text-truncate d-block"
-        >
-          Dia da Semana
-        </label>
-        <select
-          id="vol-filter-dia"
-          class="form-select bg-surface-card text-surface-main border-surface"
-          [ngModel]="selectedDia()"
-          (ngModelChange)="selectedDia.set($event)"
-          name="selectedDia"
-        >
-          <option value="">-- Todos os Dias --</option>
-          @for (dia of diasOptions; track dia) {
-            <option [value]="dia">{{ dia }}</option>
-          }
-        </select>
-      </div>
-
-      <!-- Coluna 4: Turno -->
-      <div class="col-6 col-sm-6 col-lg-2">
-        <label
-          for="vol-filter-turno"
-          class="form-label small fw-semibold text-surface-muted mb-1 text-truncate d-block"
-        >
-          Turno
-        </label>
-        <select
-          id="vol-filter-turno"
-          class="form-select bg-surface-card text-surface-main border-surface"
-          [ngModel]="selectedTurno()"
-          (ngModelChange)="selectedTurno.set($event)"
-          name="selectedTurno"
-        >
-          <option value="">-- Todos os Turnos --</option>
-          @for (turno of turnosOptions; track turno) {
-            <option [value]="turno">{{ turno }}</option>
-          }
-        </select>
-      </div>
-
-      <!-- Coluna 5: Botões de Ação de Filtro -->
-      <div class="col-12 col-lg-3 d-flex justify-content-end gap-2">
-        <button
-          mat-stroked-button
-          type="button"
-          (click)="clearFilters()"
-          class="btn-clear flex-grow-1 flex-lg-grow-0"
-          [disabled]="
-            voluntariosService.loading() || (!searchValue() && !selectedDia() && !selectedTurno())
-          "
-        >
-          <mat-icon>filter_alt_off</mat-icon>
-          <span>Limpar</span>
-        </button>
-        <button
-          mat-flat-button
-          color="primary"
-          type="submit"
-          [disabled]="voluntariosService.loading()"
-          class="flex-grow-1 flex-lg-grow-0 px-3"
-        >
-          @if (voluntariosService.loading()) {
-            <span class="spinner-border spinner-border-sm me-1" role="status"></span>
-            <span>Filtrando...</span>
-          } @else {
-            <span class="d-inline-flex align-items-center gap-1">
-              <mat-icon>filter_list</mat-icon>
-              <span>Filtrar</span>
-            </span>
-          }
-        </button>
+    <!-- Coluna 2: Termo de Busca -->
+    <div class="col-12 col-sm-6 col-lg-3">
+      <label
+        for="vol-filter-value"
+        class="form-label small fw-semibold text-surface-muted mb-1 text-truncate d-block"
+      >
+        Termo de Busca / Valor
+      </label>
+      <div class="input-group">
+        <span class="input-group-text bg-surface-subtle border-end-0 border-surface">
+          <i class="bi bi-search"></i>
+        </span>
+        <input
+          id="vol-filter-value"
+          type="text"
+          class="form-control border-start-0 border-surface bg-surface-card text-surface-main"
+          [placeholder]="getSearchPlaceholder()"
+          [ngModel]="searchValue()"
+          (ngModelChange)="searchValue.set($event)"
+          name="searchValue"
+        />
+        @if (searchValue()) {
+          <button
+            class="btn btn-outline-secondary border-start-0 border-surface"
+            type="button"
+            (click)="searchValue.set('')"
+            matTooltip="Limpar busca"
+          >
+            <mat-icon style="font-size: 18px; width: 18px; height: 18px">clear</mat-icon>
+          </button>
+        }
       </div>
     </div>
-  </form>
+
+    <!-- Coluna 3: Dia da Semana -->
+    <div class="col-6 col-sm-6 col-lg-2">
+      <label
+        for="vol-filter-dia"
+        class="form-label small fw-semibold text-surface-muted mb-1 text-truncate d-block"
+      >
+        Dia da Semana
+      </label>
+      <select
+        id="vol-filter-dia"
+        class="form-select bg-surface-card text-surface-main border-surface"
+        [ngModel]="selectedDia()"
+        (ngModelChange)="selectedDia.set($event)"
+        name="selectedDia"
+      >
+        <option value="">-- Todos os Dias --</option>
+        @for (dia of diasOptions; track dia) {
+          <option [value]="dia">{{ dia }}</option>
+        }
+      </select>
+    </div>
+
+    <!-- Coluna 4: Turno -->
+    <div class="col-6 col-sm-6 col-lg-2">
+      <label
+        for="vol-filter-turno"
+        class="form-label small fw-semibold text-surface-muted mb-1 text-truncate d-block"
+      >
+        Turno
+      </label>
+      <select
+        id="vol-filter-turno"
+        class="form-select bg-surface-card text-surface-main border-surface"
+        [ngModel]="selectedTurno()"
+        (ngModelChange)="selectedTurno.set($event)"
+        name="selectedTurno"
+      >
+        <option value="">-- Todos os Turnos --</option>
+        @for (turno of turnosOptions; track turno) {
+          <option [value]="turno">{{ turno }}</option>
+        }
+      </select>
+    </div>
+  </app-filter-panel>
 
   <!-- Loading State -->
   @if (voluntariosService.loading()) {

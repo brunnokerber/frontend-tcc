@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { environment } from '@env/environment';
 import { Pet } from '../models/pet.model';
 
 export interface PetReportStats {
@@ -18,6 +19,8 @@ export interface PetReportFilterItem {
   providedIn: 'root',
 })
 export class PetReportService {
+  private readonly ongName = environment.ongName;
+
   /**
    * Exporta a lista de pets filtrados para planilha Excel (.csv com UTF-8 BOM)
    */
@@ -81,7 +84,7 @@ export class PetReportService {
         : 'Nenhum filtro aplicado (Todos os registros)';
 
     const metadataRows = [
-      ['Peludinhos do Vale - Relatório de Pets'],
+      [`${this.ongName} - Relatório de Pets`],
       [`Gerado em:;${formattedDate}`],
       [`Filtros aplicados:;${this.escapeCsv(filterSummary)}`],
       [`Total de registros:;${pets.length}`],
@@ -173,7 +176,7 @@ export class PetReportService {
       <html lang="pt-BR">
       <head>
         <meta charset="utf-8">
-        <title>Relatório de Pets - Peludinhos do Vale</title>
+        <title>Relatório de Pets - ${this.escapeHtml(this.ongName)}</title>
         <style>
           * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
           body { margin: 0; padding: 24px; color: #0f172a; background-color: #fff; }
@@ -217,7 +220,7 @@ export class PetReportService {
 
         <div class="report-header">
           <div>
-            <h1 class="org-title">🐾 Peludinhos do Vale</h1>
+            <h1 class="org-title">🐾 ${this.escapeHtml(this.ongName)}</h1>
             <p class="report-subtitle">Sistema de Gerenciamento de Animais Resgatados &bull; Relatório de Animais</p>
           </div>
           <div class="meta-info">
@@ -275,7 +278,7 @@ export class PetReportService {
         </table>
 
         <div class="footer">
-          <span>Peludinhos do Vale &bull; Documento gerado eletronicamente para fins de controle e auditoria interna.</span>
+          <span>${this.escapeHtml(this.ongName)} &bull; Documento gerado eletronicamente para fins de controle e auditoria interna.</span>
           <span>Página 1</span>
         </div>
       </body>
