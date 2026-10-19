@@ -1,12 +1,15 @@
 import { provideZonelessChangeDetection } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
+import { Title } from '@angular/platform-browser';
+import { provideRouter } from '@angular/router';
+import { environment } from '@env/environment';
 import { App } from './app';
 
 describe('App', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [App],
-      providers: [provideZonelessChangeDetection()],
+      providers: [provideRouter([]), provideZonelessChangeDetection()],
     }).compileComponents();
   });
 
@@ -16,10 +19,10 @@ describe('App', () => {
     expect(app).toBeTruthy();
   });
 
-  it('should render title', () => {
+  it('should set page title on init', () => {
+    const titleService = TestBed.inject(Title);
     const fixture = TestBed.createComponent(App);
     fixture.detectChanges();
-    const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('h1')?.textContent).toContain('Hello, frontend-tcc');
+    expect(titleService.getTitle()).toBe(environment.ongName);
   });
 });

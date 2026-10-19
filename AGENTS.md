@@ -8,7 +8,7 @@ Este documento estabelece as regras de conduta, padrões arquiteturais e obriga�
 
 - **Projeto:** Sistema de Gerenciamento de Animais Resgatados (*Peludinhos do Vale*)
 - **Trabalho Acadêmico:** Trabalho de Conclusão de Curso (TCC) - Engenharia da Computação - Universidade Feevale
-- **Stack Principal:** Angular 20 (Zoneless + Signals), TypeScript, Angular Material, Bootstrap / Bootstrap Icons, Supabase (BaaS, PostgreSQL, RLS, Edge Functions).
+- **Stack Principal:** Angular 20 (Zoneless + Signals), TypeScript, Angular Material, Bootstrap / Bootstrap Icons, Supabase (BaaS, PostgreSQL, RLS, Edge Functions), Vitest (Test Runner & V8 Coverage).
 
 ---
 
@@ -55,12 +55,19 @@ Ao concluir qualquer tarefa que envolva nova feature, alteração de regras de n
 - **Padronização Automática:** Todo o código TypeScript, HTML, SCSS e JSON do projeto deve seguir estritamente as regras definidas no `.prettierrc`.
 - **Execução Mandatória:** Ao finalizar qualquer modificação e validar o build (`npm run build`), o assistente de IA **deve obrigatoriamente executar `npm run format`** para formatar e padronizar os arquivos antes da entrega ao usuário.
 
+### 5. Testes Unitários e Garantia da Qualidade (Vitest)
+- **Cobertura de Regras de Negócio:** Toda nova funcionalidade, serviço de domínio, validador customizado, pipe ou utilitário contendo regras de negócio ou transformações **deve obrigatoriamente vir acompanhado de testes unitários correspondentes (`.spec.ts`)**.
+- **Execução Mandatória contra Regressões:** O assistente de IA **deve obrigatoriamente executar `npm test` (ou `npm run test:coverage`)** ao finalizar novas *features* ou refatorações para certificar que os testes existentes e novos passam com 100% de sucesso sem quebras.
+- **Padrão Zoneless nos Testes:** Seguir o padrão desacoplado do Angular 20, instanciando o `TestBed` com `provideZonelessChangeDetection()` ou herdando a infraestrutura global em `src/test-setup.ts`.
+
 ---
 
 ## 📋 Checklist Obrigatório de Finalização de Tarefa
 
 Antes de considerar uma resposta ou feature concluída, a IA deve verificar:
 - [ ] O código compila sem erros (`npm run build` / typecheck)?
+- [ ] A suíte de testes unitários foi executada e aprovada com 100% de sucesso (`npm test` / `npm run test:coverage`), garantindo ausência de regressões?
+- [ ] Novos testes unitários (`.spec.ts`) foram criados ou atualizados para cobrir as regras de negócio implementadas?
 - [ ] A formatação foi padronizada executando o Prettier (`npm run format`) ao final da execução após a validação do build?
 - [ ] A nova funcionalidade está devidamente tipada sem uso de `any`?
 - [ ] As estilizações respeitam as boas práticas de CSS sem uso desnecessário de `!important`?

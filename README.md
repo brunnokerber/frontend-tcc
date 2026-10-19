@@ -166,9 +166,28 @@ npm run start-remote
 | `npm start` | Inicia o servidor local de desenvolvimento com Hot Reload em `http://localhost:4200`. |
 | `npm run start-remote` | Inicia o servidor local apontando para as configurações de produção. |
 | `npm run build` | Compila os artefatos de produção otimizados na pasta `dist/`. |
-| `npm run test` | Executa a suíte de testes unitários com Karma e Jasmine. |
+| `npm test` | Executa a suíte de testes unitários em modo headless ultrarrápido com Vitest. |
+| `npm run test:watch` | Executa os testes unitários em modo interativo de observação (*Watch mode*). |
+| `npm run test:coverage` | Executa a suíte completa de testes e gera relatórios de cobertura de código (*V8 Coverage* em `coverage/`). |
 | `npm run format` | Executa a formatação e padronização automática de código com Prettier em todos os arquivos (`.ts`, `.html`, `.scss`, `.json`). |
 | `npm run format:check` | Valida se todos os arquivos do projeto seguem o padrão do Prettier sem alterá-los. |
+
+### 🧪 Testes Unitários e Cobertura (Vitest)
+
+O projeto adota o **Vitest** com `@analogjs/vite-plugin-angular` e simulação DOM via `jsdom` como motor oficial de testes unitários:
+* **Execução Rápida e Headless:** Não requer navegador Chrome instalado nem inicialização de servidor pesado, sendo ideal tanto para o fluxo local quanto para esteiras de CI/CD.
+* **Cobertura de Código Nativa:** Utiliza o provedor `@vitest/coverage-v8`, gerando relatórios de cobertura em múltiplos formatos: `text` (terminal), `lcov` (integração contínua) e `json-summary`.
+* **Execução:**
+  ```bash
+  # Rodar todos os testes uma única vez
+  npm test
+
+  # Rodar testes com auto-reload (watch)
+  npm run test:watch
+
+  # Rodar testes gerando relatório de cobertura
+  npm run test:coverage
+  ```
 
 ### 🎨 Padronização de Código (Prettier)
 

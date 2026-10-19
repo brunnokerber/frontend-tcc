@@ -123,7 +123,7 @@
         <mxCell id="step_build" parent="box_cicd" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#9B59B6;fontSize=12;fontColor=#4A235A;" value="&lt;b&gt;2. Build de Produção&lt;/b&gt;&lt;br&gt;Otimização e compilação do bundle" vertex="1">
           <mxGeometry height="45" width="250" x="15" y="90" as="geometry" />
         </mxCell>
-        <mxCell id="step_test" parent="box_cicd" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#9B59B6;fontSize=12;fontColor=#4A235A;" value="&lt;b&gt;3. Testes Unitários &amp;amp; Cobertura&lt;/b&gt;&lt;br&gt;Karma + Jasmine (Code Coverage)" vertex="1">
+        <mxCell id="step_test" parent="box_cicd" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#9B59B6;fontSize=12;fontColor=#4A235A;" value="&lt;b&gt;3. Testes Unitários &amp;amp; Cobertura&lt;/b&gt;&lt;br&gt;Vitest + JSDOM (V8 Coverage)" vertex="1">
           <mxGeometry height="45" width="250" x="15" y="145" as="geometry" />
         </mxCell>
         <mxCell id="step_deploy" parent="box_cicd" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#D5F5E3;strokeColor=#27AE60;fontSize=12;fontColor=#145A32;fontStyle=1;" value="&lt;b&gt;4. Deploy Automatizado&lt;/b&gt;&lt;br&gt;Publicação contínua pós-aprovação" vertex="1">
