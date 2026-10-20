@@ -6,6 +6,7 @@ import {
   ConsultaExameCreateDto,
   ConsultaExameUpdateDto,
 } from '../models/consulta-exame.model';
+import { extractErrorMessage } from '@shared/utils/supabase-error.utils';
 
 @Injectable({
   providedIn: 'root',
@@ -44,7 +45,7 @@ export class ConsultasExamesService {
       this.consultasSignal.set(list);
       this.cachedPetIdSignal.set(petId);
       return list;
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.warn('Erro ao carregar consultas/exames do pet:', err);
       return [];
     } finally {
@@ -70,8 +71,8 @@ export class ConsultasExamesService {
         throw error;
       }
       return data as ConsultaExame;
-    } catch (err: any) {
-      this.toast.error(err.message || 'Erro ao buscar dados do procedimento/consulta.');
+    } catch (err: unknown) {
+      this.toast.error(extractErrorMessage(err, 'Erro ao buscar dados do procedimento/consulta.'));
       return null;
     } finally {
       this.loadingSignal.set(false);
@@ -97,8 +98,8 @@ export class ConsultasExamesService {
         this.consultasSignal.update((list) => [created, ...list]);
       }
       return created;
-    } catch (err: any) {
-      const msg = err.message || 'Erro ao registrar procedimento/consulta.';
+    } catch (err: unknown) {
+      const msg = extractErrorMessage(err, 'Erro ao registrar procedimento/consulta.');
       this.toast.error(msg);
       throw err;
     } finally {
@@ -130,8 +131,8 @@ export class ConsultasExamesService {
       this.toast.success(`Procedimento "${updated.operacao_medicamento}" atualizado com sucesso!`);
       this.consultasSignal.update((list) => list.map((c) => (c.id === id ? updated : c)));
       return updated;
-    } catch (err: any) {
-      const msg = err.message || 'Erro ao atualizar procedimento/consulta.';
+    } catch (err: unknown) {
+      const msg = extractErrorMessage(err, 'Erro ao atualizar procedimento/consulta.');
       this.toast.error(msg);
       throw err;
     } finally {

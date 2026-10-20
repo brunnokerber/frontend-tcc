@@ -95,3 +95,80 @@ As abas do prontuário clínico e histórico de estadias demandam registros filt
 * **Consulta de Prontuário Clínico (`vacinas WHERE id_pet = ?`):** Utilização do índice `idx_vacinas_pet_data` via *Bitmap Index Scan* com tempo de execução aferido de **0.109 ms**.
 * **Busca Textual por Substring (`pets WHERE nome ILIKE '%termo%'`):** Resolução instantânea via `idx_pets_nome_trgm` sem overhead de varredura completa de tabela.
 * **Filtro de Disponibilidade de Voluntários (`dias_semana @> ARRAY['Sábado']`):** Execução via `idx_voluntarios_dias_semana` com *Bitmap Index Scan*.
+
+---
+
+## 5. Estratégia de Testes Automatizados: Unitários (Vitest) e E2E (Playwright)
+
+Com foco no rigor acadêmico do TCC e na confiabilidade da operação em produção, o sistema adota uma estratégia pragmática e direta de **dois níveis de testes**, sem a sobrecarga de testes de integração intermediários com DOM simulado:
+
+```mermaid
+graph TD
+    E2E["Testes End-to-End com Playwright (Planejados)<br>Fluxos ponta a ponta, formulários e diálogos do Angular Material em navegadores reais"]
+    UNIT["Testes Unitários com Vitest (Implementados)<br>Camada de Domínio, Core Services, Pipes, Máscaras e Validadores (>90% Cobertura)"]
+
+    UNIT --> E2E
+
+    style UNIT fill:#16a34a,stroke:#15803d,color:#ffffff,font-weight:bold
+    style E2E fill:#2563eb,stroke:#1d4ed8,color:#ffffff
+```
+
+### 5.1. Cobertura Unitária e Isolamento de Regras de Negócio (Vitest)
+A camada de **Serviços de Domínio e Core** concentra as regras de negócio críticas e a orquestração do Supabase (BaaS). Todos os serviços foram submetidos a testes unitários estritos com isolamento de dependências via mocks e `provideZonelessChangeDetection()`, abrangendo cenários de sucesso, validações e caminhos de exceção:
+
+| Serviço / Domínio | % Statements | % Funções | % Linhas | Regras de Negócio e Casos de Borda Cobertos |
+| :--- | :---: | :---: | :---: | :--- |
+| **`AuthService`** | **91.5%** | **100%** | **91.5%** | Login com resolução de perfis via PostgREST, renovação thread-safe de token (`getValidToken` concorrente), mapeamento de erros Supabase (`same_password`, `weak_password`, reautenticação exigida), captura de JWT hash e logout por inatividade. |
+| **`PetsService`** | **92.3%** | **100%** | **92.3%** | CRUD de pets, upload/geração de URLs assinadas/exclusão no Supabase Storage, RPC transacional `criar_pet_com_entrada`, RPC `atualizar_pet_com_entrada` e RPC `adotar_pet` com tratamento de falhas. |
+| **`VacinasService`** | **96.9%** | **100%** | **96.9%** | Controle de doses previstas e aplicadas, cache local reativo em Signal, cálculo do calendário geral de vacinação e resiliência a falhas de rede. |
+| **`LocaisService`** | **100%** | **100%** | **100%** | Gestão de abrigos/lares temporários, consultas multicritério com normalização de telefones e integração assíncrona ao ViaCEP com tolerância a falhas. |
+| **`VoluntariosService`** | **100%** | **100%** | **100%** | Escala de voluntariado com operadores de array `@>` do PostgreSQL (`dias_semana`, `turnos`), normalização de dígitos de telefone e soft delete. |
+| **`VeterinariosService`** | **100%** | **100%** | **100%** | Registro de médicos veterinários e clínicas parceiras com tratamento de CRMV duplicado e falhas de banco. |
+| **`UsuariosService`** | **100%** | **100%** | **100%** | Acionamento da Edge Function `toggle-user-status`, parsing de erros de servidor (`parseFunctionError`), autodesativação de conta e controle RBAC. |
+| **`ConsultasExamesService`** | **100%** | **100%** | **100%** | Histórico clínico-cirúrgico, cacheamento por `id_pet`, recarga forçada e gestão de custos veterinários. |
+| **`PetsLocaisService`** | **100%** | **100%** | **100%** | Registro de passagens e histórico de estadias, controle de auxílio financeiro e invalidação de cache. |
+| **`PetReportService`** | **95.9%** | **100%** | **95.9%** | Geração e download de relatórios CSV com UTF-8 BOM sanitizado contra CSV Injection, e emissão de relatórios PDF com layout para impressão e sanitização anti-XSS. |
+| **`NavigationService`** | **100%** | **100%** | **100%** | Navegação defensiva com fallback automático para rotas padrão em acessos diretos. |
+
+### 5.2. Justificativa Técnica para a Escolha: Unitários + E2E (Playwright)
+Optou-se deliberadamente por não introduzir uma camada intermediária de testes de integração de componentes/diálogos em ambiente simulado (JSDOM). 
+
+1. **Evitar a Fragilidade de Testes Intermediários de UI:** Testar componentes visuais e modais do Angular Material isoladamente com mocks profundos de serviços e emulação de DOM tende a produzir testes frágeis (*brittle tests*), lentos para manter e com alta taxa de falsos positivos, sem de fato garantir que a interface funcione no navegador do usuário final.
+2. **Eficiência e Rigor no Pipeline:** 
+   - **Camada Unitária (Vitest):** Valida de forma instantânea (~10s no CI/CD) toda a lógica de negócio, transformações, cálculos de datas, regras de sanitização, resiliência a erros e persistência.
+   - **Camada End-to-End (Playwright - Planejada):** Assumirá a responsabilidade de verificar os fluxos visuais reais do usuário (preenchimento de formulários, abertura de diálogos, máscaras de input, alertas visuais e navegação entre páginas) diretamente em navegadores reais (Chromium, Firefox, WebKit).
+
+---
+
+## 6. Qualidade de Código, Tipagem Estrita e Padronização (ESLint + Prettier)
+
+Para assegurar manutenibilidade a longo prazo, consistência arquitetural e conformidade com os princípios da Engenharia de Software no TCC, o projeto adota um ferramental automatizado de análise estática e formatação:
+
+```mermaid
+flowchart LR
+    A["Código Fonte (.ts, .html, .scss)"] --> B["ESLint Flat Config<br>(@angular-eslint + typescript-eslint)"]
+    A --> C["Prettier<br>(Formatação & Estilo)"]
+    B --> D{"Erros de Tipagem<br>ou 'any'?"}
+    D -- Sim --> E["Bloqueia Commit / Build<br>(@typescript-eslint/no-explicit-any)"]
+    D -- Não --> F["Aprovado para Build e Testes"]
+```
+
+### 6.1. Análise Estática com ESLint (Flat Config)
+* **Arquitetura Moderna Flat Config (`eslint.config.js`):** Integrado ao ecossistema do Angular 20 via `@angular-eslint/schematics`, processando tanto componentes TypeScript quanto templates inline e arquivos HTML dedicados.
+* **Política Mandatória de Zero `any` (`@typescript-eslint/no-explicit-any: "error"`):** O uso de `any` é explicitamente bloqueado pelo linter em todo o código de produção (`**/*.ts`), obrigando o uso de tipagem estrita com interfaces, tipos genéricos e type guards seguros com `unknown` (`err instanceof Error`, `extractErrorMessage`).
+* **Boas Práticas Angular:** Validação automatizada de convenções de seletores (`app-*`), ciclo de vida de componentes e templates limpos.
+* **Comando de Execução:** `npm run lint`.
+
+### 6.2. Padronização Visual e Estilística com Prettier
+* **Configuração Única (`.prettierrc`):** Unifica largura de linha (100 colunas), aspas simples, ponto-e-vírgula e indentação de 2 espaços em todas as linguagens do projeto (`.ts`, `.html`, `.scss`, `.json`).
+* **Comandos de Execução:** `npm run format` (reescrita) e `npm run format:check` (validação em CI/CD).
+
+### 6.3. Esteiras Automatizadas de CI/CD (GitHub Actions - `ci.yml` e `deploy.yml`)
+Tanto a validação em desenvolvimento (*Pull Requests* e *Pushes* via `ci.yml`) quanto a esteira de publicação em produção na Vercel (`deploy.yml` na branch `master`) compartilham os mesmos estágios sequenciais de validação (*Quality Gates*):
+1. **Validação de Formatação:** Execução do `npm run format:check` para garantir conformidade com o Prettier.
+2. **Análise Estática e Tipagem Estrita:** Execução do `npm run lint` assegurando conformidade com o ESLint e impedindo a introdução de `any`.
+3. **Testes Unitários e Cobertura:** Execução do `npm run test:coverage` via Vitest com retenção do artefato de cobertura de código.
+4. **Build e Deploy de Produção:** No CI, validação do bundle com `npm run build`; no pipeline de produção, acionamento do build e deploy atômico na Vercel via Vercel CLI.
+
+
+

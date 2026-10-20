@@ -2,6 +2,7 @@ import { inject, Injectable, signal } from '@angular/core';
 import { SupabaseService } from '@core/services/supabase';
 import { ToastService } from '@core/services/toast.service';
 import { onlyDigits } from '@shared/utils/string-utils';
+import { extractErrorMessage } from '@shared/utils/supabase-error.utils';
 import { Local, LocalCreateDto, LocalFilter, LocalUpdateDto } from '../models/local.model';
 
 @Injectable({
@@ -49,8 +50,8 @@ export class LocaisService {
       const list = (data as Local[]) || [];
       this.locaisSignal.set(list);
       return list;
-    } catch (err: any) {
-      const message = err.message || 'Erro ao carregar a lista de locais.';
+    } catch (err: unknown) {
+      const message = extractErrorMessage(err, 'Erro ao carregar a lista de locais.');
       this.errorSignal.set(message);
       this.toast.error(message);
       return [];
@@ -72,8 +73,8 @@ export class LocaisService {
         throw error;
       }
       return data as Local;
-    } catch (err: any) {
-      this.toast.error(err.message || 'Erro ao buscar dados do local.');
+    } catch (err: unknown) {
+      this.toast.error(extractErrorMessage(err, 'Erro ao buscar dados do local.'));
       return null;
     } finally {
       this.loadingSignal.set(false);
@@ -97,8 +98,8 @@ export class LocaisService {
       this.toast.success(`Local "${created.local}" cadastrado com sucesso!`);
       await this.fetchLocais();
       return created;
-    } catch (err: any) {
-      const msg = err.message || 'Erro ao cadastrar o local.';
+    } catch (err: unknown) {
+      const msg = extractErrorMessage(err, 'Erro ao cadastrar o local.');
       this.toast.error(msg);
       throw err;
     } finally {
@@ -127,8 +128,8 @@ export class LocaisService {
       this.toast.success(`Local "${updated.local}" atualizado com sucesso!`);
       await this.fetchLocais();
       return updated;
-    } catch (err: any) {
-      const msg = err.message || 'Erro ao atualizar o local.';
+    } catch (err: unknown) {
+      const msg = extractErrorMessage(err, 'Erro ao atualizar o local.');
       this.toast.error(msg);
       throw err;
     } finally {

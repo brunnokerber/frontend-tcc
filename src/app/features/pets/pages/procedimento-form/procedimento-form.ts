@@ -24,6 +24,7 @@ import {
   maxDateTodayValidator,
 } from '@shared/validators/date.validators';
 import { dateToIsoString, parseIsoToDate, sanitize } from '@shared/utils/string-utils';
+import { extractErrorMessage } from '@shared/utils/supabase-error.utils';
 import {
   ConsultaExame,
   ConsultaExameCreateDto,
@@ -205,8 +206,8 @@ export default class ProcedimentoFormComponent implements OnInit {
         return;
       }
       this.setProcedimentoData(proc);
-    } catch (err: any) {
-      this.toast.error(err.message || 'Erro ao carregar dados do procedimento.');
+    } catch (err: unknown) {
+      this.toast.error(extractErrorMessage(err, 'Erro ao carregar dados do procedimento.'));
     } finally {
       this.isLoading.set(false);
     }

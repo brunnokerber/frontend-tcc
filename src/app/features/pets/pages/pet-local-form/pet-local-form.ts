@@ -26,6 +26,7 @@ import {
   maxDateTodayValidator,
 } from '@shared/validators/date.validators';
 import { dateToIsoString, parseIsoToDate, sanitize } from '@shared/utils/string-utils';
+import { extractErrorMessage } from '@shared/utils/supabase-error.utils';
 import {
   getSexoIcon,
   getStatusBadgeClass,
@@ -230,8 +231,8 @@ export default class PetLocalFormComponent implements OnInit {
         this.petLocalForm.controls.data_saida.updateValueAndValidity({ emitEvent: false });
         this.petLocalForm.controls.data_reentrada.updateValueAndValidity({ emitEvent: false });
       }
-    } catch (err: any) {
-      this.toast.error(err.message || 'Erro ao carregar dados do pet.');
+    } catch (err: unknown) {
+      this.toast.error(extractErrorMessage(err, 'Erro ao carregar dados do pet.'));
     }
   }
 
@@ -240,8 +241,8 @@ export default class PetLocalFormComponent implements OnInit {
     try {
       const list = await this.locaisService.fetchLocais();
       this.locais.set(list || []);
-    } catch (err: any) {
-      this.toast.error(err.message || 'Erro ao carregar lista de locais parceiros.');
+    } catch (err: unknown) {
+      this.toast.error(extractErrorMessage(err, 'Erro ao carregar lista de locais parceiros.'));
     } finally {
       this.loadingLocais.set(false);
     }
@@ -257,8 +258,8 @@ export default class PetLocalFormComponent implements OnInit {
         return;
       }
       this.setPetLocalData(petLocal);
-    } catch (err: any) {
-      this.toast.error(err.message || 'Erro ao carregar dados da passagem.');
+    } catch (err: unknown) {
+      this.toast.error(extractErrorMessage(err, 'Erro ao carregar dados da passagem.'));
     } finally {
       this.isLoading.set(false);
     }
@@ -343,7 +344,7 @@ export default class PetLocalFormComponent implements OnInit {
           this.goBack();
         }
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Erro ao salvar registro de local de passagem:', err);
     } finally {
       this.isSaving.set(false);

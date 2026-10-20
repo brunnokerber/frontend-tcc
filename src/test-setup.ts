@@ -1,3 +1,4 @@
+import { provideZonelessChangeDetection } from '@angular/core';
 import '@angular/compiler';
 import { getTestBed } from '@angular/core/testing';
 import { BrowserTestingModule, platformBrowserTesting } from '@angular/platform-browser/testing';
@@ -17,5 +18,16 @@ Object.defineProperty(window, 'matchMedia', {
   }),
 });
 
-// Inicialização do ambiente de testes do Angular
-getTestBed().initTestEnvironment(BrowserTestingModule, platformBrowserTesting());
+// Mock de URL.createObjectURL e revokeObjectURL para JSDOM
+if (!window.URL.createObjectURL) {
+  window.URL.createObjectURL = () => 'blob:mock-url';
+}
+if (!window.URL.revokeObjectURL) {
+  window.URL.revokeObjectURL = () => {};
+}
+
+// Inicialização do ambiente de testes do Angular com Zoneless global
+getTestBed().initTestEnvironment(
+  BrowserTestingModule,
+  platformBrowserTesting([provideZonelessChangeDetection()]),
+);

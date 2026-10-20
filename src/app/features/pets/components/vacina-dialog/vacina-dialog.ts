@@ -27,7 +27,7 @@ import {
 } from '@shared/components/confirmation-dialog/confirmation-dialog';
 import { DateMaskDirective } from '@shared/directives/date-mask.directive';
 import { FormErrorPipe } from '@shared/pipes/form-error.pipe';
-import { dateToIsoString, getTodayIso, parseIsoToDate } from '@shared/utils/string-utils';
+import { dateToIsoString, parseIsoToDate } from '@shared/utils/string-utils';
 import { maxDateTodayValidator } from '@shared/validators/date.validators';
 import { getSexoIcon, getTipoBadgeClass, getTipoFaIcon, Pet } from '../../models/pet.model';
 import {

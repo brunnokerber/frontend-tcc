@@ -166,11 +166,23 @@ npm run start-remote
 | `npm start` | Inicia o servidor local de desenvolvimento com Hot Reload em `http://localhost:4200`. |
 | `npm run start-remote` | Inicia o servidor local apontando para as configurações de produção. |
 | `npm run build` | Compila os artefatos de produção otimizados na pasta `dist/`. |
+| `npm run lint` | Executa a análise estática de código com ESLint, garantindo conformidade arquitetural e tipagem estrita com zero `any`. |
 | `npm test` | Executa a suíte de testes unitários em modo headless ultrarrápido com Vitest. |
 | `npm run test:watch` | Executa os testes unitários em modo interativo de observação (*Watch mode*). |
 | `npm run test:coverage` | Executa a suíte completa de testes e gera relatórios de cobertura de código (*V8 Coverage* em `coverage/`). |
 | `npm run format` | Executa a formatação e padronização automática de código com Prettier em todos os arquivos (`.ts`, `.html`, `.scss`, `.json`). |
 | `npm run format:check` | Valida se todos os arquivos do projeto seguem o padrão do Prettier sem alterá-los. |
+
+### 🔍 Análise Estática e Tipagem Estrita (ESLint)
+
+O projeto adota o **ESLint** com configuração moderna (*Flat Config* em `eslint.config.js`), integrando `@angular-eslint` e `typescript-eslint`:
+* **Zero `any` Obrigatório:** A regra `@typescript-eslint/no-explicit-any: "error"` está ativa globalmente em arquivos de produção (`**/*.ts`), impedindo que tipos inseguros sejam introduzidos no repositório.
+* **Validação de Sintaxe e Angular Best Practices:** Assegura conformidade de seletores de componentes (`app-*`), templates e convenções de código limpo.
+* **Execução:**
+  ```bash
+  # Rodar o linter em todo o projeto
+  npm run lint
+  ```
 
 ### 🧪 Testes Unitários e Cobertura (Vitest)
 
@@ -202,6 +214,14 @@ O projeto utiliza o **Prettier** para assegurar consistência sintática e visua
   # Apenas checar se há arquivos fora do padrão
   npm run format:check
   ```
+
+### 🚀 Integração e Entrega Contínua (CI/CD - GitHub Actions)
+
+O repositório conta com dois fluxos automatizados integrados: [`.github/workflows/ci.yml`](./.github/workflows/ci.yml) (para Pull Requests e desenvolvimento) e [`.github/workflows/deploy.yml`](./.github/workflows/deploy.yml) (para deploy em produção na Vercel). Ambos executam a mesma esteira sequencial de qualidade:
+1. `npm run format:check` — Checagem de estilo e formatação com Prettier.
+2. `npm run lint` — Análise estática com ESLint e verificação de tipagem estrita com zero `any`.
+3. `npm run test:coverage` — Execução da suíte completa de testes unitários com Vitest e upload do relatório de cobertura.
+4. `npm run build` / `vercel deploy` — Validação do bundle no CI e publicação atômica na Vercel em produção.
 
 ---
 

@@ -16,8 +16,12 @@ export const BR_DATE_FORMATS: MatDateFormats = {
 @Injectable()
 export class CustomDateAdapter extends NativeDateAdapter {
   override parse(value: unknown): Date | null {
-    if (typeof value === 'string' && value.trim().length > 0) {
-      const parts = value.trim().split(/[\/\-\.]/);
+    if (typeof value === 'string') {
+      const trimmed = value.trim();
+      if (trimmed.length === 0) {
+        return null;
+      }
+      const parts = trimmed.split(/[/.-]/);
       if (parts.length === 3) {
         let day: number, month: number, year: number;
         // YYYY-MM-DD
@@ -41,16 +45,16 @@ export class CustomDateAdapter extends NativeDateAdapter {
       }
       return this.invalid();
     }
-    return value ? new Date(value as string | number | Date) : null;
+    return value ? new Date(value as number | Date) : null;
   }
 
-  override format(date: Date, displayFormat: any): string {
+  override format(date: Date, displayFormat: object | string): string {
     if (displayFormat === 'DD/MM/YYYY') {
       const day = date.getDate().toString().padStart(2, '0');
       const month = (date.getMonth() + 1).toString().padStart(2, '0');
       const year = date.getFullYear();
       return `${day}/${month}/${year}`;
     }
-    return super.format(date, displayFormat);
+    return super.format(date, displayFormat as object);
   }
 }

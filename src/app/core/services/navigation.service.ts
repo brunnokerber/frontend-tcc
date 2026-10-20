@@ -15,7 +15,7 @@ export class NavigationService {
    *
    * @param fallbackUrl Rota para onde redirecionar se não houver histórico (padrão: '/')
    */
-  public back(fallbackUrl: string | any[] = ['/']): void {
+  public back(fallbackUrl: string | unknown[] = ['/']): void {
     if (typeof window !== 'undefined' && window.history && window.history.length > 1) {
       this.location.back();
     } else {

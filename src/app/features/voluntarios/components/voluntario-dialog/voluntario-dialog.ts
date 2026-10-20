@@ -151,7 +151,7 @@ export class VoluntarioDialogComponent implements OnInit {
           this.dialogRef.close(created);
         }
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Erro ao salvar voluntário na modal:', err);
     } finally {
       this.isSaving.set(false);

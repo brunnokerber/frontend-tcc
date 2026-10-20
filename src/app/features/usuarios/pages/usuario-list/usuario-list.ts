@@ -12,7 +12,7 @@ import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSelectModule } from '@angular/material/select';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { UsuarioDialogComponent } from '@core/auth/components/usuario-dialog/usuario-dialog';
 import {
   AppRole,
@@ -23,6 +23,7 @@ import {
 import { AuthService } from '@core/auth/services/auth.service';
 import { ToastService } from '@core/services/toast.service';
 import { ConfirmationDialogComponent } from '@shared/components/confirmation-dialog/confirmation-dialog';
+import { extractErrorMessage } from '@shared/utils/supabase-error.utils';
 import { PageHeaderComponent } from '../../../../shared/components/page-header/page-header';
 import { StatCardComponent } from '../../../../shared/components/stat-card/stat-card';
 import { FilterPanelComponent } from '../../../../shared/components/filter-panel/filter-panel';
@@ -290,8 +291,8 @@ export default class UsuarioListComponent implements OnInit {
         try {
           await this.authService.sendResetPassword(email);
           this.toast.success(`E-mail com link de redefinição enviado com sucesso para "${email}"!`);
-        } catch (err: any) {
-          const msg = err.message || 'Erro ao enviar e-mail de redefinição.';
+        } catch (err: unknown) {
+          const msg = extractErrorMessage(err, 'Erro ao enviar e-mail de redefinição.');
           this.toast.error(msg);
         }
       }

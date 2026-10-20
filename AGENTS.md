@@ -45,8 +45,9 @@ Ao concluir qualquer tarefa que envolva nova feature, alteração de regras de n
 - `src/app/shared/`: Componentes reutilizáveis de UI, pipes, diretivas e modelos genéricos.
 - `src/app/features/`: Módulos de negócio autocontidos com carregamento tardio (*Lazy Loading*).
 
-### 3. Qualidade de Código & Tipagem
-- **TypeScript Estrito:** Nunca use `any`. Crie e mantenha interfaces e types consistentes para todos os modelos de dados e respostas de API.
+### 3. Qualidade de Código, Tipagem & Linting (ESLint)
+- **TypeScript Estrito & Zero `any`:** É estritamente proibido o uso de `any` no código de produção. A regra `@typescript-eslint/no-explicit-any: "error"` está ativa e bloqueia qualquer ocorrência de `any`. Utilize `unknown` com type guards (`err instanceof Error`, `extractErrorMessage`) ou tipagens explícitas.
+- **Execução Mandatória do Linter:** O assistente de IA **deve obrigatoriamente executar `npm run lint`** para assegurar que nenhum erro de sintaxe, acessibilidade ou tipagem fraca passe despercebido.
 - **Tratamento de Erros:** Sempre trate respostas de erro da API/Supabase fornecendo feedback visual ao usuário (snackbars/toasts).
 - **Acessibilidade e Design Responsivo:** Garantir conformidade com mobile-first, suporte a tema claro/escuro e acessibilidade (contrastes, labels e tags semânticas).
 - **Boas Práticas de CSS/SCSS:** **Evitar ao máximo o uso de `!important`** em estilizações. Priorize a especificidade correta de seletores, variáveis CSS (`var(--mat-sys-*)`) e herança limpa do Design System.
@@ -66,6 +67,7 @@ Ao concluir qualquer tarefa que envolva nova feature, alteração de regras de n
 
 Antes de considerar uma resposta ou feature concluída, a IA deve verificar:
 - [ ] O código compila sem erros (`npm run build` / typecheck)?
+- [ ] O linter foi executado e aprovado com 0 erros (`npm run lint`), garantindo tipagem estrita sem `any`?
 - [ ] A suíte de testes unitários foi executada e aprovada com 100% de sucesso (`npm test` / `npm run test:coverage`), garantindo ausência de regressões?
 - [ ] Novos testes unitários (`.spec.ts`) foram criados ou atualizados para cobrir as regras de negócio implementadas?
 - [ ] A formatação foi padronizada executando o Prettier (`npm run format`) ao final da execução após a validação do build?

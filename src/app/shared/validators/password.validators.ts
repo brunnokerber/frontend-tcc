@@ -9,7 +9,7 @@ import { AbstractControl, ValidationErrors, ValidatorFn } from '@angular/forms';
  * - Ao menos um símbolo / caractere especial (!@#$%^&*()_+-=[]{};':"|,.<>/?~`)
  */
 export const SENHA_FORTE_REGEX =
-  /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~`]).{8,}$/;
+  /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?~`]).{8,}$/;
 
 /**
  * Interface com os critérios individuais avaliados para feedback visual em tempo real.
@@ -33,7 +33,7 @@ export function evaluatePasswordStrength(password: string | null | undefined): P
   const hasUpperCase = /[A-Z]/.test(val);
   const hasLowerCase = /[a-z]/.test(val);
   const hasNumber = /\d/.test(val);
-  const hasSymbol = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~`]/.test(val);
+  const hasSymbol = /[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?~`]/.test(val);
 
   return {
     hasMinLength,

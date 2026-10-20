@@ -9,6 +9,7 @@ import {
   VacinaUpdateDto,
 } from '../models/vacina.model';
 import { getTodayIso } from '@shared/utils/string-utils';
+import { extractErrorMessage } from '@shared/utils/supabase-error.utils';
 
 @Injectable({
   providedIn: 'root',
@@ -47,7 +48,7 @@ export class VacinasService {
       this.vacinasSignal.set(list);
       this.cachedPetIdSignal.set(petId);
       return list;
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.warn('Erro ao carregar vacinas do pet:', err);
       return [];
     } finally {
@@ -73,8 +74,8 @@ export class VacinasService {
         throw error;
       }
       return data as Vacina;
-    } catch (err: any) {
-      this.toast.error(err.message || 'Erro ao buscar dados da vacina.');
+    } catch (err: unknown) {
+      this.toast.error(extractErrorMessage(err, 'Erro ao buscar dados da vacina.'));
       return null;
     } finally {
       this.loadingSignal.set(false);
@@ -100,8 +101,8 @@ export class VacinasService {
         this.vacinasSignal.update((list) => [created, ...list]);
       }
       return created;
-    } catch (err: any) {
-      const msg = err.message || 'Erro ao registrar a vacina.';
+    } catch (err: unknown) {
+      const msg = extractErrorMessage(err, 'Erro ao registrar a vacina.');
       this.toast.error(msg);
       throw err;
     } finally {

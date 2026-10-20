@@ -43,7 +43,7 @@ export function normalizeToMidnight(value: unknown): Date | null {
  * Validador que impede a seleção de datas futuras (maiores que a data de hoje).
  */
 export function maxDateTodayValidator(
-  errorMessage: string = 'A data não pode ser posterior a hoje',
+  errorMessage = 'A data não pode ser posterior a hoje',
 ): ValidatorFn {
   return (control: AbstractControl): ValidationErrors | null => {
     const val = control.value;
@@ -119,8 +119,8 @@ export function dateSequenceValidator(
  */
 export function dateNotBeforeDateValidator(
   getBaseDate: () => unknown,
-  errorKey: string = 'dataAntesNascimento',
-  errorMessage: string = 'A data não pode ser anterior ao nascimento do animal',
+  errorKey = 'dataAntesNascimento',
+  errorMessage = 'A data não pode ser anterior ao nascimento do animal',
 ): ValidatorFn {
   return (control: AbstractControl): ValidationErrors | null => {
     const val = control.value;

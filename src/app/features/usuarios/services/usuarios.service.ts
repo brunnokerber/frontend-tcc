@@ -3,7 +3,10 @@ import { AuthService } from '@core/auth/services/auth.service';
 import { AppRole, UserProfile } from '@core/auth/models/login.model';
 import { SupabaseService } from '@core/services/supabase';
 import { ToastService } from '@core/services/toast.service';
-import { extractFunctionErrorMessage } from '@shared/utils/supabase-error.utils';
+import {
+  extractErrorMessage,
+  extractFunctionErrorMessage,
+} from '@shared/utils/supabase-error.utils';
 
 @Injectable({
   providedIn: 'root',
@@ -37,8 +40,8 @@ export class UsuariosService {
       const list = (data as UserProfile[]) || [];
       this.usuariosSignal.set(list);
       return list;
-    } catch (err: any) {
-      const msg = err.message || 'Erro ao carregar a lista de usuários.';
+    } catch (err: unknown) {
+      const msg = extractErrorMessage(err, 'Erro ao carregar a lista de usuários.');
       this.toast.error(msg);
       return [];
     } finally {
@@ -79,8 +82,11 @@ export class UsuariosService {
       );
       await this.fetchUsuarios();
       return true;
-    } catch (err: any) {
-      const msg = err.message || `Erro ao ${ativo ? 'reativar' : 'desativar'} conta de usuário.`;
+    } catch (err: unknown) {
+      const msg = extractErrorMessage(
+        err,
+        `Erro ao ${ativo ? 'reativar' : 'desativar'} conta de usuário.`,
+      );
       this.toast.error(msg);
       return false;
     } finally {
@@ -125,8 +131,8 @@ export class UsuariosService {
       );
       await this.fetchUsuarios();
       return true;
-    } catch (err: any) {
-      const msg = err.message || 'Erro ao alterar perfil de permissão.';
+    } catch (err: unknown) {
+      const msg = extractErrorMessage(err, 'Erro ao alterar perfil de permissão.');
       this.toast.error(msg);
       return false;
     } finally {

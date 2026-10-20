@@ -113,7 +113,7 @@ export class VeterinarioDialogComponent implements OnInit {
           this.dialogRef.close(created);
         }
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Erro ao salvar veterinário na modal:', err);
     } finally {
       this.isSaving.set(false);

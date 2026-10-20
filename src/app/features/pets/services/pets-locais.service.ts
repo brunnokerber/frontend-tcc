@@ -2,6 +2,7 @@ import { inject, Injectable, signal } from '@angular/core';
 import { SupabaseService } from '@core/services/supabase';
 import { ToastService } from '@core/services/toast.service';
 import { PetLocal, PetLocalCreateDto, PetLocalUpdateDto } from '../models/pet-local.model';
+import { extractErrorMessage } from '@shared/utils/supabase-error.utils';
 
 @Injectable({
   providedIn: 'root',
@@ -40,7 +41,7 @@ export class PetsLocaisService {
       this.locaisSignal.set(list);
       this.cachedPetIdSignal.set(petId);
       return list;
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.warn('Erro ao carregar histórico de locais do pet:', err);
       return [];
     } finally {
@@ -66,8 +67,8 @@ export class PetsLocaisService {
         throw error;
       }
       return data as PetLocal;
-    } catch (err: any) {
-      this.toast.error(err.message || 'Erro ao buscar dados do local de passagem.');
+    } catch (err: unknown) {
+      this.toast.error(extractErrorMessage(err, 'Erro ao buscar dados do local de passagem.'));
       return null;
     } finally {
       this.loadingSignal.set(false);
@@ -93,8 +94,8 @@ export class PetsLocaisService {
         this.locaisSignal.update((list) => [created, ...list]);
       }
       return created;
-    } catch (err: any) {
-      const msg = err.message || 'Erro ao registrar local de passagem.';
+    } catch (err: unknown) {
+      const msg = extractErrorMessage(err, 'Erro ao registrar local de passagem.');
       this.toast.error(msg);
       throw err;
     } finally {
@@ -123,8 +124,8 @@ export class PetsLocaisService {
       this.toast.success('Local de passagem atualizado com sucesso!');
       this.locaisSignal.update((list) => list.map((l) => (l.id === id ? updated : l)));
       return updated;
-    } catch (err: any) {
-      const msg = err.message || 'Erro ao atualizar local de passagem.';
+    } catch (err: unknown) {
+      const msg = extractErrorMessage(err, 'Erro ao atualizar local de passagem.');
       this.toast.error(msg);
       throw err;
     } finally {

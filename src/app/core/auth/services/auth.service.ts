@@ -729,7 +729,9 @@ export class AuthService {
     this.removeUserFromStorage();
     this.setMustSetPassword(false);
     this.currentUser.set(null);
-    this.authClient.auth.signOut().catch(() => {});
+    this.authClient.auth.signOut().catch((err: unknown) => {
+      console.warn('Erro ao deslogar no Supabase:', err);
+    });
     this.router.navigate(['/login']);
 
     if (reason === 'inactivity' && hadSession) {

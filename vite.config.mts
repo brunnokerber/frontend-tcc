@@ -23,6 +23,8 @@ export default defineConfig({
       reporter: ['text', 'json-summary', 'lcov'],
       reportsDirectory: './coverage',
       exclude: [
+        'dist/**',
+        'vite.config.mts',
         'src/main.ts',
         'src/environments/**',
         'src/test-setup.ts',

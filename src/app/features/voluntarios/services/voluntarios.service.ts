@@ -2,6 +2,7 @@ import { inject, Injectable, signal } from '@angular/core';
 import { SupabaseService } from '@core/services/supabase';
 import { ToastService } from '@core/services/toast.service';
 import { onlyDigits } from '@shared/utils/string-utils';
+import { extractErrorMessage } from '@shared/utils/supabase-error.utils';
 import {
   Voluntario,
   VoluntarioCreateDto,
@@ -69,8 +70,8 @@ export class VoluntariosService {
       const list = (data as Voluntario[]) || [];
       this.voluntariosSignal.set(list);
       return list;
-    } catch (err: any) {
-      const message = err.message || 'Erro ao carregar a lista de voluntários.';
+    } catch (err: unknown) {
+      const message = extractErrorMessage(err, 'Erro ao carregar a lista de voluntários.');
       this.errorSignal.set(message);
       this.toast.error(message);
       return [];
@@ -92,8 +93,8 @@ export class VoluntariosService {
         throw error;
       }
       return data as Voluntario;
-    } catch (err: any) {
-      this.toast.error(err.message || 'Erro ao buscar dados do voluntário.');
+    } catch (err: unknown) {
+      this.toast.error(extractErrorMessage(err, 'Erro ao buscar dados do voluntário.'));
       return null;
     } finally {
       this.loadingSignal.set(false);
@@ -117,8 +118,8 @@ export class VoluntariosService {
       this.toast.success(`Voluntário(a) "${created.nome}" cadastrado com sucesso!`);
       await this.fetchVoluntarios();
       return created;
-    } catch (err: any) {
-      const msg = err.message || 'Erro ao cadastrar voluntário.';
+    } catch (err: unknown) {
+      const msg = extractErrorMessage(err, 'Erro ao cadastrar voluntário.');
       this.toast.error(msg);
       throw err;
     } finally {
@@ -147,8 +148,8 @@ export class VoluntariosService {
       this.toast.success(`Voluntário(a) "${updated.nome}" atualizado com sucesso!`);
       await this.fetchVoluntarios();
       return updated;
-    } catch (err: any) {
-      const msg = err.message || 'Erro ao atualizar dados do voluntário.';
+    } catch (err: unknown) {
+      const msg = extractErrorMessage(err, 'Erro ao atualizar dados do voluntário.');
       this.toast.error(msg);
       throw err;
     } finally {
@@ -168,8 +169,8 @@ export class VoluntariosService {
       this.toast.success('Voluntário removido com sucesso!');
       await this.fetchVoluntarios();
       return true;
-    } catch (err: any) {
-      const msg = err.message || 'Erro ao excluir voluntário.';
+    } catch (err: unknown) {
+      const msg = extractErrorMessage(err, 'Erro ao excluir voluntário.');
       this.toast.error(msg);
       return false;
     } finally {

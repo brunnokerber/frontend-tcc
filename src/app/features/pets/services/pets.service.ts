@@ -1,14 +1,7 @@
 import { inject, Injectable, signal } from '@angular/core';
 import { SupabaseService } from '@core/services/supabase';
 import { ToastService } from '@core/services/toast.service';
-import {
-  Entrada,
-  EntradaUpdateDto,
-  Pet,
-  PetCreateDto,
-  PetFilter,
-  PetUpdateDto,
-} from '../models/pet.model';
+import { EntradaUpdateDto, Pet, PetCreateDto, PetFilter, PetUpdateDto } from '../models/pet.model';
 import { AdotarPetDto } from '../models/pet-local.model';
 import { compressAndResizeImage } from '@shared/utils/image-utils';
 
@@ -301,7 +294,7 @@ export class PetsService {
   async adotarPet(petId: number, dto: AdotarPetDto): Promise<boolean> {
     this.loadingSignal.set(true);
     try {
-      const { data, error } = await this.supabase.client.rpc('adotar_pet', {
+      const { error } = await this.supabase.client.rpc('adotar_pet', {
         p_pet_id: petId,
         p_pet_local_data: {
           id_local: dto.id_local,

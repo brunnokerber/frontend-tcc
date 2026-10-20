@@ -22,7 +22,6 @@ import {
   getStatusBadgeClass,
   getTipoBadgeClass,
   getTipoFaIcon,
-  Pet,
   PetLocal,
   SortOrderMode,
   Vacina,

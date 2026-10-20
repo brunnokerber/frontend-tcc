@@ -214,7 +214,7 @@ export class LocalDialogComponent implements OnInit {
           this.dialogRef.close(created);
         }
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Erro ao salvar local:', err);
     } finally {
       this.isSaving.set(false);

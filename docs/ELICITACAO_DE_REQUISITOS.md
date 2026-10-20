@@ -514,5 +514,5 @@ erDiagram
 
 Este documento consolida a especificação formal de requisitos de software para a plataforma de gestão da ONG *Peludinhos do Vale*. Ele serve simultaneamente como:
 1. **Referencial Metodológico do TCC:** Fundamentando a seção de Engenharia de Requisitos, Análise e Modelagem do Trabalho de Conclusão de Curso na Universidade Feevale.
-2. **Baseline de Garantia da Qualidade (QA):** Permitindo a elaboração de planos de testes unitários, testes de integração e validação de aceitação pelos usuários finais.
+2. **Baseline de Garantia da Qualidade (QA) e Conformidade:** Permitindo a elaboração de planos de testes unitários (Vitest), testes ponta a ponta (E2E com Playwright), análise estática automatizada com tipagem estrita (ESLint com zero `any`) e validação de aceitação pelos usuários finais.
 3. **Guia de Evolução e Manutenibilidade:** Assegurando que futuras expansões funcionais (ex: módulos de adoção pública, campanhas de apadrinhamento e integração com meios de pagamento) respeitem a integridade e as regras de negócio consolidadas.

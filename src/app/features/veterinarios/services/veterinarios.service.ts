@@ -2,6 +2,7 @@ import { inject, Injectable, signal } from '@angular/core';
 import { SupabaseService } from '@core/services/supabase';
 import { ToastService } from '@core/services/toast.service';
 import { onlyDigits } from '@shared/utils/string-utils';
+import { extractErrorMessage } from '@shared/utils/supabase-error.utils';
 import {
   Veterinario,
   VeterinarioCreateDto,
@@ -55,8 +56,8 @@ export class VeterinariosService {
       const list = (data as Veterinario[]) || [];
       this.veterinariosSignal.set(list);
       return list;
-    } catch (err: any) {
-      const message = err.message || 'Erro ao carregar a lista de veterinários.';
+    } catch (err: unknown) {
+      const message = extractErrorMessage(err, 'Erro ao carregar a lista de veterinários.');
       this.errorSignal.set(message);
       this.toast.error(message);
       return [];
@@ -78,8 +79,8 @@ export class VeterinariosService {
         throw error;
       }
       return data as Veterinario;
-    } catch (err: any) {
-      this.toast.error(err.message || 'Erro ao buscar dados do veterinário.');
+    } catch (err: unknown) {
+      this.toast.error(extractErrorMessage(err, 'Erro ao buscar dados do veterinário.'));
       return null;
     } finally {
       this.loadingSignal.set(false);
@@ -103,8 +104,8 @@ export class VeterinariosService {
       this.toast.success(`Veterinário(a) "${created.nome}" cadastrado(a) com sucesso!`);
       await this.fetchVeterinarios();
       return created;
-    } catch (err: any) {
-      const msg = err.message || 'Erro ao cadastrar o veterinário.';
+    } catch (err: unknown) {
+      const msg = extractErrorMessage(err, 'Erro ao cadastrar o veterinário.');
       this.toast.error(msg);
       throw err;
     } finally {
@@ -130,8 +131,8 @@ export class VeterinariosService {
       this.toast.success(`Veterinário(a) "${updated.nome}" atualizado(a) com sucesso!`);
       await this.fetchVeterinarios();
       return updated;
-    } catch (err: any) {
-      const msg = err.message || 'Erro ao atualizar o veterinário.';
+    } catch (err: unknown) {
+      const msg = extractErrorMessage(err, 'Erro ao atualizar o veterinário.');
       this.toast.error(msg);
       throw err;
     } finally {

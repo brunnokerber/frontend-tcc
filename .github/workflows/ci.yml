@@ -28,6 +28,9 @@ jobs:
       - name: 🎨 Validar Formatação (Prettier)
         run: npm run format:check
 
+      - name: 🔍 Análise Estática e Tipagem Estrita (ESLint)
+        run: npm run lint
+
       - name: 🧪 Executar Testes Unitários e Cobertura (Vitest)
         run: npm run test:coverage
 
