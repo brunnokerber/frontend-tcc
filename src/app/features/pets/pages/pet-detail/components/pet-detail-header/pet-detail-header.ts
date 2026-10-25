@@ -35,6 +35,7 @@ export class PetDetailHeaderComponent {
   public totalCustoVacinas = input<number>(0);
   public totalCustoConsultas = input<number>(0);
   public totalCustoAuxilio = input<number>(0);
+  public totalCustoDespesas = input<number>(0);
   public diasNoAbrigo = input<number | null>(null);
 
   public back = output<void>();

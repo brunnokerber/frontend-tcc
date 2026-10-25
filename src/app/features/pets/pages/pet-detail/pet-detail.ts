@@ -18,11 +18,16 @@ import { ConsultasExamesService } from '../../services/consultas-exames.service'
 import { PetsLocaisService } from '../../services/pets-locais.service';
 import { PetsService } from '../../services/pets.service';
 import { VacinasService } from '../../services/vacinas.service';
+import { Despesa } from '@features/financeiro/models/despesa.model';
+import { DespesasService } from '@features/financeiro/services/despesas.service';
+import { DespesaDialogComponent } from '@features/financeiro/components/despesa-dialog/despesa-dialog';
+import { DespesaDetalhesDialogComponent } from '@features/financeiro/components/despesa-detalhes-dialog/despesa-detalhes-dialog';
 import { PetDetailHeaderComponent } from './components/pet-detail-header/pet-detail-header';
 import { PetInfoCardComponent } from './components/pet-info-card/pet-info-card';
 import { PetLocaisCardComponent } from './components/pet-locais-card/pet-locais-card';
 import { PetProcedimentosCardComponent } from './components/pet-procedimentos-card/pet-procedimentos-card';
 import { PetVacinasCardComponent } from './components/pet-vacinas-card/pet-vacinas-card';
+import { PetDespesasCardComponent } from './components/pet-despesas-card/pet-despesas-card';
 
 @Component({
   selector: 'app-pet-detail',
@@ -36,6 +41,7 @@ import { PetVacinasCardComponent } from './components/pet-vacinas-card/pet-vacin
     PetVacinasCardComponent,
     PetProcedimentosCardComponent,
     PetLocaisCardComponent,
+    PetDespesasCardComponent,
   ],
   templateUrl: './pet-detail.html',
   styleUrls: ['./pet-detail.scss'],
@@ -49,6 +55,7 @@ export default class PetDetailComponent implements OnInit {
   public vacinasService = inject(VacinasService);
   public consultasExamesService = inject(ConsultasExamesService);
   public petsLocaisService = inject(PetsLocaisService);
+  public despesasService = inject(DespesasService);
   private authService = inject(AuthService);
   private toast = inject(ToastService);
 
@@ -59,6 +66,7 @@ export default class PetDetailComponent implements OnInit {
   public vacinas = this.vacinasService.vacinas;
   public consultasExames = this.consultasExamesService.consultas;
   public petsLocais = this.petsLocaisService.petsLocais;
+  public despesas = signal<Despesa[]>([]);
 
   // Foto assinada do pet (Supabase Storage)
   public fotoUrl = signal<string | null>(null);
@@ -67,6 +75,7 @@ export default class PetDetailComponent implements OnInit {
   public loadingVacinas = this.vacinasService.loading;
   public loadingConsultas = this.consultasExamesService.loading;
   public loadingLocais = this.petsLocaisService.loading;
+  public loadingDespesas = signal<boolean>(false);
 
   constructor() {
     effect(() => {
@@ -112,8 +121,16 @@ export default class PetDetailComponent implements OnInit {
     this.petsLocais().reduce((acc, l) => acc + (Number(l.valor_auxilio) || 0), 0),
   );
 
+  public totalCustoDespesas = computed(() =>
+    this.despesas().reduce((acc, d) => acc + (Number(d.valor) || 0), 0),
+  );
+
   public totalInvestidoGeral = computed(
-    () => this.totalCustoVacinas() + this.totalCustoConsultas() + this.totalCustoAuxilio(),
+    () =>
+      this.totalCustoVacinas() +
+      this.totalCustoConsultas() +
+      this.totalCustoAuxilio() +
+      this.totalCustoDespesas(),
   );
 
   public diasNoAbrigo = computed(() => {
@@ -151,6 +168,7 @@ export default class PetDetailComponent implements OnInit {
     this.vacinasService.getVacinasByPetId(id, forceRefresh);
     this.consultasExamesService.getConsultasExamesByPetId(id, forceRefresh);
     this.petsLocaisService.getPetsLocaisByPetId(id, forceRefresh);
+    this.carregarDespesasPet(id);
   }
 
   goBack() {
@@ -314,6 +332,110 @@ export default class PetDetailComponent implements OnInit {
     dialogRef.afterClosed().subscribe((adotadoComSucesso: boolean) => {
       if (adotadoComSucesso && p.id) {
         this.loadPetAndSubCollections(p.id, true);
+      }
+    });
+  }
+
+  async carregarDespesasPet(id: number): Promise<void> {
+    this.loadingDespesas.set(true);
+    try {
+      const lista = await this.despesasService.getDespesasByPetId(id);
+      this.despesas.set(lista);
+    } finally {
+      this.loadingDespesas.set(false);
+    }
+  }
+
+  openAddDespesa(): void {
+    const p = this.pet();
+    if (!p) return;
+
+    const dialogRef = this.dialog.open(DespesaDialogComponent, {
+      width: '680px',
+      maxWidth: '95vw',
+      disableClose: true,
+      data: {
+        id_pet: p.id,
+      },
+    });
+
+    dialogRef.afterClosed().subscribe((saved: boolean) => {
+      if (saved && p.id) {
+        this.carregarDespesasPet(p.id);
+      }
+    });
+  }
+
+  openDetalhesDespesa(despesa: Despesa): void {
+    const dialogRef = this.dialog.open(DespesaDetalhesDialogComponent, {
+      width: '680px',
+      maxWidth: '96vw',
+      autoFocus: false,
+      data: {
+        despesa,
+        isAdmin: this.isAdmin(),
+      },
+    });
+
+    dialogRef.afterClosed().subscribe((action) => {
+      if (action === 'edit') {
+        this.openEditDespesa(despesa);
+      }
+    });
+  }
+
+  openEditDespesa(despesa: Despesa): void {
+    const p = this.pet();
+    if (!p || !despesa.id) return;
+
+    const dialogRef = this.dialog.open(DespesaDialogComponent, {
+      width: '680px',
+      maxWidth: '95vw',
+      disableClose: true,
+      data: {
+        despesa,
+        id_pet: p.id,
+      },
+    });
+
+    dialogRef.afterClosed().subscribe((saved: boolean) => {
+      if (saved && p.id) {
+        this.carregarDespesasPet(p.id);
+      }
+    });
+  }
+
+  confirmDeleteDespesa(despesa: Despesa): void {
+    if (!despesa.id) return;
+
+    if (!this.isAdmin()) {
+      this.toast.error(
+        'Apenas administradores possuem permissão para excluir registros de despesas.',
+      );
+      return;
+    }
+
+    const p = this.pet();
+
+    const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
+      data: {
+        title: 'Excluir Despesa',
+        message: `Tem certeza que deseja excluir o lançamento "${despesa.descricao}"? Esta ação removerá o custo vinculado do histórico financeiro do animal.`,
+        confirmText: 'Sim, excluir',
+        cancelText: 'Cancelar',
+        confirmColor: 'warn',
+        icon: 'delete_forever',
+        isDestructive: true,
+      } as ConfirmationDialogData,
+      width: '460px',
+    });
+
+    dialogRef.afterClosed().subscribe(async (confirmed: boolean) => {
+      if (confirmed && despesa.id) {
+        const deleted = await this.despesasService.deleteDespesa(despesa.id);
+        if (deleted && p?.id) {
+          this.carregarDespesasPet(p.id);
+        }
       }
     });
   }

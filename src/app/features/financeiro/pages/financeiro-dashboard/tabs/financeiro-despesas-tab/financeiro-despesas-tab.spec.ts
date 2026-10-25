@@ -6,6 +6,7 @@ import { AuthService } from '@core/auth/services/auth.service';
 import { ToastService } from '@core/services/toast.service';
 import { Despesa } from '@features/financeiro/models/despesa.model';
 import { DespesasService } from '@features/financeiro/services/despesas.service';
+import { FinanceiroService } from '@features/financeiro/services/financeiro.service';
 import { of } from 'rxjs';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { FinanceiroDespesasTabComponent } from './financeiro-despesas-tab';
@@ -50,6 +51,14 @@ describe('FinanceiroDespesasTabComponent', () => {
     deleteDespesa: vi.fn().mockResolvedValue(true),
   };
 
+  const mockFinanceiroService = {
+    filtro: signal({
+      tipo: 'mes_atual',
+      dataInicio: '2026-10-01',
+      dataFim: '2026-10-31',
+    }),
+  };
+
   const mockAuthService = {
     isAdmin: signal(true),
   };
@@ -73,6 +82,7 @@ describe('FinanceiroDespesasTabComponent', () => {
         provideZonelessChangeDetection(),
         provideRouter([]),
         { provide: DespesasService, useValue: mockDespesasService },
+        { provide: FinanceiroService, useValue: mockFinanceiroService },
         { provide: AuthService, useValue: mockAuthService },
         { provide: ToastService, useValue: mockToast },
         { provide: MatDialog, useValue: mockDialog },
@@ -92,6 +102,27 @@ describe('FinanceiroDespesasTabComponent', () => {
     expect(component.despesas().length).toBe(2);
     expect(component.filteredDespesas().length).toBe(2);
     expect(component.pagedDespesas().length).toBe(2);
+  });
+
+  it('deve filtrar despesas respeitando o período de datas ativo do FinanceiroService', () => {
+    // mockDespesas possui data 2026-10-18 e 2026-10-20
+    mockFinanceiroService.filtro.set({
+      tipo: 'customizado',
+      dataInicio: '2026-10-19',
+      dataFim: '2026-10-25',
+    });
+
+    // Apenas a despesa do dia 2026-10-20 deve permanecer
+    expect(component.filteredDespesas().length).toBe(1);
+    expect(component.filteredDespesas()[0].data_despesa).toBe('2026-10-20');
+
+    // Restaura o filtro do mês
+    mockFinanceiroService.filtro.set({
+      tipo: 'mes_atual',
+      dataInicio: '2026-10-01',
+      dataFim: '2026-10-31',
+    });
+    expect(component.filteredDespesas().length).toBe(2);
   });
 
   it('deve filtrar despesas por texto de busca', () => {
@@ -120,6 +151,11 @@ describe('FinanceiroDespesasTabComponent', () => {
 
   it('deve abrir modal de edição de despesa', () => {
     component.openEditarDespesa(mockDespesas[0]);
+    expect(mockDialog.open).toHaveBeenCalled();
+  });
+
+  it('deve abrir modal de detalhes da despesa', () => {
+    component.openDetalhesDespesa(mockDespesas[0]);
     expect(mockDialog.open).toHaveBeenCalled();
   });
 

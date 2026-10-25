@@ -57,4 +57,5 @@ export interface DespesaFilter {
   categoria?: string;
   dataInicio?: string;
   dataFim?: string;
+  id_pet?: number | null;
 }

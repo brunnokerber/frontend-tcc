@@ -137,8 +137,8 @@
 
       <!-- Métricas Rápidas de Saúde e Investimento -->
       <div class="col-12 col-lg-7">
-        <div class="row g-2 text-center">
-          <div class="col-6 col-md-3">
+        <div class="row row-cols-2 row-cols-sm-3 row-cols-xl-5 g-2 text-center">
+          <div class="col">
             <div class="metric-box p-2 rounded-2">
               <span
                 class="text-surface-muted small d-block text-uppercase fw-semibold tracking-wide"
@@ -149,7 +149,7 @@
               </span>
             </div>
           </div>
-          <div class="col-6 col-md-3">
+          <div class="col">
             <div class="metric-box p-2 rounded-2">
               <span
                 class="text-surface-muted small d-block text-uppercase fw-semibold tracking-wide"
@@ -160,7 +160,7 @@
               </span>
             </div>
           </div>
-          <div class="col-6 col-md-3">
+          <div class="col">
             <div class="metric-box p-2 rounded-2">
               <span
                 class="text-surface-muted small d-block text-uppercase fw-semibold tracking-wide"
@@ -171,7 +171,7 @@
               </span>
             </div>
           </div>
-          <div class="col-6 col-md-3">
+          <div class="col">
             <div class="metric-box p-2 rounded-2">
               <span
                 class="text-surface-muted small d-block text-uppercase fw-semibold tracking-wide"
@@ -182,21 +182,32 @@
               </span>
             </div>
           </div>
-          <div class="col-12 mt-2">
-            <div
-              class="d-flex align-items-center justify-content-center gap-2 text-surface-muted small"
-            >
-              <mat-icon style="font-size: 16px; width: 16px; height: 16px">calendar_today</mat-icon>
-              <span>
-                Tempo sob tutela:
-                @if (diasNoAbrigo(); as dias) {
-                  <strong>{{ dias }} dias</strong>
-                } @else {
-                  Não informado
-                }
+          <div class="col">
+            <div class="metric-box p-2 rounded-2">
+              <span
+                class="text-surface-muted small d-block text-uppercase fw-semibold tracking-wide"
+                >Despesas ONG</span
+              >
+              <span class="fs-6 fw-bold text-danger">
+                {{ totalCustoDespesas() | currency: 'BRL' : 'symbol' : '1.2-2' }}
               </span>
             </div>
           </div>
+        </div>
+
+        <!-- Tempo sob Tutela -->
+        <div
+          class="d-flex align-items-center justify-content-center gap-2 text-surface-muted small mt-2 pt-1"
+        >
+          <mat-icon style="font-size: 16px; width: 16px; height: 16px">calendar_today</mat-icon>
+          <span>
+            Tempo sob tutela:
+            @if (diasNoAbrigo(); as dias) {
+              <strong>{{ dias }} dias</strong>
+            } @else {
+              Não informado
+            }
+          </span>
         </div>
       </div>
     </div>

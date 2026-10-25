@@ -128,7 +128,7 @@ export class FinanceiroReportService {
           <td>${this.escapeHtml(m.categoria)}</td>
           <td>${this.formatDate(m.data_movimentacao)}</td>
           <td>${this.escapeHtml(m.pessoa_referencia)}</td>
-          <td style="text-align: right; font-weight: bold; color: ${m.tipo_movimentacao === 'Entrada' ? '#2e7d32' : '#c62828'};">
+          <td style="text-align: right; font-weight: bold; color: ${m.tipo_movimentacao === 'Entrada' ? '#16a34a' : '#dc2626'};">
             ${m.tipo_movimentacao === 'Entrada' ? '+' : '-'} R$ ${Number(m.valor).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
           </td>
         </tr>`,
@@ -142,163 +142,213 @@ export class FinanceiroReportService {
   <meta charset="UTF-8">
   <title>Balanço Financeiro & Prestação de Contas - ${this.escapeHtml(this.ongName)}</title>
   <style>
-    @page { size: A4; margin: 15mm; }
+    * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
     body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      color: #333;
+      color: #0f172a;
       background: #fff;
-      font-size: 11pt;
+      font-size: 13px;
       line-height: 1.4;
       margin: 0;
-      padding: 0;
+      padding: 24px;
     }
-    .header {
-      border-bottom: 2px solid #2e7d32;
-      padding-bottom: 12px;
+    .no-print {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    .btn-print {
+      background: #2563eb;
+      color: #fff;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 13px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      transition: background-color 0.15s ease;
+    }
+    .btn-print:hover {
+      background: #1d4ed8;
+    }
+    .report-header {
+      border-bottom: 2px solid #e2e8f0;
+      padding-bottom: 16px;
       margin-bottom: 20px;
       display: flex;
       justify-content: space-between;
-      align-items: flex-end;
+      align-items: flex-start;
     }
-    .header h1 {
+    .org-title {
+      font-size: 20px;
+      font-weight: 800;
+      color: #1e3a8a;
+      margin: 0 0 4px 0;
+    }
+    .report-subtitle {
+      font-size: 14px;
+      color: #64748b;
       margin: 0;
-      font-size: 18pt;
-      color: #1b5e20;
     }
-    .header p {
-      margin: 2px 0 0 0;
-      font-size: 9pt;
-      color: #666;
+    .meta-info {
+      text-align: right;
+      font-size: 12px;
+      color: #64748b;
     }
     .period-badge {
-      background: #f1f8e9;
-      color: #2e7d32;
-      padding: 4px 10px;
+      display: inline-block;
+      background: #f1f5f9;
+      color: #334155;
+      padding: 3px 8px;
       border-radius: 4px;
-      font-weight: bold;
-      font-size: 10pt;
-      border: 1px solid #c8e6c9;
+      font-weight: 600;
+      font-size: 12px;
+      border: 1px solid #cbd5e1;
+      margin-bottom: 4px;
     }
-    .kpi-grid {
+    .stats-grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
       gap: 12px;
-      margin-bottom: 24px;
+      margin-bottom: 20px;
     }
-    .kpi-card {
-      border: 1px solid #e0e0e0;
+    .stat-box {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
       border-radius: 6px;
       padding: 10px;
       text-align: center;
-      background: #fafafa;
     }
-    .kpi-title {
-      font-size: 8pt;
+    .stat-label {
+      font-size: 11px;
+      color: #64748b;
       text-transform: uppercase;
-      color: #757575;
-      margin-bottom: 4px;
       font-weight: 600;
+      margin-bottom: 4px;
     }
-    .kpi-val {
-      font-size: 14pt;
-      font-weight: bold;
+    .stat-value {
+      font-size: 18px;
+      font-weight: 800;
+      color: #0f172a;
     }
-    .text-success { color: #2e7d32; }
-    .text-danger { color: #c62828; }
+    .stat-sub {
+      font-size: 11px;
+      color: #64748b;
+      margin-top: 4px;
+      font-weight: 500;
+    }
+    .text-success { color: #16a34a; }
+    .text-danger { color: #dc2626; }
     .section-title {
-      font-size: 12pt;
-      font-weight: bold;
+      font-size: 13px;
+      font-weight: 700;
       margin: 20px 0 8px 0;
-      color: #37474f;
-      border-bottom: 1px solid #cfd8dc;
-      padding-bottom: 4px;
+      color: #1e293b;
+      text-transform: uppercase;
+      letter-spacing: 0.025em;
     }
     table {
       width: 100%;
       border-collapse: collapse;
       margin-bottom: 20px;
-      font-size: 9.5pt;
+      font-size: 12px;
     }
     th, td {
-      border: 1px solid #e0e0e0;
-      padding: 6px 8px;
+      border: 1px solid #e2e8f0;
+      padding: 8px 10px;
     }
     th {
-      background: #f5f5f5;
-      font-weight: bold;
-      color: #424242;
+      background: #f1f5f9;
+      font-weight: 700;
+      color: #334155;
       text-align: left;
+      font-size: 11px;
+      text-transform: uppercase;
+      border-bottom: 2px solid #cbd5e1;
     }
     .badge {
       display: inline-block;
-      padding: 2px 6px;
-      border-radius: 3px;
-      font-size: 8pt;
-      font-weight: bold;
+      padding: 2px 8px;
+      border-radius: 9999px;
+      font-size: 11px;
+      font-weight: 600;
     }
-    .badge-in { background: #e8f5e9; color: #2e7d32; border: 1px solid #a5d6a7; }
-    .badge-out { background: #ffebee; color: #c62828; border: 1px solid #ef9a9a; }
+    .badge-in { background: #dcfce7; color: #16a34a; border: 1px solid #bbf7d0; }
+    .badge-out { background: #fee2e2; color: #dc2626; border: 1px solid #fecaca; }
     .footer {
-      margin-top: 40px;
-      border-top: 1px solid #ccc;
-      padding-top: 10px;
+      margin-top: 30px;
+      border-top: 1px solid #e2e8f0;
+      padding-top: 12px;
       display: flex;
       justify-content: space-between;
-      font-size: 8pt;
-      color: #888;
+      font-size: 11px;
+      color: #94a3b8;
     }
     .signature-box {
-      margin-top: 50px;
+      margin-top: 40px;
       display: flex;
       justify-content: space-around;
       text-align: center;
       page-break-inside: avoid;
     }
     .signature-line {
-      width: 220px;
-      border-top: 1px solid #555;
-      padding-top: 5px;
-      font-size: 9pt;
-      color: #333;
+      width: 240px;
+      border-top: 1px solid #94a3b8;
+      padding-top: 6px;
+      font-size: 12px;
+      color: #475569;
+      font-weight: 500;
     }
     @media print {
-      body { margin: 0; }
-      .no-print { display: none; }
+      body { padding: 0; }
+      .no-print { display: none !important; }
+      @page { margin: 12mm 15mm; size: A4 portrait; }
+      table { page-break-inside: auto; }
+      tr { page-break-inside: avoid; page-break-after: auto; }
+      thead { display: table-header-group; }
     }
   </style>
 </head>
 <body>
-  <div class="header">
+  <div class="no-print">
+    <button class="btn-print" onclick="window.print()">🖨️ Imprimir / Salvar como PDF</button>
+  </div>
+
+  <div class="report-header">
     <div>
-      <h1>${this.escapeHtml(this.ongName)}</h1>
-      <p>Sistema de Gestão &bull; Relatório Oficial de Prestação de Contas</p>
+      <h1 class="org-title">🐾 ${this.escapeHtml(this.ongName)}</h1>
+      <p class="report-subtitle">Sistema de Gestão &bull; Relatório Oficial de Prestação de Contas</p>
     </div>
-    <div style="text-align: right;">
-      <span class="period-badge">Período: ${this.escapeHtml(periodoLabel)}</span>
-      <p style="margin-top: 4px;">Emissão: ${dataEmissao}</p>
+    <div class="meta-info">
+      <div><span class="period-badge">Período: ${this.escapeHtml(periodoLabel)}</span></div>
+      <div><strong>Emissão:</strong> ${dataEmissao}</div>
     </div>
   </div>
 
-  <div class="kpi-grid">
-    <div class="kpi-card">
-      <div class="kpi-title">Total Arrecadado</div>
-      <div class="kpi-val text-success">R$ ${balanco.totalEntradas.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
-      <small style="font-size: 7.5pt; color: #666;">${balanco.qtdEntradas} doações</small>
+  <div class="stats-grid">
+    <div class="stat-box">
+      <div class="stat-label">Total Arrecadado</div>
+      <div class="stat-value text-success">R$ ${balanco.totalEntradas.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+      <div class="stat-sub">${balanco.qtdEntradas} doações</div>
     </div>
-    <div class="kpi-card">
-      <div class="kpi-title">Total Despesas</div>
-      <div class="kpi-val text-danger">R$ ${balanco.totalSaidas.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
-      <small style="font-size: 7.5pt; color: #666;">${balanco.qtdSaidas} lançamentos</small>
+    <div class="stat-box">
+      <div class="stat-label">Total Despesas</div>
+      <div class="stat-value text-danger">R$ ${balanco.totalSaidas.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+      <div class="stat-sub">${balanco.qtdSaidas} lançamentos</div>
     </div>
-    <div class="kpi-card">
-      <div class="kpi-title">Saldo Líquido</div>
-      <div class="kpi-val ${saldoClass}">R$ ${balanco.saldoLiquido.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
-      <small style="font-size: 7.5pt; font-weight: bold;" class="${saldoClass}">${saldoStatus}</small>
+    <div class="stat-box">
+      <div class="stat-label">Saldo Líquido</div>
+      <div class="stat-value ${saldoClass}">R$ ${balanco.saldoLiquido.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+      <div class="stat-sub ${saldoClass}" style="font-weight: 700;">${saldoStatus}</div>
     </div>
-    <div class="kpi-card">
-      <div class="kpi-title">Taxa de Cobertura</div>
-      <div class="kpi-val">${balanco.taxaCobertura.toFixed(1)}%</div>
-      <small style="font-size: 7.5pt; color: #666;">Autonomia financeira</small>
+    <div class="stat-box">
+      <div class="stat-label">Taxa de Cobertura</div>
+      <div class="stat-value">${balanco.taxaCobertura.toFixed(1)}%</div>
+      <div class="stat-sub">Autonomia financeira</div>
     </div>
   </div>
 
@@ -346,14 +396,6 @@ export class FinanceiroReportService {
     <span>Documento gerado eletronicamente por Peludinhos do Vale - Gestão Animal</span>
     <span>Página 1 de 1</span>
   </div>
-
-  <script>
-    window.onload = function() {
-      setTimeout(function() {
-        window.print();
-      }, 300);
-    };
-  </script>
 </body>
 </html>
     `;

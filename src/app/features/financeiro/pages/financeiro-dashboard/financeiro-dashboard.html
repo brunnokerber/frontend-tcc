@@ -22,11 +22,11 @@
     <mat-menu #exportMenu="matMenu" class="custom-export-menu shadow-sm">
       <button mat-menu-item (click)="exportarPdf()">
         <mat-icon class="text-danger">picture_as_pdf</mat-icon>
-        <span>Prestação de Contas (PDF)</span>
+        <span>Relatório em PDF</span>
       </button>
       <button mat-menu-item (click)="exportarCsv()">
-        <mat-icon class="text-success">table_view</mat-icon>
-        <span>Planilha Financeira (CSV)</span>
+        <mat-icon class="text-success">table_chart</mat-icon>
+        <span>Planilha em CSV</span>
       </button>
     </mat-menu>
 
@@ -212,7 +212,12 @@
   </div>
 
   <!-- Abas do Módulo Financeiro (Composição) -->
-  <mat-tab-group class="modern-tabs shadow-xs rounded-3 bg-surface" animationDuration="200ms">
+  <mat-tab-group
+    class="modern-tabs shadow-xs rounded-3 bg-surface"
+    animationDuration="200ms"
+    [selectedIndex]="selectedTabIndex()"
+    (selectedIndexChange)="onTabChange($event)"
+  >
     <!-- ABA 1: Painel Geral, Gráficos & Insights -->
     <mat-tab>
       <ng-template mat-tab-label>

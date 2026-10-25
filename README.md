@@ -79,13 +79,13 @@ frontend-tcc/
 │   │   │   │   └── components/  # Diálogos modais (insumo, rateio, doação monetária)
 │   │   │   ├── financeiro/      # Painel administrativo financeiro e despesas (apenas Admin)
 │   │   │   │   ├── pages/financeiro-dashboard/
-│   │   │   │   │   └── tabs/    # Subcomponentes isolados: fluxo-tab (gráficos/KPIs), despesas-tab
-│   │   │   │   └── components/  # Diálogo de despesas
+│   │   │   │   │   └── tabs/    # Subcomponentes isolados: fluxo-tab (gráficos/KPIs), despesas-tab (lazy load)
+│   │   │   │   └── components/  # Diálogos: inclusão/edição (despesa-dialog) e visualização de detalhes (despesa-detalhes-dialog)
 │   │   │   ├── locais/          # Cadastro, listagem e filtros de locais/lares temporários
 │   │   │   ├── login/           # Tela de autenticação
-│   │   │   ├── pets/            # Prontuário, triagem, vacinas, procedimentos e estadias
+│   │   │   ├── pets/            # Prontuário, triagem, vacinas, procedimentos, estadias e despesas vinculadas
 │   │   │   │   ├── pages/pet-detail/
-│   │   │   │   │   └── components/ # Subcomponentes: header, info-card, vacinas, procedimentos, locais
+│   │   │   │   │   └── components/ # Subcomponentes: header, info-card, vacinas, procedimentos, locais, pet-despesas-card
 │   │   │   │   └── components/  # Diálogos: adoção e formulários
 │   │   │   ├── usuarios/        # Administração de usuários e convites (apenas Admin)
 │   │   │   ├── veterinarios/    # Cadastro e busca de médicos veterinários

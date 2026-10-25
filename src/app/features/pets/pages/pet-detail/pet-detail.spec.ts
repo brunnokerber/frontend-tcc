@@ -14,6 +14,8 @@ import { VacinasService } from '../../services/vacinas.service';
 import { ConsultasExamesService } from '../../services/consultas-exames.service';
 import { PetsLocaisService } from '../../services/pets-locais.service';
 import { ConsultaExame, Pet, PetLocal, Vacina } from '../../models/pet.model';
+import { Despesa } from '@features/financeiro/models/despesa.model';
+import { DespesasService } from '@features/financeiro/services/despesas.service';
 
 describe('PetDetailComponent', () => {
   let component: PetDetailComponent;
@@ -55,6 +57,18 @@ describe('PetDetailComponent', () => {
     { id: 30, id_pet: 1, id_local: 5, valor_auxilio: 200, data_saida: '2026-03-01' },
   ];
 
+  const mockDespesas: Despesa[] = [
+    {
+      id: 50,
+      descricao: 'Ração Especial Hepática',
+      categoria: 'Alimentação',
+      valor: 80,
+      data_despesa: '2026-03-05',
+      favorecido: 'Pet Shop ABC',
+      id_pet: 1,
+    },
+  ];
+
   const cachedPetSignal = signal<Pet | null>(mockPet);
   const loadingPetSignal = signal<boolean>(false);
   const vacinasSignal = signal<Vacina[]>(mockVacinas);
@@ -91,6 +105,11 @@ describe('PetDetailComponent', () => {
     getPetsLocaisByPetId: vi.fn(),
   };
 
+  const mockDespesasService = {
+    getDespesasByPetId: vi.fn().mockResolvedValue(mockDespesas),
+    deleteDespesa: vi.fn().mockResolvedValue(true),
+  };
+
   const mockAuthService = {
     isAdmin: signal(true),
   };
@@ -123,6 +142,7 @@ describe('PetDetailComponent', () => {
         { provide: VacinasService, useValue: mockVacinasService },
         { provide: ConsultasExamesService, useValue: mockConsultasService },
         { provide: PetsLocaisService, useValue: mockPetsLocaisService },
+        { provide: DespesasService, useValue: mockDespesasService },
         { provide: AuthService, useValue: mockAuthService },
         { provide: ToastService, useValue: mockToast },
         { provide: NavigationService, useValue: mockNav },
@@ -158,19 +178,24 @@ describe('PetDetailComponent', () => {
     fixture.detectChanges();
   });
 
-  it('deve inicializar e carregar dados do pet e subcoleções', () => {
+  it('deve inicializar e carregar dados do pet, subcoleções e despesas vinculadas', () => {
     expect(component).toBeTruthy();
     expect(mockPetsService.getPetById).toHaveBeenCalledWith(1, false);
     expect(mockVacinasService.getVacinasByPetId).toHaveBeenCalledWith(1, false);
     expect(mockConsultasService.getConsultasExamesByPetId).toHaveBeenCalledWith(1, false);
     expect(mockPetsLocaisService.getPetsLocaisByPetId).toHaveBeenCalledWith(1, false);
+    expect(mockDespesasService.getDespesasByPetId).toHaveBeenCalledWith(1);
   });
 
-  it('deve calcular corretamente as métricas financeiras investidas', () => {
+  it('deve calcular corretamente as métricas financeiras investidas incluindo despesas da ONG', async () => {
+    await fixture.whenStable();
+    component.despesas.set(mockDespesas);
+
     expect(component.totalCustoVacinas()).toBe(100);
     expect(component.totalCustoConsultas()).toBe(150);
     expect(component.totalCustoAuxilio()).toBe(200);
-    expect(component.totalInvestidoGeral()).toBe(450);
+    expect(component.totalCustoDespesas()).toBe(80);
+    expect(component.totalInvestidoGeral()).toBe(530); // 100 + 150 + 200 + 80
   });
 
   it('deve navegar para a edição do pet ao chamar goToEdit', () => {
@@ -195,6 +220,27 @@ describe('PetDetailComponent', () => {
     component.confirmDeleteProcedimento(mockConsultas[0]);
     expect(mockDialog.open).toHaveBeenCalled();
     expect(mockConsultasService.deleteConsultaExame).toHaveBeenCalledWith(20);
+  });
+
+  it('deve abrir modal de inclusão de despesa vinculada ao animal', () => {
+    component.openAddDespesa();
+    expect(mockDialog.open).toHaveBeenCalled();
+  });
+
+  it('deve abrir modal de edição de despesa vinculada', () => {
+    component.openEditDespesa(mockDespesas[0]);
+    expect(mockDialog.open).toHaveBeenCalled();
+  });
+
+  it('deve abrir modal de visualização de detalhes da despesa vinculada', () => {
+    component.openDetalhesDespesa(mockDespesas[0]);
+    expect(mockDialog.open).toHaveBeenCalled();
+  });
+
+  it('deve abrir modal de confirmação e excluir despesa vinculada ao animal', async () => {
+    component.confirmDeleteDespesa(mockDespesas[0]);
+    expect(mockDialog.open).toHaveBeenCalled();
+    expect(mockDespesasService.deleteDespesa).toHaveBeenCalledWith(50);
   });
 
   it('deve abrir modal de registro de adoção ao chamar openAdotarModal', () => {

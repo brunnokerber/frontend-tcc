@@ -21,7 +21,10 @@
               </h2>
             }
             @if (subtitle) {
-              <span class="dialog-subtitle small text-surface-muted d-block text-truncate">
+              <span
+                class="dialog-subtitle small text-surface-muted d-block text-truncate"
+                [matTooltip]="subtitle"
+              >
                 {{ subtitle }}
               </span>
             }

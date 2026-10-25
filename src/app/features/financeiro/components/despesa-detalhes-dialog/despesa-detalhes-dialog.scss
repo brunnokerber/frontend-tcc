@@ -1,0 +1,16 @@
+.detail-card {
+  background-color: var(--mat-sys-surface-container-lowest);
+  border-color: var(--mat-sys-outline-variant);
+  transition: background-color 0.2s ease-in-out;
+}
+
+.highlight-card {
+  background-color: var(--mat-sys-surface-container-low);
+}
+
+.observacoes-box {
+  white-space: pre-wrap;
+  word-break: break-word;
+  line-height: 1.5;
+  font-size: 0.875rem;
+}

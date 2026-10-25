@@ -248,12 +248,6 @@ export default class PetListComponent implements OnInit {
     return items;
   }
 
-  exportExcel(): void {
-    const list = this.petsService.pets();
-    if (!list || list.length === 0) return;
-    this.petReportService.exportToCsv(list, this.getAppliedFiltersSummary());
-  }
-
   exportPdf(): void {
     const list = this.petsService.pets();
     if (!list || list.length === 0) return;
@@ -268,6 +262,12 @@ export default class PetListComponent implements OnInit {
       },
       this.getAppliedFiltersSummary(),
     );
+  }
+
+  exportCsv(): void {
+    const list = this.petsService.pets();
+    if (!list || list.length === 0) return;
+    this.petReportService.exportToCsv(list, this.getAppliedFiltersSummary());
   }
 
   goToDetails(pet: Pet) {

@@ -49,6 +49,7 @@ describe('PetDetailHeaderComponent', () => {
     fixture.componentRef.setInput('totalCustoVacinas', 250);
     fixture.componentRef.setInput('totalCustoConsultas', 300);
     fixture.componentRef.setInput('totalCustoAuxilio', 100);
+    fixture.componentRef.setInput('totalCustoDespesas', 150);
     fixture.componentRef.setInput('diasNoAbrigo', 45);
     fixture.detectChanges();
   });
@@ -60,6 +61,7 @@ describe('PetDetailHeaderComponent', () => {
     expect(compiled.textContent).toContain('Disponível');
     expect(compiled.textContent).toContain('45 dias');
     expect(compiled.textContent).toContain('Chip: 98200041234');
+    expect(compiled.textContent).toContain('Despesas ONG');
   });
 
   it('deve emitir evento de voltar', () => {

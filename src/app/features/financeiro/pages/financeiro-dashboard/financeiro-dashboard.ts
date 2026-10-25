@@ -68,6 +68,10 @@ export default class FinanceiroDashboardComponent implements OnInit {
 
   public isAdmin = this.authService.isAdmin;
 
+  // Controle de Aba Ativa e Otimização de Requisições
+  public selectedTabIndex = signal<number>(0);
+  private despesasCarregadasParaFiltro: string | null = null;
+
   // Estado dos Filtros Globais
   public filtro = this.financeiroService.filtro;
   public customInicio = signal<Date | null>(null);
@@ -107,10 +111,39 @@ export default class FinanceiroDashboardComponent implements OnInit {
   }
 
   async carregarDados(): Promise<void> {
-    await Promise.all([
-      this.financeiroService.carregarFluxoCaixa(),
-      this.despesasService.fetchDespesas(),
-    ]);
+    await this.financeiroService.carregarFluxoCaixa();
+
+    // Otimização: Apenas busca despesas detalhadas se a aba de despesas estiver ativa
+    if (this.selectedTabIndex() === 1) {
+      await this.carregarDespesasSeNecessario(true);
+    } else {
+      this.despesasCarregadasParaFiltro = null;
+    }
+  }
+
+  async onTabChange(index: number): Promise<void> {
+    this.selectedTabIndex.set(index);
+    if (index === 1) {
+      await this.carregarDespesasSeNecessario();
+    }
+  }
+
+  async carregarDespesasSeNecessario(
+    force = false,
+    datas?: { dataInicio: string; dataFim: string },
+  ): Promise<void> {
+    const f = this.filtro();
+    const dataInicio = datas?.dataInicio ?? f.dataInicio;
+    const dataFim = datas?.dataFim ?? f.dataFim;
+    const filtroKey = `${f.tipo}_${dataInicio}_${dataFim}`;
+
+    if (force || this.despesasCarregadasParaFiltro !== filtroKey) {
+      await this.despesasService.fetchDespesas({
+        dataInicio,
+        dataFim,
+      });
+      this.despesasCarregadasParaFiltro = filtroKey;
+    }
   }
 
   async selecionarPeriodo(tipo: TipoPeriodoFiltro): Promise<void> {
@@ -118,7 +151,17 @@ export default class FinanceiroDashboardComponent implements OnInit {
       if (this.fluxoTab) {
         this.fluxoTab.pageIndexMov.set(0);
       }
+      if (this.despesasTab) {
+        this.despesasTab.pageIndexDesp.set(0);
+      }
       await this.financeiroService.aplicarFiltro(tipo);
+
+      // Otimização: Apenas executa requisição HTTP de despesas se a aba ativa for a de despesas
+      if (this.selectedTabIndex() === 1) {
+        await this.carregarDespesasSeNecessario(true);
+      } else {
+        this.despesasCarregadasParaFiltro = null;
+      }
     }
   }
 
@@ -139,11 +182,24 @@ export default class FinanceiroDashboardComponent implements OnInit {
     if (this.fluxoTab) {
       this.fluxoTab.pageIndexMov.set(0);
     }
+    if (this.despesasTab) {
+      this.despesasTab.pageIndexDesp.set(0);
+    }
     const dataInicioStr = dateToIsoString(ini);
     const dataFimStr = dateToIsoString(fim);
 
     if (dataInicioStr && dataFimStr) {
       await this.financeiroService.aplicarFiltro('customizado', dataInicioStr, dataFimStr);
+
+      // Otimização: Apenas executa requisição HTTP de despesas se a aba ativa for a de despesas
+      if (this.selectedTabIndex() === 1) {
+        await this.carregarDespesasSeNecessario(true, {
+          dataInicio: dataInicioStr,
+          dataFim: dataFimStr,
+        });
+      } else {
+        this.despesasCarregadasParaFiltro = null;
+      }
     }
   }
 

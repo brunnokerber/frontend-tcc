@@ -4,19 +4,18 @@ import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
-import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
-import { MatInputModule } from '@angular/material/input';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatSelectModule } from '@angular/material/select';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { RouterModule } from '@angular/router';
 import { AuthService } from '@core/auth/services/auth.service';
 import { ToastService } from '@core/services/toast.service';
 import { DespesaDialogComponent } from '@features/financeiro/components/despesa-dialog/despesa-dialog';
+import { DespesaDetalhesDialogComponent } from '@features/financeiro/components/despesa-detalhes-dialog/despesa-detalhes-dialog';
 import { DESPESA_CATEGORIAS, Despesa } from '@features/financeiro/models/despesa.model';
 import { DespesasService } from '@features/financeiro/services/despesas.service';
+import { FinanceiroService } from '@features/financeiro/services/financeiro.service';
 import { ConfirmationDialogComponent } from '@shared/components/confirmation-dialog/confirmation-dialog';
 import { FilterPanelComponent } from '@shared/components/filter-panel/filter-panel';
 
@@ -31,9 +30,6 @@ import { FilterPanelComponent } from '@shared/components/filter-panel/filter-pan
     MatCardModule,
     MatButtonModule,
     MatIconModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatSelectModule,
     MatProgressSpinnerModule,
     MatPaginatorModule,
     MatTooltipModule,
@@ -44,6 +40,7 @@ import { FilterPanelComponent } from '@shared/components/filter-panel/filter-pan
 })
 export class FinanceiroDespesasTabComponent {
   public despesasService = inject(DespesasService);
+  public financeiroService = inject(FinanceiroService);
   private authService = inject(AuthService);
   private dialog = inject(MatDialog);
   private toast = inject(ToastService);
@@ -66,6 +63,7 @@ export class FinanceiroDespesasTabComponent {
     const list = this.despesas();
     const term = this.searchTermDespesas().toLowerCase().trim();
     const cat = this.selectedCategoriaDespesas();
+    const f = this.financeiroService.filtro();
 
     return list.filter((d) => {
       const matchTerm =
@@ -73,7 +71,10 @@ export class FinanceiroDespesasTabComponent {
         d.descricao.toLowerCase().includes(term) ||
         d.favorecido.toLowerCase().includes(term);
       const matchCat = !cat || d.categoria === cat;
-      return matchTerm && matchCat;
+      const matchData =
+        (!f.dataInicio || d.data_despesa >= f.dataInicio) &&
+        (!f.dataFim || d.data_despesa <= f.dataFim);
+      return matchTerm && matchCat && matchData;
     });
   });
 
@@ -94,6 +95,21 @@ export class FinanceiroDespesasTabComponent {
     this.pageIndexDesp.set(0);
   }
 
+  openDetalhesDespesa(despesa: Despesa): void {
+    const ref = this.dialog.open(DespesaDetalhesDialogComponent, {
+      data: { despesa, isAdmin: this.isAdmin() },
+      width: '680px',
+      maxWidth: '96vw',
+      autoFocus: false,
+    });
+
+    ref.afterClosed().subscribe((action) => {
+      if (action === 'edit') {
+        this.openEditarDespesa(despesa);
+      }
+    });
+  }
+
   openEditarDespesa(despesa: Despesa): void {
     const ref = this.dialog.open(DespesaDialogComponent, {
       data: { despesa },
@@ -105,7 +121,11 @@ export class FinanceiroDespesasTabComponent {
 
     ref.afterClosed().subscribe(async (salvou: boolean) => {
       if (salvou) {
-        await this.despesasService.fetchDespesas();
+        const f = this.financeiroService.filtro();
+        await this.despesasService.fetchDespesas({
+          dataInicio: f.dataInicio,
+          dataFim: f.dataFim,
+        });
         this.dataChanged.emit();
       }
     });

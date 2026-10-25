@@ -119,7 +119,7 @@ export class PetReportService {
     stats: PetReportStats,
     appliedFilters: PetReportFilterItem[] = [],
   ): void {
-    const printWindow = window.open('', '_blank', 'width=1100,height=850');
+    const printWindow = window.open('', '_blank');
     if (!printWindow) {
       alert(
         'Por favor, permita pop-ups no navegador para visualizar e imprimir o relatório em PDF.',
@@ -200,7 +200,7 @@ export class PetReportService {
           .footer { margin-top: 30px; border-top: 1px solid #e2e8f0; padding-top: 12px; display: flex; justify-content: space-between; font-size: 11px; color: #94a3b8; }
           
           .no-print { display: flex; justify-content: flex-end; gap: 10px; margin-bottom: 16px; }
-          .btn-print { background: #2563eb; color: #fff; border: none; padding: 8px 16px; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 13px; }
+          .btn-print { background: #2563eb; color: #fff; border: none; padding: 8px 16px; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 13px; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); transition: background-color 0.15s ease; }
           .btn-print:hover { background: #1d4ed8; }
 
           @media print {

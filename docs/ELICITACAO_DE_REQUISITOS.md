@@ -174,10 +174,10 @@ O processo metodológico de Engenharia de Requisitos adotado no presente TCC bas
 
 ### Módulo 6: Auditoria, Gestão Financeira e Experiência do Usuário
 
-* **[RF22] Totalizador Financeiro por Animal**
-  * **Descrição:** Somatório em tempo real no prontuário do pet calculando: Total Gasto em Vacinas + Total Gasto em Consultas/Procedimentos + Total Gasto em Auxílio de Hospedagem = Custo Total Investido.
+* **[RF22] Totalizador Financeiro por Animal e Despesas Vinculadas da ONG**
+  * **Descrição:** Somatório em tempo real no prontuário do pet calculando: Total Gasto em Vacinas + Total Gasto em Consultas/Procedimentos + Total Gasto em Auxílio de Hospedagem + Total de Despesas Institucionais Vinculadas da ONG = Custo Total Investido Geral. O prontuário do animal deve exibir um card dedicado (`app-pet-despesas-card`) listando todas as despesas institucionais alocadas àquele animal com descrição, categoria, data, favorecido, valor e ações administrativas (inclusão com ID pré-selecionado, edição e exclusão restrita a administradores), além de refletir a métrica no hero do pet.
   * **Prioridade:** Must Have (Essencial)
-  * **Regras Associadas:** RN11, RN15
+  * **Regras Associadas:** RN11, RN15, RN26, RN27
 
 * **[RF23] Alternância de Tema Visual (Light / Dark / Auto)**
   * **Descrição:** O sistema deve suportar modo claro, modo escuro e sincronização com preferência do sistema operacional, persistindo a escolha localmente.
@@ -257,12 +257,14 @@ O processo metodológico de Engenharia de Requisitos adotado no presente TCC bas
     * **Distribuição de Despesas por Categoria:** Barras horizontais dinâmicas com percentuais e valores consolidados por tipo de despesa.
     * **Inteligência de Direcionamento (Top 5 Animais Mais Custosos):** Ranking dos animais que mais demandaram investimento clínico no período com link direto para o prontuário, apoiando campanhas de apadrinhamento.
     * **Lançamentos Detalhados:** Tabela discriminada de todos os registros contábeis do período com paginação.
+    * **Otimização de Requisições HTTP por Aba Ativa (Lazy Tab Loading):** O carregamento da tabela de despesas gerais (`public.despesas` via `DespesasService.fetchDespesas`) ocorre estritamente sob demanda. Na inicialização do painel e na alternância de períodos temporais, se o gestor estiver na aba 0 ("Visão Geral & Indicadores"), apenas a consolidação da view `public.vw_fluxo_caixa` é consultada. A requisição HTTP detalhada de despesas é disparada exclusivamente se a aba 1 ("Despesas Gerais da ONG") estiver ativa ou for ativada pelo usuário, contando com cache por período para evitar requisições redundantes.
   * **Prioridade:** Must Have (Essencial)
   * **Regras Associadas:** RN01, RN17, RN28
 
 * **[RF36] Registro e Gestão de Despesas Gerais da Instituição (`public.despesas`)**
   * **Descrição:** Permitir o cadastro, consulta, edição e exclusão de despesas gerais e saídas financeiras institucionais da ONG que não são procedimentos clínicos individuais (ex: sacos de ração em atacado, insumos de limpeza, transporte de resgates, manutenção da sede, despesas operacionais avulsas).
   * **Atributos:** Descrição (obrigatório, 3-100 caracteres), Categoria padronizada (enum com 8 opções: Alimentação / Ração, Medicamentos & Insumos Gerais, Higiene & Limpeza, Transporte & Resgate, Infraestrutura & Sede, Serviços Veterinários Avulsos, Administrativo & Operacional, Outro), Valor (decimal 10,2 positivo), Data do Pagamento/Despesa (date, padrão data corrente), Favorecido/Fornecedor (obrigatório, 2-100 caracteres), Telefone (opcional, com máscara), Vínculo opcional a um animal resgatado (`id_pet`) e Observações (opcional, máx. 255 caracteres).
+  * **Visualização Completa de Detalhes:** Modal dedicada (`DespesaDetalhesDialogComponent`) acessível tanto no painel financeiro geral quanto no prontuário do pet, exibindo todos os dados do lançamento (ID, descrição integral sem truncamento, valor destacado, categoria contábil, data, favorecido, telefone formatado, vínculo com animal com atalho de navegação, texto completo de observações e trilha de auditoria com popover de identificação do editor).
   * **Governança de Exclusão:** Exclusão física restrita a administradores (`is_admin()`).
   * **Prioridade:** Must Have (Essencial)
   * **Regras Associadas:** RN17, RN27, RN28
@@ -474,7 +476,7 @@ O processo metodológico de Engenharia de Requisitos adotado no presente TCC bas
 | **RF33** | Painel Master-Detail e consolidado por local | RN24, RN25 | RNF01, RNF03, RNF04 | `doacoes`, `direcionamento_doacoes`, `locais` | `DoacaoListComponent`, `DoacoesService` |
 | **RF34** | Registro e controle de doações monetárias (Admin-only delete) | RN01, RN17, RN26, RN27 | RNF01, RNF03, RNF04, RNF06 | `doacoes_monetarias` | `DoacaoMonetariaDialogComponent`, `DoacaoListComponent`, `AuditBadgeComponent`, `DoacoesMonetariasService` |
 | **RF35** | Painel financeiro, balanço orçamentário e sustentabilidade | RN01, RN17, RN28 | RNF01, RNF03, RNF04, RNF06 | `vw_fluxo_caixa`, `doacoes_monetarias`, `despesas`, `consultas_exames`, `vacinas`, `pets_locais` | `FinanceiroDashboardComponent`, `FinanceiroService` |
-| **RF36** | Registro e gestão de despesas gerais da instituição (Admin-only delete) | RN17, RN27, RN28 | RNF01, RNF04, RNF06, RNF08 | `despesas`, `pets` | `DespesaDialogComponent`, `FinanceiroDashboardComponent`, `AuditBadgeComponent`, `DespesasService` |
+| **RF36** | Registro e gestão de despesas gerais da instituição (Admin-only delete) | RN17, RN27, RN28 | RNF01, RNF04, RNF06, RNF08 | `despesas`, `pets` | `DespesaDialogComponent`, `DespesaDetalhesDialogComponent`, `FinanceiroDashboardComponent`, `AuditBadgeComponent`, `DespesasService` |
 | **RF37** | Prestação de contas oficial em PDF e exportação de planilha (Excel/CSV) | RN28 | RNF01, RNF04, RNF09, RNF10 | `vw_fluxo_caixa`, `despesas` | `FinanceiroReportService`, `FinanceiroDashboardComponent` |
 
 ---

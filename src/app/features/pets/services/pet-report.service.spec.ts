@@ -170,9 +170,14 @@ describe('PetReportService (Geração de Relatórios CSV e Impressão PDF)', () 
 
       service.generatePdfReport(mockPets, mockStats, [{ label: 'Espécie', value: 'Cachorro' }]);
 
+      expect(window.open).toHaveBeenCalledWith('', '_blank');
       expect(fakeWindow.document.open).toHaveBeenCalled();
       expect(fakeWindow.document.write).toHaveBeenCalled();
       expect(fakeWindow.document.close).toHaveBeenCalled();
+
+      // Verifica presença do botão de impressão
+      expect(writtenHtml).toContain('btn-print');
+      expect(writtenHtml).toContain('Imprimir / Salvar como PDF');
 
       // Verifica presença do nome da ONG configurado no ambiente
       expect(writtenHtml).toContain(environment.ongName);

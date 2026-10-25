@@ -286,4 +286,45 @@ describe('DespesasService (Gestão de Despesas Gerais da ONG)', () => {
       expect(toastMock.error).toHaveBeenCalled();
     });
   });
+
+  describe('getDespesasByPetId', () => {
+    it('deve consultar despesas filtradas por id_pet ordenadas por data', async () => {
+      const petDespesas = [mockDespesas[1]];
+      const queryBuilder = {
+        select: vi.fn().mockReturnThis(),
+        eq: vi.fn().mockReturnThis(),
+        order: vi.fn().mockReturnThis(),
+      };
+      queryBuilder.order
+        .mockReturnValueOnce(queryBuilder)
+        .mockResolvedValueOnce({ data: petDespesas, error: null });
+
+      supabaseMock.client.from.mockReturnValue(queryBuilder);
+
+      const result = await service.getDespesasByPetId(10);
+
+      expect(supabaseMock.client.from).toHaveBeenCalledWith('despesas');
+      expect(queryBuilder.select).toHaveBeenCalledWith('*, pet:id_pet(id, nome, tipo_pet)');
+      expect(queryBuilder.eq).toHaveBeenCalledWith('id_pet', 10);
+      expect(result).toEqual(petDespesas);
+    });
+
+    it('deve retornar lista vazia e exibir toast de erro se consulta falhar', async () => {
+      const queryBuilder = {
+        select: vi.fn().mockReturnThis(),
+        eq: vi.fn().mockReturnThis(),
+        order: vi.fn().mockReturnThis(),
+      };
+      queryBuilder.order
+        .mockReturnValueOnce(queryBuilder)
+        .mockResolvedValueOnce({ data: null, error: new Error('Erro de conexão') });
+
+      supabaseMock.client.from.mockReturnValue(queryBuilder);
+
+      const result = await service.getDespesasByPetId(99);
+
+      expect(result).toEqual([]);
+      expect(toastMock.error).toHaveBeenCalledWith('Erro de conexão');
+    });
+  });
 });

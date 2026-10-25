@@ -81,11 +81,25 @@ describe('FinanceiroReportService (Exportação de Balanço e Relatórios)', () 
   });
 
   describe('printBalancetePdf', () => {
-    it('deve abrir janela e injetar HTML de impressão', () => {
+    it('deve alertar o usuário caso a janela pop-up seja bloqueada pelo navegador', () => {
+      vi.spyOn(window, 'open').mockReturnValue(null);
+      const alertSpy = vi.spyOn(window, 'alert').mockImplementation(() => {});
+
+      service.printBalancetePdf(mockMovimentacoes, mockBalanco, [], 'Outubro/2026');
+
+      expect(alertSpy).toHaveBeenCalledWith(
+        'Por favor, permita popups para gerar a impressão do relatório em PDF.',
+      );
+    });
+
+    it('deve abrir janela e injetar HTML com botão de impressão manual sem auto-print', () => {
+      let writtenHtml = '';
       const mockPrintWindow = {
         document: {
           open: vi.fn(),
-          write: vi.fn(),
+          write: vi.fn((content: string) => {
+            writtenHtml += content;
+          }),
           close: vi.fn(),
         },
       };
@@ -98,6 +112,18 @@ describe('FinanceiroReportService (Exportação de Balanço e Relatórios)', () 
       expect(mockPrintWindow.document.open).toHaveBeenCalled();
       expect(mockPrintWindow.document.write).toHaveBeenCalled();
       expect(mockPrintWindow.document.close).toHaveBeenCalled();
+      expect(writtenHtml).toContain('btn-print');
+      expect(writtenHtml).toContain('Imprimir / Salvar como PDF');
+      expect(writtenHtml).toContain('stats-grid');
+      expect(writtenHtml).toContain('stat-box');
+      expect(writtenHtml).toContain('stat-label');
+      expect(writtenHtml).toContain('stat-value');
+      expect(writtenHtml).toContain('Total Arrecadado');
+      expect(writtenHtml).toContain('Total Despesas');
+      expect(writtenHtml).toContain('Saldo Líquido');
+      expect(writtenHtml).toContain('Taxa de Cobertura');
+      expect(writtenHtml).not.toContain('window.onload');
+      expect(writtenHtml).not.toContain('setTimeout');
     });
   });
 });

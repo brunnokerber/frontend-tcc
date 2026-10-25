@@ -14,6 +14,7 @@
       [totalCustoVacinas]="totalCustoVacinas()"
       [totalCustoConsultas]="totalCustoConsultas()"
       [totalCustoAuxilio]="totalCustoAuxilio()"
+      [totalCustoDespesas]="totalCustoDespesas()"
       [diasNoAbrigo]="diasNoAbrigo()"
       (back)="goBack()"
       (adotar)="openAdotarModal()"
@@ -27,7 +28,7 @@
         <app-pet-info-card [pet]="p" (edit)="goToEdit()" />
       </div>
 
-      <!-- COLUNA DA DIREITA: Vacinas, Procedimentos e Locais -->
+      <!-- COLUNA DA DIREITA: Vacinas, Procedimentos, Locais e Despesas da ONG -->
       <div class="col-12 col-xl-8">
         <div class="d-flex flex-column gap-4">
           <!-- CARD 1: VACINAS -->
@@ -59,6 +60,18 @@
             [loading]="loadingLocais()"
             (addLocal)="openAddLocal()"
             (editLocal)="openEditLocal($event)"
+          />
+
+          <!-- CARD 4: DESPESAS VINCULADAS DA ONG -->
+          <app-pet-despesas-card
+            [pet]="p"
+            [despesas]="despesas()"
+            [loading]="loadingDespesas()"
+            [isAdmin]="isAdmin()"
+            (addDespesa)="openAddDespesa()"
+            (viewDespesa)="openDetalhesDespesa($event)"
+            (editDespesa)="openEditDespesa($event)"
+            (deleteDespesa)="confirmDeleteDespesa($event)"
           />
         </div>
       </div>

@@ -32,6 +32,7 @@ import { DespesasService } from '../../services/despesas.service';
 
 export interface DespesaDialogData {
   despesa?: Despesa;
+  id_pet?: number | null;
 }
 
 @Component({
@@ -109,6 +110,10 @@ export class DespesaDialogComponent implements OnInit {
         telefone: d.telefone || '',
         observacoes: d.observacoes || '',
         id_pet: d.id_pet || null,
+      });
+    } else if (this.data?.id_pet) {
+      this.form.patchValue({
+        id_pet: this.data.id_pet,
       });
     }
   }

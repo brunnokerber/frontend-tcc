@@ -1,37 +1,53 @@
 <div class="p-3 p-md-4">
   <!-- Painel de Filtros da Aba de Despesas -->
-  <app-filter-panel (clear)="limparFiltroDespesas()">
-    <div class="row g-2 w-100">
-      <!-- Campo de Busca -->
-      <div class="col-12 col-md-6">
-        <mat-form-field appearance="outline" class="w-100 density-compact">
-          <mat-label>Buscar por descrição ou favorecido</mat-label>
-          <input
-            matInput
-            [ngModel]="searchTermDespesas()"
-            (ngModelChange)="searchTermDespesas.set($event); pageIndexDesp.set(0)"
-            placeholder="Ex: Ração, Agropecuária, Material de limpeza"
-          />
-          <mat-icon matPrefix class="me-2">search</mat-icon>
-        </mat-form-field>
+  <app-filter-panel
+    (search)="pageIndexDesp.set(0)"
+    (clear)="limparFiltroDespesas()"
+    [clearDisabled]="!searchTermDespesas() && !selectedCategoriaDespesas()"
+    actionsColClass="col-12 col-md-4 col-xl-3 ms-auto"
+  >
+    <!-- Campo de Busca -->
+    <div class="col-12 col-md-5 col-xl-5">
+      <label
+        for="despesa-search-term"
+        class="form-label small fw-semibold text-surface-muted mb-1 text-truncate d-block"
+      >
+        Buscar por descrição ou favorecido
+      </label>
+      <div class="input-group">
+        <span class="input-group-text bg-surface-subtle border-end-0 border-surface">
+          <i class="bi bi-search"></i>
+        </span>
+        <input
+          id="despesa-search-term"
+          type="text"
+          class="form-control border-start-0 border-surface bg-surface-card text-surface-main"
+          placeholder="Ex: Ração, Agropecuária, Material de limpeza"
+          [ngModel]="searchTermDespesas()"
+          (ngModelChange)="searchTermDespesas.set($event); pageIndexDesp.set(0)"
+        />
       </div>
+    </div>
 
-      <!-- Categoria -->
-      <div class="col-12 col-md-6">
-        <mat-form-field appearance="outline" class="w-100 density-compact">
-          <mat-label>Filtrar por Categoria</mat-label>
-          <mat-select
-            [ngModel]="selectedCategoriaDespesas()"
-            (ngModelChange)="selectedCategoriaDespesas.set($event); pageIndexDesp.set(0)"
-          >
-            <mat-option value="">Todas as Categorias</mat-option>
-            @for (cat of categoriasDespesas; track cat) {
-              <mat-option [value]="cat">{{ cat }}</mat-option>
-            }
-          </mat-select>
-          <mat-icon matPrefix class="me-2">category</mat-icon>
-        </mat-form-field>
-      </div>
+    <!-- Categoria -->
+    <div class="col-12 col-md-3 col-xl-4">
+      <label
+        for="despesa-filter-categoria"
+        class="form-label small fw-semibold text-surface-muted mb-1 text-truncate d-block"
+      >
+        Filtrar por Categoria
+      </label>
+      <select
+        id="despesa-filter-categoria"
+        class="form-select bg-surface-card text-surface-main border-surface"
+        [ngModel]="selectedCategoriaDespesas()"
+        (ngModelChange)="selectedCategoriaDespesas.set($event); pageIndexDesp.set(0)"
+      >
+        <option value="">Todas as Categorias</option>
+        @for (cat of categoriasDespesas; track cat) {
+          <option [value]="cat">{{ cat }}</option>
+        }
+      </select>
     </div>
   </app-filter-panel>
 
@@ -67,7 +83,16 @@
             @for (d of pagedDespesas(); track d.id) {
               <tr>
                 <td class="fw-semibold">
-                  {{ d.descricao }}
+                  <span
+                    role="button"
+                    tabindex="0"
+                    (click)="openDetalhesDespesa(d)"
+                    (keyup.enter)="openDetalhesDespesa(d)"
+                    class="d-inline-block text-surface-main cursor-pointer"
+                    matTooltip="Clique para visualizar detalhes completos"
+                  >
+                    {{ d.descricao }}
+                  </span>
                   @if (d.observacoes) {
                     <span
                       class="d-block small text-surface-muted text-truncate"
@@ -108,6 +133,16 @@
                 <td class="text-end fw-bold text-danger">R$ {{ d.valor | number: '1.2-2' }}</td>
                 <td class="text-end">
                   <div class="d-inline-flex align-items-center gap-1">
+                    <button
+                      type="button"
+                      mat-icon-button
+                      (click)="openDetalhesDespesa(d)"
+                      matTooltip="Visualizar detalhes da despesa"
+                      class="btn-sm"
+                    >
+                      <mat-icon>visibility</mat-icon>
+                    </button>
+
                     <button
                       type="button"
                       mat-icon-button

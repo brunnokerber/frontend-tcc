@@ -90,16 +90,58 @@ describe('FinanceiroDashboardComponent', () => {
     fixture.detectChanges();
   });
 
-  it('deve inicializar e carregar dados contábeis', () => {
+  it('deve inicializar carregando apenas fluxo de caixa (otimização: sem fetchDespesas na aba 0)', () => {
     expect(mockFinanceiroService.carregarFluxoCaixa).toHaveBeenCalled();
-    expect(mockDespesasService.fetchDespesas).toHaveBeenCalled();
+    expect(mockDespesasService.fetchDespesas).not.toHaveBeenCalled();
     expect(component.balanco().totalEntradas).toBe(5000);
     expect(component.periodoLabel()).toContain('Mês Atual');
   });
 
-  it('deve selecionar um período predefinido', async () => {
+  it('deve carregar despesas sob demanda ao alternar para a aba de despesas (index 1)', async () => {
+    await component.onTabChange(1);
+    expect(component.selectedTabIndex()).toBe(1);
+    expect(mockDespesasService.fetchDespesas).toHaveBeenCalledTimes(1);
+
+    // Se chamar novamente para a mesma aba com o mesmo filtro, não repete requisição
+    await component.onTabChange(1);
+    expect(mockDespesasService.fetchDespesas).toHaveBeenCalledTimes(1);
+  });
+
+  it('deve selecionar um período predefinido e atualizar despesas se a aba 1 estiver ativa', async () => {
+    await component.onTabChange(1);
+    mockDespesasService.fetchDespesas.mockClear();
+
     await component.selecionarPeriodo('ultimo_mes');
     expect(mockFinanceiroService.aplicarFiltro).toHaveBeenCalledWith('ultimo_mes');
+    expect(mockDespesasService.fetchDespesas).toHaveBeenCalled();
+  });
+
+  it('não deve disparar fetchDespesas ao selecionar período se a aba ativa for a visão geral (index 0)', async () => {
+    component.selectedTabIndex.set(0);
+    mockDespesasService.fetchDespesas.mockClear();
+
+    await component.selecionarPeriodo('trimestre');
+    expect(mockFinanceiroService.aplicarFiltro).toHaveBeenCalledWith('trimestre');
+    expect(mockDespesasService.fetchDespesas).not.toHaveBeenCalled();
+  });
+
+  it('deve aplicar filtro customizado e atualizar despesas se a aba 1 estiver ativa', async () => {
+    await component.onTabChange(1);
+    mockDespesasService.fetchDespesas.mockClear();
+
+    component.customInicio.set(new Date('2026-10-01T12:00:00Z'));
+    component.customFim.set(new Date('2026-10-25T12:00:00Z'));
+    await component.aplicarFiltroCustomizado();
+
+    expect(mockFinanceiroService.aplicarFiltro).toHaveBeenCalledWith(
+      'customizado',
+      '2026-10-01',
+      '2026-10-25',
+    );
+    expect(mockDespesasService.fetchDespesas).toHaveBeenCalledWith({
+      dataInicio: '2026-10-01',
+      dataFim: '2026-10-25',
+    });
   });
 
   it('deve abrir modal para registrar nova despesa', () => {

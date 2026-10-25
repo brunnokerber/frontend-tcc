@@ -51,6 +51,10 @@ export class DespesasService {
         query = query.or(`descricao.ilike.${term},favorecido.ilike.${term}`);
       }
 
+      if (filter?.id_pet !== undefined && filter?.id_pet !== null) {
+        query = query.eq('id_pet', filter.id_pet);
+      }
+
       const { data, error } = await query;
 
       if (error) {
@@ -179,6 +183,30 @@ export class DespesasService {
       return false;
     } finally {
       this.loading.set(false);
+    }
+  }
+
+  /**
+   * Consulta todas as despesas institucionais vinculadas a um animal específico
+   */
+  async getDespesasByPetId(petId: number): Promise<Despesa[]> {
+    try {
+      const { data, error } = await this.supabase.client
+        .from('despesas')
+        .select('*, pet:id_pet(id, nome, tipo_pet)')
+        .eq('id_pet', petId)
+        .order('data_despesa', { ascending: false })
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        throw error;
+      }
+
+      return (data as unknown as Despesa[]) || [];
+    } catch (err: unknown) {
+      const msg = extractErrorMessage(err, 'Erro ao carregar despesas vinculadas ao animal.');
+      this.toast.error(msg);
+      return [];
     }
   }
 }
