@@ -100,6 +100,7 @@ export class AdotarPetDialogComponent implements OnInit {
 
   async carregarLocais(): Promise<void> {
     this.loadingLocais.set(true);
+    this.adocaoForm.controls.id_local.disable();
     try {
       const list = await this.locaisService.fetchLocais();
       this.locais.set(list || []);
@@ -108,6 +109,9 @@ export class AdotarPetDialogComponent implements OnInit {
       this.toast.error(msg);
     } finally {
       this.loadingLocais.set(false);
+      if (!this.isSaving()) {
+        this.adocaoForm.controls.id_local.enable();
+      }
     }
   }
 
@@ -147,6 +151,7 @@ export class AdotarPetDialogComponent implements OnInit {
 
     this.isSaving.set(true);
     this.errorMessage.set(null);
+    this.adocaoForm.disable();
 
     try {
       const success = await this.petsService.adotarPet(this.pet.id, {
@@ -168,6 +173,7 @@ export class AdotarPetDialogComponent implements OnInit {
       this.errorMessage.set(msg);
     } finally {
       this.isSaving.set(false);
+      this.adocaoForm.enable();
     }
   }
 

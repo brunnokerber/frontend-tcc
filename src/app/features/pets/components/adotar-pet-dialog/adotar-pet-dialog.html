@@ -53,13 +53,13 @@
     }
 
     <!-- Campos do Formulário de Adoção -->
-    <div class="row g-2">
+    <div class="row g-3">
       <!-- Seletor de Local / Adotante com Botão de Cadastro Rápido via Dialog -->
       <div class="col-12">
         <div class="d-flex align-items-start gap-2">
           <mat-form-field appearance="outline" class="flex-grow-1">
-            <mat-label>Adotante / Local de Destino *</mat-label>
-            <mat-select formControlName="id_local" [disabled]="loadingLocais() || isSaving()">
+            <mat-label>Adotante / Local de Destino</mat-label>
+            <mat-select formControlName="id_local">
               @if (loadingLocais()) {
                 <mat-option disabled>Carregando locais parceiros...</mat-option>
               } @else {
@@ -106,7 +106,7 @@
       <!-- Data da Adoção -->
       <div class="col-12 col-md-6">
         <mat-form-field appearance="outline" class="w-100">
-          <mat-label>Data da Adoção *</mat-label>
+          <mat-label>Data da Adoção</mat-label>
           <input
             matInput
             [matDatepicker]="pickerAdocao"
@@ -125,7 +125,7 @@
       <!-- Motivo do Registro -->
       <div class="col-12 col-md-6">
         <mat-form-field appearance="outline" class="w-100">
-          <mat-label>Motivo da Saída *</mat-label>
+          <mat-label>Motivo da Saída</mat-label>
           <input
             matInput
             formControlName="motivo_saida"
@@ -143,7 +143,7 @@
 
       <!-- Valor de Auxílio Inicial (Opcional) -->
       <div class="col-12">
-        <mat-form-field appearance="outline" class="w-100">
+        <mat-form-field appearance="outline" class="w-100 field-with-hint">
           <mat-label>Auxílio / Apoio Financeiro Inicial (Opcional)</mat-label>
           <mat-icon matPrefix class="me-2">payments</mat-icon>
           <input
@@ -164,7 +164,7 @@
       </div>
 
       <!-- Observações / Termo de Adoção Responsável -->
-      <div class="col-12">
+      <div class="col-12 mt-2">
         <mat-form-field appearance="outline" class="w-100">
           <mat-label>Observações / Termo de Adoção</mat-label>
           <textarea

@@ -19,3 +19,8 @@
   align-items: center;
   gap: 0.25rem;
 }
+
+// Respiro adicional para campos que exibem mat-hint evitando sobreposição com o campo seguinte
+.field-with-hint {
+  margin-bottom: 0.5rem;
+}
