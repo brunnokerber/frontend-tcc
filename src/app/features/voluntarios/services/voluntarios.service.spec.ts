@@ -184,15 +184,7 @@ describe('VoluntariosService (Escala e Gestão de Voluntários)', () => {
         select: vi.fn().mockReturnThis(),
         single: vi.fn().mockResolvedValue({ data: novoVoluntario, error: null }),
       };
-      const queryBuilderFetch = {
-        select: vi.fn().mockReturnThis(),
-        order: vi
-          .fn()
-          .mockResolvedValue({ data: [...mockVoluntarios, novoVoluntario], error: null }),
-      };
-      supabaseMock.client.from
-        .mockReturnValueOnce(queryBuilderInsert)
-        .mockReturnValueOnce(queryBuilderFetch);
+      supabaseMock.client.from.mockReturnValue(queryBuilderInsert);
 
       const dto: VoluntarioCreateDto = { nome: 'Ana Paula', telefone: '51999990000' };
       const created = await service.createVoluntario(dto);
@@ -226,13 +218,7 @@ describe('VoluntariosService (Escala e Gestão de Voluntários)', () => {
         select: vi.fn().mockReturnThis(),
         single: vi.fn().mockResolvedValue({ data: updatedVoluntario, error: null }),
       };
-      const queryBuilderFetch = {
-        select: vi.fn().mockReturnThis(),
-        order: vi.fn().mockResolvedValue({ data: [updatedVoluntario], error: null }),
-      };
-      supabaseMock.client.from
-        .mockReturnValueOnce(queryBuilderUpdate)
-        .mockReturnValueOnce(queryBuilderFetch);
+      supabaseMock.client.from.mockReturnValue(queryBuilderUpdate);
 
       const dto: VoluntarioUpdateDto = { nome: 'Juliana Atualizada' };
       const result = await service.updateVoluntario(1, dto);
@@ -258,18 +244,12 @@ describe('VoluntariosService (Escala e Gestão de Voluntários)', () => {
       expect(toastMock.error).toHaveBeenCalledWith('Erro ao atualizar');
     });
 
-    it('deve remover voluntário e recarregar a lista', async () => {
+    it('deve remover voluntário e notificar sucesso', async () => {
       const queryBuilderDelete = {
         delete: vi.fn().mockReturnThis(),
         eq: vi.fn().mockResolvedValue({ error: null }),
       };
-      const queryBuilderFetch = {
-        select: vi.fn().mockReturnThis(),
-        order: vi.fn().mockResolvedValue({ data: [mockVoluntarios[1]], error: null }),
-      };
-      supabaseMock.client.from
-        .mockReturnValueOnce(queryBuilderDelete)
-        .mockReturnValueOnce(queryBuilderFetch);
+      supabaseMock.client.from.mockReturnValue(queryBuilderDelete);
 
       const success = await service.deleteVoluntario(1);
 

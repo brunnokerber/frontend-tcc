@@ -7,7 +7,7 @@
         : 'Cadastre uma nova saída financeira ou pagamento operacional'
     "
     [icon]="isEditing() ? 'edit' : 'receipt_long'"
-    size="lg"
+    size="xl"
     [closeDisabled]="isSaving() || isDeleting()"
     (close)="onCancel()"
   >
@@ -189,14 +189,18 @@
         </div>
 
         <div class="row g-3">
-          <!-- Vínculo Opcional com Pet -->
+          <!-- Vínculo com Pet -->
           <div class="col-12">
             <mat-form-field appearance="outline" class="w-100 mb-0">
-              <mat-label>Vincular a um Pet Específico (Opcional)</mat-label>
+              <mat-label>{{
+                isPetLocked() ? 'Pet Vinculado' : 'Vincular a um Pet Específico (Opcional)'
+              }}</mat-label>
               <mat-select formControlName="id_pet">
-                <mat-option [value]="null"
-                  >Nenhum (Despesa geral / institucional da ONG)</mat-option
-                >
+                @if (!isPetLocked()) {
+                  <mat-option [value]="null"
+                    >Nenhum (Despesa geral / institucional da ONG)</mat-option
+                  >
+                }
                 @for (pet of petsDisponiveis(); track pet.id) {
                   <mat-option [value]="pet.id">{{ pet.nome }} (ID: #{{ pet.id }})</mat-option>
                 }
@@ -204,8 +208,15 @@
               <mat-icon matPrefix class="me-2">pets</mat-icon>
             </mat-form-field>
             <div class="pet-select-hint mb-3">
-              Associe esta despesa a um animal caso o recurso tenha sido destinado exclusivamente a
-              ele (ex: cirurgia, exame específico).
+              @if (isPetLocked()) {
+                <span class="text-surface-muted small d-inline-flex align-items-center gap-1">
+                  <mat-icon style="font-size: 16px; width: 16px; height: 16px">lock</mat-icon>
+                  Despesa vinculada exclusivamente a este animal (campo fixo).
+                </span>
+              } @else {
+                Associe esta despesa a um animal caso o recurso tenha sido destinado exclusivamente
+                a ele (ex: cirurgia, exame específico).
+              }
             </div>
           </div>
 

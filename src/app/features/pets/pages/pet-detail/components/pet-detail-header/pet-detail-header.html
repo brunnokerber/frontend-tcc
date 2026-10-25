@@ -35,19 +35,36 @@
     </div>
 
     <div class="col-12 col-md-6 d-flex justify-content-md-end gap-2 flex-wrap">
-      @if (p.link_documentos) {
-        <a
-          [href]="p.link_documentos"
-          target="_blank"
-          rel="noopener noreferrer"
-          mat-stroked-button
-          color="primary"
-          class="d-flex align-items-center gap-1 rounded-3"
-        >
-          <mat-icon>open_in_new</mat-icon>
-          <span>Prontuário / Docs</span>
-        </a>
-      }
+      <!-- Menu de Exportação / Relatórios do Pet -->
+      <button
+        type="button"
+        mat-stroked-button
+        [matMenuTriggerFor]="exportMenu"
+        class="btn-export flex-fill flex-sm-grow-0 py-2 px-2 px-sm-3 rounded-3 shadow-xs"
+        matTooltip="Exportar ficha cadastral, prontuário para adoção ou relatórios deste animal"
+      >
+        <mat-icon>file_download</mat-icon>
+        <span class="fw-semibold">
+          <span class="d-none d-sm-inline">Exportar </span>Relatório
+        </span>
+        <mat-icon iconPositionEnd>expand_more</mat-icon>
+      </button>
+
+      <mat-menu #exportMenu="matMenu" class="custom-export-menu shadow-sm">
+        <button mat-menu-item (click)="onGerarFichaAdotante()">
+          <mat-icon class="text-primary">assignment</mat-icon>
+          <span>Ficha de Adoção / Prontuário (PDF)</span>
+        </button>
+        <button mat-menu-item (click)="onGerarFichaCompleta()">
+          <mat-icon class="text-success">account_balance_wallet</mat-icon>
+          <span>Ficha Completa com Custos (PDF)</span>
+        </button>
+        <mat-divider></mat-divider>
+        <button mat-menu-item (click)="onExportarCsv()">
+          <mat-icon class="text-success">table_chart</mat-icon>
+          <span>Planilha em CSV</span>
+        </button>
+      </mat-menu>
       @if (p.status === 'Disponível') {
         <button
           type="button"

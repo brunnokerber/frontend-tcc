@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, inject, OnInit, signal, ViewChild } from '@angular/core';
+import { Component, computed, inject, signal, ViewChild } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
@@ -7,7 +7,6 @@ import { PageEvent } from '@angular/material/paginator';
 import { MatTabsModule } from '@angular/material/tabs';
 import { AuthService } from '@core/auth/services/auth.service';
 import { ToastService } from '@core/services/toast.service';
-import { LocaisService } from '@features/locais/services/locais.service';
 import { ConfirmationDialogComponent } from '@shared/components/confirmation-dialog/confirmation-dialog';
 import { PageHeaderComponent } from '@shared/components/page-header/page-header';
 import { formatPhone, onlyDigits } from '@shared/utils/string-utils';
@@ -53,11 +52,10 @@ import { DoacoesMonetariasTabComponent } from './tabs/doacoes-monetarias-tab/doa
   templateUrl: './doacao-list.html',
   styleUrls: ['./doacao-list.scss'],
 })
-export default class DoacaoListComponent implements OnInit {
+export default class DoacaoListComponent {
   public doacoesService = inject(DoacoesService);
   public doacoesMonetariasService = inject(DoacoesMonetariasService);
   public authService = inject(AuthService);
-  private locaisService = inject(LocaisService);
   private dialog = inject(MatDialog);
   private toast = inject(ToastService);
 
@@ -90,26 +88,28 @@ export default class DoacaoListComponent implements OnInit {
   public pageSizeMonetaria = signal<number>(10);
   public expandedRows = signal<Set<number>>(new Set());
 
+  public selectedTabIndex = signal<number>(0);
+
   public pagedDoacoesMonetarias = computed(() => {
     const list = this.doacoesMonetariasService.doacoesMonetarias();
     const start = this.pageIndexMonetaria() * this.pageSizeMonetaria();
     return list.slice(start, start + this.pageSizeMonetaria());
   });
 
-  async ngOnInit(): Promise<void> {
-    await Promise.all([
-      this.doacoesService.fetchDoacoes(),
-      this.doacoesService.fetchDirecionamentos(),
-      this.doacoesMonetariasService.fetchDoacoesMonetarias(),
-      this.locaisService.fetchLocais(),
-    ]);
+  onTabChange(index: number): void {
+    this.selectedTabIndex.set(index);
   }
 
   onDataChanged(): void {
-    // Sincroniza totais globais se necessário
-    this.doacoesService.fetchDoacoes();
-    this.doacoesService.fetchDirecionamentos();
-    this.doacoesMonetariasService.fetchDoacoesMonetarias();
+    const tab = this.selectedTabIndex();
+    if (tab === 0) {
+      this.insumosTab?.applyFilters(true);
+    } else if (tab === 1) {
+      this.monetariaTab?.applyFiltersMonetaria(true);
+    } else if (tab === 2) {
+      this.direcionamentosTab?.carregarLocais();
+      this.doacoesService.fetchDirecionamentos();
+    }
   }
 
   onPageChangeMonetaria(event: PageEvent): void {

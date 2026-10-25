@@ -88,16 +88,22 @@
         >
           <div
             class="user-avatar text-white rounded-circle d-flex align-items-center justify-content-center"
+            [class.bg-role-admin-solid]="user?.role === 'admin'"
+            [class.bg-role-user-solid]="user?.role !== 'admin'"
           >
-            <mat-icon>person</mat-icon>
+            <mat-icon>{{ user?.role === 'admin' ? 'admin_panel_settings' : 'person' }}</mat-icon>
           </div>
           <div class="user-info d-none d-sm-flex flex-column text-start">
             <span class="user-email small fw-semibold text-truncate" style="max-width: 140px">{{
               user?.email || 'Usuário'
             }}</span>
-            <span class="user-role text-surface-muted" style="font-size: 0.72rem">{{
-              user?.role === 'admin' ? 'Administrador' : 'Operador'
-            }}</span>
+            <span
+              class="user-role fw-semibold"
+              [class.text-role-admin]="user?.role === 'admin'"
+              [class.text-role-user]="user?.role !== 'admin'"
+              style="font-size: 0.72rem"
+              >{{ user?.role === 'admin' ? 'Administrador' : 'Operador' }}</span
+            >
           </div>
           <mat-icon class="text-surface-muted d-none d-sm-inline fs-6">expand_more</mat-icon>
         </button>
@@ -186,14 +192,21 @@
         >
           <div
             class="user-avatar text-white rounded-circle d-flex align-items-center justify-content-center"
+            [class.bg-role-admin-solid]="user?.role === 'admin'"
+            [class.bg-role-user-solid]="user?.role !== 'admin'"
           >
-            <mat-icon>person</mat-icon>
+            <mat-icon>{{ user?.role === 'admin' ? 'admin_panel_settings' : 'person' }}</mat-icon>
           </div>
           <div class="d-flex flex-column">
             <span class="small fw-semibold text-truncate" style="max-width: 170px">{{
               user?.email || 'Usuário'
             }}</span>
-            <span class="user-role text-surface-muted" style="font-size: 0.72rem">
+            <span
+              class="user-role fw-semibold"
+              [class.text-role-admin]="user?.role === 'admin'"
+              [class.text-role-user]="user?.role !== 'admin'"
+              style="font-size: 0.72rem"
+            >
               Painel &bull; {{ user?.role === 'admin' ? 'Administrador' : 'Operador' }}
             </span>
           </div>

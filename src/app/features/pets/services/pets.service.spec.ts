@@ -281,6 +281,47 @@ describe('PetsService (Gestão de Pets e Entradas)', () => {
       expect(storageBuilder.createSignedUrl).toHaveBeenCalledWith('avatars/rex.jpg', 3600);
     });
 
+    it('deve reaproveitar a URL assinada em cache sem chamar storage.createSignedUrl novamente', async () => {
+      const storageBuilder: any = {
+        createSignedUrl: vi
+          .fn()
+          .mockResolvedValue({ data: { signedUrl: 'https://cdn.test/cached.jpg' }, error: null }),
+      };
+      supabaseMock.client.storage.from.mockReturnValue(storageBuilder);
+
+      const url1 = await service.getSignedFotoUrl('avatars/thor.jpg');
+      expect(url1).toBe('https://cdn.test/cached.jpg');
+      expect(storageBuilder.createSignedUrl).toHaveBeenCalledTimes(1);
+
+      // Segunda chamada deve vir do cache
+      const url2 = await service.getSignedFotoUrl('avatars/thor.jpg');
+      expect(url2).toBe('https://cdn.test/cached.jpg');
+      expect(storageBuilder.createSignedUrl).toHaveBeenCalledTimes(1);
+
+      // Consulta síncrona do cache deve retornar a URL imediatamente
+      expect(service.getCachedSignedFotoUrl('avatars/thor.jpg')).toBe(
+        'https://cdn.test/cached.jpg',
+      );
+    });
+
+    it('deve registrar e recuperar manualmente uma URL via setCachedSignedFotoUrl', () => {
+      expect(service.getCachedSignedFotoUrl('avatars/manual.jpg')).toBeNull();
+
+      service.setCachedSignedFotoUrl('avatars/manual.jpg', 'https://cdn.test/manual.jpg');
+      expect(service.getCachedSignedFotoUrl('avatars/manual.jpg')).toBe(
+        'https://cdn.test/manual.jpg',
+      );
+    });
+
+    it('deve ignorar registro manual caso caminhoFoto ou url sejam vazios', () => {
+      service.setCachedSignedFotoUrl('', 'https://cdn.test/empty.jpg');
+      service.setCachedSignedFotoUrl(null, 'https://cdn.test/null.jpg');
+      service.setCachedSignedFotoUrl('avatars/empty-url.jpg', '');
+
+      expect(service.getCachedSignedFotoUrl('')).toBeNull();
+      expect(service.getCachedSignedFotoUrl('avatars/empty-url.jpg')).toBeNull();
+    });
+
     it('deve retornar null se storage.createSignedUrl retornar erro ou dados vazios', async () => {
       const storageBuilder: any = {
         createSignedUrl: vi

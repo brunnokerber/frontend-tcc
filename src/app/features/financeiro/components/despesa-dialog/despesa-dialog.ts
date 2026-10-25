@@ -33,6 +33,7 @@ import { DespesasService } from '../../services/despesas.service';
 export interface DespesaDialogData {
   despesa?: Despesa;
   id_pet?: number | null;
+  pet?: { id: number; nome: string } | null;
 }
 
 @Component({
@@ -76,6 +77,7 @@ export class DespesaDialogComponent implements OnInit {
   public isEditing = signal<boolean>(false);
   public isSaving = signal<boolean>(false);
   public isDeleting = signal<boolean>(false);
+  public isPetLocked = signal<boolean>(false);
   public isAdmin = this.authService.isAdmin;
 
   public form = this.fb.nonNullable.group({
@@ -90,12 +92,24 @@ export class DespesaDialogComponent implements OnInit {
   });
 
   async ngOnInit(): Promise<void> {
-    // Carrega pets ativos para associação opcional
-    try {
-      const pets = await this.petsService.fetchPets();
-      this.petsDisponiveis.set(pets.map((p) => ({ id: p.id, nome: p.nome })));
-    } catch {
-      // Ignora falha de pets, associação é opcional
+    const targetPetId = this.data?.id_pet ?? null;
+    const isLocked = targetPetId !== null;
+    this.isPetLocked.set(isLocked);
+
+    if (isLocked) {
+      // Pet específico fornecido: NÃO realiza busca de listagem de pets
+      const petNome = this.data?.pet?.nome || `Pet #${targetPetId}`;
+      this.petsDisponiveis.set([{ id: targetPetId, nome: petNome }]);
+      this.form.controls.id_pet.setValue(targetPetId);
+      this.form.controls.id_pet.disable();
+    } else {
+      // Carrega pets ativos para associação opcional apenas se não houver pet fixado
+      try {
+        const pets = await this.petsService.fetchPets();
+        this.petsDisponiveis.set(pets.map((p) => ({ id: p.id, nome: p.nome })));
+      } catch {
+        // Ignora falha de pets, associação é opcional
+      }
     }
 
     if (this.data?.despesa) {
@@ -109,12 +123,11 @@ export class DespesaDialogComponent implements OnInit {
         favorecido: d.favorecido,
         telefone: d.telefone || '',
         observacoes: d.observacoes || '',
-        id_pet: d.id_pet || null,
+        id_pet: isLocked ? targetPetId : d.id_pet || null,
       });
-    } else if (this.data?.id_pet) {
-      this.form.patchValue({
-        id_pet: this.data.id_pet,
-      });
+      if (isLocked) {
+        this.form.controls.id_pet.disable();
+      }
     }
   }
 
@@ -151,7 +164,7 @@ export class DespesaDialogComponent implements OnInit {
         });
 
         if (result) {
-          this.dialogRef.close(true);
+          this.dialogRef.close({ action: 'saved', despesa: result });
         }
       } else {
         const result = await this.despesasService.createDespesa({
@@ -166,7 +179,7 @@ export class DespesaDialogComponent implements OnInit {
         });
 
         if (result) {
-          this.dialogRef.close(true);
+          this.dialogRef.close({ action: 'saved', despesa: result });
         }
       }
     } finally {
@@ -202,7 +215,7 @@ export class DespesaDialogComponent implements OnInit {
         try {
           const success = await this.despesasService.deleteDespesa(despesa.id);
           if (success) {
-            this.dialogRef.close(true);
+            this.dialogRef.close({ action: 'deleted', id: despesa.id });
           }
         } finally {
           this.isDeleting.set(false);

@@ -16,6 +16,7 @@ import { PetsLocaisService } from '../../services/pets-locais.service';
 import { ConsultaExame, Pet, PetLocal, Vacina } from '../../models/pet.model';
 import { Despesa } from '@features/financeiro/models/despesa.model';
 import { DespesasService } from '@features/financeiro/services/despesas.service';
+import { PetReportService } from '../../services/pet-report.service';
 
 describe('PetDetailComponent', () => {
   let component: PetDetailComponent;
@@ -77,12 +78,15 @@ describe('PetDetailComponent', () => {
   const loadingConsultasSignal = signal<boolean>(false);
   const locaisSignal = signal<PetLocal[]>(mockLocais);
   const loadingLocaisSignal = signal<boolean>(false);
+  const petDespesasSignal = signal<Despesa[]>(mockDespesas);
+  const loadingDespesasSignal = signal<boolean>(false);
 
   const mockPetsService = {
     cachedPet: cachedPetSignal,
     loading: loadingPetSignal,
     getPetById: vi.fn(),
     getSignedFotoUrl: vi.fn().mockResolvedValue('https://signed.url/rex.jpg'),
+    getCachedSignedFotoUrl: vi.fn().mockReturnValue('https://signed.url/rex.jpg'),
   };
 
   const mockVacinasService = {
@@ -106,8 +110,15 @@ describe('PetDetailComponent', () => {
   };
 
   const mockDespesasService = {
+    petDespesas: petDespesasSignal,
+    loading: loadingDespesasSignal,
     getDespesasByPetId: vi.fn().mockResolvedValue(mockDespesas),
     deleteDespesa: vi.fn().mockResolvedValue(true),
+  };
+
+  const mockPetReportService = {
+    generatePetFichaPdf: vi.fn(),
+    exportPetSingleCsv: vi.fn(),
   };
 
   const mockAuthService = {
@@ -143,6 +154,7 @@ describe('PetDetailComponent', () => {
         { provide: ConsultasExamesService, useValue: mockConsultasService },
         { provide: PetsLocaisService, useValue: mockPetsLocaisService },
         { provide: DespesasService, useValue: mockDespesasService },
+        { provide: PetReportService, useValue: mockPetReportService },
         { provide: AuthService, useValue: mockAuthService },
         { provide: ToastService, useValue: mockToast },
         { provide: NavigationService, useValue: mockNav },
@@ -184,12 +196,12 @@ describe('PetDetailComponent', () => {
     expect(mockVacinasService.getVacinasByPetId).toHaveBeenCalledWith(1, false);
     expect(mockConsultasService.getConsultasExamesByPetId).toHaveBeenCalledWith(1, false);
     expect(mockPetsLocaisService.getPetsLocaisByPetId).toHaveBeenCalledWith(1, false);
-    expect(mockDespesasService.getDespesasByPetId).toHaveBeenCalledWith(1);
+    expect(mockDespesasService.getDespesasByPetId).toHaveBeenCalledWith(1, false);
   });
 
   it('deve calcular corretamente as métricas financeiras investidas incluindo despesas da ONG', async () => {
     await fixture.whenStable();
-    component.despesas.set(mockDespesas);
+    petDespesasSignal.set(mockDespesas);
 
     expect(component.totalCustoVacinas()).toBe(100);
     expect(component.totalCustoConsultas()).toBe(150);
@@ -201,7 +213,7 @@ describe('PetDetailComponent', () => {
   it('deve navegar para a edição do pet ao chamar goToEdit', () => {
     component.goToEdit();
     expect(router.navigate).toHaveBeenCalledWith(['/pets', 1, 'editar'], {
-      state: { pet: mockPet },
+      state: { pet: mockPet, fotoUrl: 'https://signed.url/rex.jpg' },
     });
   });
 
@@ -246,5 +258,34 @@ describe('PetDetailComponent', () => {
   it('deve abrir modal de registro de adoção ao chamar openAdotarModal', () => {
     component.openAdotarModal();
     expect(mockDialog.open).toHaveBeenCalled();
+  });
+
+  it('deve chamar generatePetFichaPdf ao disparar handleEmitirRelatorio com adotante', () => {
+    component.handleEmitirRelatorio('adotante');
+    expect(mockPetReportService.generatePetFichaPdf).toHaveBeenCalledWith(
+      expect.objectContaining({
+        pet: mockPet,
+        incluirFinanceiro: false,
+      }),
+    );
+  });
+
+  it('deve chamar generatePetFichaPdf com incluirFinanceiro true ao disparar com completa', () => {
+    component.handleEmitirRelatorio('completa');
+    expect(mockPetReportService.generatePetFichaPdf).toHaveBeenCalledWith(
+      expect.objectContaining({
+        pet: mockPet,
+        incluirFinanceiro: true,
+      }),
+    );
+  });
+
+  it('deve chamar exportPetSingleCsv ao disparar handleEmitirRelatorio com csv', () => {
+    component.handleEmitirRelatorio('csv');
+    expect(mockPetReportService.exportPetSingleCsv).toHaveBeenCalledWith(
+      expect.objectContaining({
+        pet: mockPet,
+      }),
+    );
   });
 });

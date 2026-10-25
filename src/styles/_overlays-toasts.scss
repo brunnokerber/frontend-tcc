@@ -274,12 +274,14 @@ html.dark-theme,
     }
 
     .role-chip {
-      background: rgba(108, 117, 125, 0.12);
-      color: #495057;
+      background: var(--color-role-user-bg);
+      color: var(--color-role-user);
+      border: 1px solid var(--color-role-user-border);
 
       &.is-admin {
-        background: rgba(103, 58, 183, 0.12);
-        color: #512da8;
+        background: var(--color-role-admin-bg);
+        color: var(--color-role-admin);
+        border: 1px solid var(--color-role-admin-border);
       }
     }
 

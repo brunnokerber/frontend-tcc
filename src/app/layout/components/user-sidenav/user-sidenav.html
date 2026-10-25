@@ -18,8 +18,10 @@
     <div class="user-drawer-card p-3 rounded-3 mb-3 d-flex align-items-center gap-3">
       <div
         class="user-avatar-large rounded-circle d-flex align-items-center justify-content-center text-white"
+        [class.bg-role-admin-solid]="user?.role === 'admin'"
+        [class.bg-role-user-solid]="user?.role !== 'admin'"
       >
-        <mat-icon>person</mat-icon>
+        <mat-icon>{{ user?.role === 'admin' ? 'admin_panel_settings' : 'person' }}</mat-icon>
       </div>
       <div class="d-flex flex-column overflow-hidden">
         <span class="fw-bold text-truncate user-email-label" [title]="user?.email">{{
@@ -28,8 +30,8 @@
         <div class="d-flex align-items-center gap-2 mt-1">
           <span
             class="badge small"
-            [class.bg-primary]="user?.role === 'admin'"
-            [class.bg-secondary]="user?.role !== 'admin'"
+            [class.badge-role-admin]="user?.role === 'admin'"
+            [class.badge-role-user]="user?.role !== 'admin'"
           >
             {{ user?.role === 'admin' ? 'Administrador' : 'Operador' }}
           </span>

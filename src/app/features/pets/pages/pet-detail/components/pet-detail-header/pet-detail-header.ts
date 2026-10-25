@@ -1,7 +1,9 @@
 import { CommonModule, CurrencyPipe, DatePipe } from '@angular/common';
 import { Component, input, output } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
+import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
+import { MatMenuModule } from '@angular/material/menu';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import {
   getSexoIcon,
@@ -21,7 +23,9 @@ import { AuditBadgeComponent } from '@shared/components/audit-badge/audit-badge'
     DatePipe,
     CurrencyPipe,
     MatButtonModule,
+    MatDividerModule,
     MatIconModule,
+    MatMenuModule,
     MatTooltipModule,
     AuditBadgeComponent,
   ],
@@ -41,6 +45,7 @@ export class PetDetailHeaderComponent {
   public back = output<void>();
   public adotar = output<void>();
   public photoPreview = output<{ url: string; nome: string }>();
+  public emitirRelatorio = output<'adotante' | 'completa' | 'csv'>();
 
   readonly getStatusBadgeClass = getStatusBadgeClass;
   readonly getTipoBadgeClass = getTipoBadgeClass;
@@ -57,5 +62,17 @@ export class PetDetailHeaderComponent {
 
   onPhotoClick(url: string, nome: string): void {
     this.photoPreview.emit({ url, nome });
+  }
+
+  onGerarFichaAdotante(): void {
+    this.emitirRelatorio.emit('adotante');
+  }
+
+  onGerarFichaCompleta(): void {
+    this.emitirRelatorio.emit('completa');
+  }
+
+  onExportarCsv(): void {
+    this.emitirRelatorio.emit('csv');
   }
 }

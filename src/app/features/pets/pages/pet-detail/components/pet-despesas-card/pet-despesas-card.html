@@ -5,14 +5,7 @@
     <div class="d-flex align-items-center gap-2">
       <mat-icon class="text-danger">request_quote</mat-icon>
       <div>
-        <div class="d-flex align-items-center gap-2">
-          <h2 class="h5 fw-bold mb-0">Despesas Vinculadas da ONG</h2>
-          @if (despesas().length > 0) {
-            <span class="badge bg-danger-subtle text-danger border border-danger-subtle">
-              Total: {{ totalDespesas() | currency: 'BRL' : 'symbol' : '1.2-2' }}
-            </span>
-          }
-        </div>
+        <h2 class="h5 fw-bold mb-0">Despesas Vinculadas da ONG</h2>
         <span class="text-surface-muted small"
           >Custos e despesas institucionais alocados especificamente a este animal</span
         >

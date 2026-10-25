@@ -22,6 +22,7 @@ import { Despesa } from '@features/financeiro/models/despesa.model';
 import { DespesasService } from '@features/financeiro/services/despesas.service';
 import { DespesaDialogComponent } from '@features/financeiro/components/despesa-dialog/despesa-dialog';
 import { DespesaDetalhesDialogComponent } from '@features/financeiro/components/despesa-detalhes-dialog/despesa-detalhes-dialog';
+import { PetReportService, PetFichaReportData } from '../../services/pet-report.service';
 import { PetDetailHeaderComponent } from './components/pet-detail-header/pet-detail-header';
 import { PetInfoCardComponent } from './components/pet-info-card/pet-info-card';
 import { PetLocaisCardComponent } from './components/pet-locais-card/pet-locais-card';
@@ -58,6 +59,7 @@ export default class PetDetailComponent implements OnInit {
   public despesasService = inject(DespesasService);
   private authService = inject(AuthService);
   private toast = inject(ToastService);
+  public petReportService = inject(PetReportService);
 
   public isAdmin = this.authService.isAdmin;
 
@@ -66,7 +68,7 @@ export default class PetDetailComponent implements OnInit {
   public vacinas = this.vacinasService.vacinas;
   public consultasExames = this.consultasExamesService.consultas;
   public petsLocais = this.petsLocaisService.petsLocais;
-  public despesas = signal<Despesa[]>([]);
+  public despesas = this.despesasService.petDespesas;
 
   // Foto assinada do pet (Supabase Storage)
   public fotoUrl = signal<string | null>(null);
@@ -86,9 +88,14 @@ export default class PetDetailComponent implements OnInit {
         return;
       }
 
-      this.carregarFotoPet(fotoPath).then((url) => {
-        this.fotoUrl.set(url);
-      });
+      const cached = this.petsService.getCachedSignedFotoUrl(fotoPath);
+      if (cached) {
+        this.fotoUrl.set(cached);
+      } else {
+        this.carregarFotoPet(fotoPath).then((url) => {
+          this.fotoUrl.set(url);
+        });
+      }
     });
   }
 
@@ -168,7 +175,7 @@ export default class PetDetailComponent implements OnInit {
     this.vacinasService.getVacinasByPetId(id, forceRefresh);
     this.consultasExamesService.getConsultasExamesByPetId(id, forceRefresh);
     this.petsLocaisService.getPetsLocaisByPetId(id, forceRefresh);
-    this.carregarDespesasPet(id);
+    this.carregarDespesasPet(id, forceRefresh);
   }
 
   goBack() {
@@ -178,7 +185,9 @@ export default class PetDetailComponent implements OnInit {
   goToEdit() {
     const p = this.pet();
     if (p) {
-      this.router.navigate(['/pets', p.id, 'editar'], { state: { pet: p } });
+      this.router.navigate(['/pets', p.id, 'editar'], {
+        state: { pet: p, fotoUrl: this.fotoUrl() },
+      });
     }
   }
 
@@ -195,10 +204,8 @@ export default class PetDetailComponent implements OnInit {
         },
       });
 
-      dialogRef.afterClosed().subscribe((res) => {
-        if (res && (res.action === 'saved' || res.action === 'deleted')) {
-          this.vacinasService.getVacinasByPetId(p.id, true);
-        }
+      dialogRef.afterClosed().subscribe((_res) => {
+        // O VacinasService já sincroniza o vacinasSignal reativamente com os dados retornados pelo insert
       });
     }
   }
@@ -217,10 +224,8 @@ export default class PetDetailComponent implements OnInit {
         },
       });
 
-      dialogRef.afterClosed().subscribe((res) => {
-        if (res && (res.action === 'saved' || res.action === 'deleted')) {
-          this.vacinasService.getVacinasByPetId(p.id, true);
-        }
+      dialogRef.afterClosed().subscribe((_res) => {
+        // O VacinasService já sincroniza o vacinasSignal reativamente com os dados retornados pelo update
       });
     }
   }
@@ -336,11 +341,10 @@ export default class PetDetailComponent implements OnInit {
     });
   }
 
-  async carregarDespesasPet(id: number): Promise<void> {
+  async carregarDespesasPet(id: number, forceRefresh = false): Promise<void> {
     this.loadingDespesas.set(true);
     try {
-      const lista = await this.despesasService.getDespesasByPetId(id);
-      this.despesas.set(lista);
+      await this.despesasService.getDespesasByPetId(id, forceRefresh);
     } finally {
       this.loadingDespesas.set(false);
     }
@@ -351,25 +355,25 @@ export default class PetDetailComponent implements OnInit {
     if (!p) return;
 
     const dialogRef = this.dialog.open(DespesaDialogComponent, {
-      width: '680px',
-      maxWidth: '95vw',
+      width: '880px',
+      maxWidth: '96vw',
+      maxHeight: '94vh',
       disableClose: true,
       data: {
         id_pet: p.id,
+        pet: { id: p.id, nome: p.nome },
       },
     });
 
-    dialogRef.afterClosed().subscribe((saved: boolean) => {
-      if (saved && p.id) {
-        this.carregarDespesasPet(p.id);
-      }
+    dialogRef.afterClosed().subscribe((_res) => {
+      // O DespesasService sincroniza petDespesas reativamente com os dados retornados pelo insert
     });
   }
 
   openDetalhesDespesa(despesa: Despesa): void {
     const dialogRef = this.dialog.open(DespesaDetalhesDialogComponent, {
       width: '680px',
-      maxWidth: '96vw',
+      maxWidth: '95vw',
       autoFocus: false,
       data: {
         despesa,
@@ -389,19 +393,19 @@ export default class PetDetailComponent implements OnInit {
     if (!p || !despesa.id) return;
 
     const dialogRef = this.dialog.open(DespesaDialogComponent, {
-      width: '680px',
-      maxWidth: '95vw',
+      width: '880px',
+      maxWidth: '96vw',
+      maxHeight: '94vh',
       disableClose: true,
       data: {
         despesa,
         id_pet: p.id,
+        pet: { id: p.id, nome: p.nome },
       },
     });
 
-    dialogRef.afterClosed().subscribe((saved: boolean) => {
-      if (saved && p.id) {
-        this.carregarDespesasPet(p.id);
-      }
+    dialogRef.afterClosed().subscribe((_res) => {
+      // O DespesasService sincroniza petDespesas reativamente com os dados retornados pelo update
     });
   }
 
@@ -414,8 +418,6 @@ export default class PetDetailComponent implements OnInit {
       );
       return;
     }
-
-    const p = this.pet();
 
     const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
       data: {
@@ -432,11 +434,35 @@ export default class PetDetailComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe(async (confirmed: boolean) => {
       if (confirmed && despesa.id) {
-        const deleted = await this.despesasService.deleteDespesa(despesa.id);
-        if (deleted && p?.id) {
-          this.carregarDespesasPet(p.id);
-        }
+        await this.despesasService.deleteDespesa(despesa.id);
+        // O DespesasService sincroniza petDespesas reativamente na exclusão
       }
     });
+  }
+
+  handleEmitirRelatorio(tipo: 'adotante' | 'completa' | 'csv'): void {
+    const pet = this.pet();
+    if (!pet) return;
+
+    const reportData: PetFichaReportData = {
+      pet,
+      fotoUrl: this.fotoUrl(),
+      vacinas: this.vacinas(),
+      consultas: this.consultasExames(),
+      locais: this.petsLocais(),
+      despesas: this.despesas(),
+      incluirFinanceiro: tipo === 'completa',
+      totalInvestido: this.totalInvestidoGeral(),
+      totalCustoVacinas: this.totalCustoVacinas(),
+      totalCustoConsultas: this.totalCustoConsultas(),
+      totalCustoAuxilio: this.totalCustoAuxilio(),
+      totalCustoDespesas: this.totalCustoDespesas(),
+    };
+
+    if (tipo === 'csv') {
+      this.petReportService.exportPetSingleCsv(reportData);
+    } else {
+      this.petReportService.generatePetFichaPdf(reportData);
+    }
   }
 }

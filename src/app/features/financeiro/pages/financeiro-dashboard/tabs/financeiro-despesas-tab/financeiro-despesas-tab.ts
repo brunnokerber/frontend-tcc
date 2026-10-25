@@ -113,19 +113,15 @@ export class FinanceiroDespesasTabComponent {
   openEditarDespesa(despesa: Despesa): void {
     const ref = this.dialog.open(DespesaDialogComponent, {
       data: { despesa },
-      width: '760px',
+      width: '880px',
       maxWidth: '96vw',
+      maxHeight: '94vh',
       disableClose: true,
       autoFocus: false,
     });
 
-    ref.afterClosed().subscribe(async (salvou: boolean) => {
+    ref.afterClosed().subscribe((salvou: boolean) => {
       if (salvou) {
-        const f = this.financeiroService.filtro();
-        await this.despesasService.fetchDespesas({
-          dataInicio: f.dataInicio,
-          dataFim: f.dataFim,
-        });
         this.dataChanged.emit();
       }
     });

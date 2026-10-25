@@ -217,4 +217,180 @@ describe('PetReportService (Geração de Relatórios CSV e Impressão PDF)', () 
       expect(writtenHtml).toContain('Sem registro');
     });
   });
+
+  describe('generatePetFichaPdf', () => {
+    it('não deve fazer nada se data.pet for nulo ou indefinido', () => {
+      vi.spyOn(window, 'open');
+      service.generatePetFichaPdf({ pet: null as unknown as Pet });
+      expect(window.open).not.toHaveBeenCalled();
+    });
+
+    it('deve alertar o usuário caso a janela popup seja bloqueada pelo navegador', () => {
+      vi.spyOn(window, 'open').mockReturnValue(null);
+      const alertSpy = vi.spyOn(window, 'alert').mockImplementation(() => {});
+
+      service.generatePetFichaPdf({ pet: mockPets[0] });
+
+      expect(alertSpy).toHaveBeenCalledWith(
+        expect.stringContaining('permita pop-ups no navegador'),
+      );
+    });
+
+    it('deve gerar ficha de adoção e prontuário sem custos (modo adotante com termo de guarda)', () => {
+      let writtenHtml = '';
+      const fakeWindow = {
+        document: {
+          open: vi.fn(),
+          write: vi.fn((content: string) => {
+            writtenHtml += content;
+          }),
+          close: vi.fn(),
+        },
+      };
+      vi.spyOn(window, 'open').mockReturnValue(fakeWindow as unknown as Window);
+
+      service.generatePetFichaPdf({
+        pet: mockPets[0],
+        fotoUrl: 'https://storage/rex.jpg',
+        vacinas: [
+          {
+            id: 1,
+            id_pet: 1,
+            nome_vacina: 'V10 Déctupla',
+            data_prevista: '2026-02-01',
+            data_aplicacao: '2026-02-01',
+            veterinario: { id: 1, nome: 'Dr. Carlos Silva' },
+            custo: 90,
+          },
+        ],
+        consultas: [
+          {
+            id: 1,
+            id_pet: 1,
+            tipo_operacao: 'Consulta de Rotina',
+            operacao_medicamento: 'Checkup Geral',
+            data_realizacao: '2026-02-10',
+            veterinario: { id: 1, nome: 'Dr. Carlos Silva' },
+            custo: 120,
+          },
+        ],
+        incluirFinanceiro: false,
+      });
+
+      expect(window.open).toHaveBeenCalledWith('', '_blank');
+      expect(writtenHtml).toContain('Ficha de Adoção &amp; Prontuário do Animal');
+      expect(writtenHtml).toContain('Rex &quot;Feroz&quot;; Amigo');
+      expect(writtenHtml).toContain('Termo de Guarda Responsável e Entrega do Animal');
+      expect(writtenHtml).toContain('Assinatura do Adotante / Tutor Responsável');
+      expect(writtenHtml).toContain('V10 Déctupla');
+      expect(writtenHtml).toContain('Dr. Carlos Silva');
+      expect(writtenHtml).toContain('Checkup Geral');
+      // No modo adotante, não deve exibir resumo financeiro
+      expect(writtenHtml).not.toContain('Resumo Financeiro &amp; Investimentos');
+    });
+
+    it('deve gerar ficha completa com prestação de contas quando incluirFinanceiro for true', () => {
+      let writtenHtml = '';
+      const fakeWindow = {
+        document: {
+          open: vi.fn(),
+          write: vi.fn((content: string) => {
+            writtenHtml += content;
+          }),
+          close: vi.fn(),
+        },
+      };
+      vi.spyOn(window, 'open').mockReturnValue(fakeWindow as unknown as Window);
+
+      service.generatePetFichaPdf({
+        pet: mockPets[0],
+        incluirFinanceiro: true,
+        totalInvestido: 450,
+        totalCustoVacinas: 100,
+        totalCustoConsultas: 150,
+        totalCustoAuxilio: 100,
+        totalCustoDespesas: 100,
+        despesas: [
+          {
+            id: 1,
+            id_pet: 1,
+            categoria: 'Medicamentos',
+            descricao: 'Antibiótico Pós-operatório',
+            valor: 100,
+            data_despesa: '2026-02-15',
+          },
+        ],
+      });
+
+      expect(writtenHtml).toContain('Ficha do Animal &amp; Prestação de Contas');
+      expect(writtenHtml).toContain('Resumo Financeiro & Investimentos no Animal');
+      expect(writtenHtml).toContain('Antibiótico Pós-operatório');
+      expect(writtenHtml).not.toContain('Termo de Guarda Responsável e Entrega');
+    });
+  });
+
+  describe('exportPetSingleCsv', () => {
+    it('não deve fazer nada se data.pet for nulo ou indefinido', () => {
+      const createElSpy = vi.spyOn(document, 'createElement');
+      service.exportPetSingleCsv({ pet: null as unknown as Pet });
+      expect(createElSpy).not.toHaveBeenCalled();
+    });
+
+    it('deve exportar CSV da ficha individual do pet com suas seções', () => {
+      let blobResult: Blob | null = null;
+      let downloadedFilename = '';
+
+      vi.spyOn(URL, 'createObjectURL').mockImplementation((blob: Blob) => {
+        blobResult = blob;
+        return 'blob:mock-csv-url';
+      });
+      vi.spyOn(URL, 'revokeObjectURL').mockImplementation(() => {});
+
+      const mockAnchor = {
+        setAttribute: vi.fn((attr: string, val: string) => {
+          if (attr === 'download') downloadedFilename = val;
+        }),
+        click: vi.fn(),
+      };
+      vi.spyOn(document, 'createElement').mockReturnValue(
+        mockAnchor as unknown as HTMLAnchorElement,
+      );
+      vi.spyOn(document.body, 'appendChild').mockImplementation(
+        () => mockAnchor as unknown as Node,
+      );
+      vi.spyOn(document.body, 'removeChild').mockImplementation(
+        () => mockAnchor as unknown as Node,
+      );
+
+      service.exportPetSingleCsv({
+        pet: mockPets[0],
+        vacinas: [
+          {
+            id: 1,
+            id_pet: 1,
+            nome_vacina: 'Antirrábica',
+            data_prevista: '2026-01-20',
+            data_aplicacao: '2026-01-20',
+            custo: 50,
+          },
+        ],
+        consultas: [
+          {
+            id: 1,
+            id_pet: 1,
+            tipo_operacao: 'Exame de Sangue',
+            operacao_medicamento: 'Hemograma',
+            data_realizacao: '2026-01-22',
+            custo: 80,
+          },
+        ],
+        incluirFinanceiro: true,
+        totalInvestido: 130,
+      });
+
+      expect(mockAnchor.click).toHaveBeenCalled();
+      expect(downloadedFilename).toContain('ficha-pet-1-');
+      expect(blobResult).toBeTruthy();
+    });
+  });
 });

@@ -116,7 +116,6 @@ export class VoluntariosService {
 
       const created = data as Voluntario;
       this.toast.success(`Voluntário(a) "${created.nome}" cadastrado com sucesso!`);
-      await this.fetchVoluntarios();
       return created;
     } catch (err: unknown) {
       const msg = extractErrorMessage(err, 'Erro ao cadastrar voluntário.');
@@ -146,7 +145,6 @@ export class VoluntariosService {
 
       const updated = data as Voluntario;
       this.toast.success(`Voluntário(a) "${updated.nome}" atualizado com sucesso!`);
-      await this.fetchVoluntarios();
       return updated;
     } catch (err: unknown) {
       const msg = extractErrorMessage(err, 'Erro ao atualizar dados do voluntário.');
@@ -167,7 +165,6 @@ export class VoluntariosService {
       }
 
       this.toast.success('Voluntário removido com sucesso!');
-      await this.fetchVoluntarios();
       return true;
     } catch (err: unknown) {
       const msg = extractErrorMessage(err, 'Erro ao excluir voluntário.');

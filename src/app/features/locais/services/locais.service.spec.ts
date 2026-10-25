@@ -171,25 +171,21 @@ describe('LocaisService (Gestão de Locais e Integração ViaCEP)', () => {
   });
 
   describe('createLocal e updateLocal', () => {
-    it('deve criar novo local e atualizar a listagem', async () => {
+    it('deve criar novo local e atualizar o signal em memória sem GET redundante', async () => {
       const novoLocal: Local = { id: 3, local: 'Clínica Amiga', tipo_local: 'Clínica Veterinária' };
       const queryBuilderInsert = {
         insert: vi.fn().mockReturnThis(),
         select: vi.fn().mockReturnThis(),
         single: vi.fn().mockResolvedValue({ data: novoLocal, error: null }),
       };
-      const queryBuilderFetch = {
-        select: vi.fn().mockReturnThis(),
-        order: vi.fn().mockResolvedValue({ data: [...mockLocais, novoLocal], error: null }),
-      };
-      supabaseMock.client.from
-        .mockReturnValueOnce(queryBuilderInsert)
-        .mockReturnValueOnce(queryBuilderFetch);
+      supabaseMock.client.from.mockReturnValue(queryBuilderInsert);
 
       const dto: LocalCreateDto = { local: 'Clínica Amiga', tipo_local: 'Clínica Veterinária' };
       const created = await service.createLocal(dto);
 
       expect(created).toEqual(novoLocal);
+      expect(supabaseMock.client.from).toHaveBeenCalledTimes(1);
+      expect(service.locais()).toContainEqual(novoLocal);
       expect(toastMock.success).toHaveBeenCalledWith(
         'Local "Clínica Amiga" cadastrado com sucesso!',
       );
@@ -209,7 +205,7 @@ describe('LocaisService (Gestão de Locais e Integração ViaCEP)', () => {
       expect(toastMock.error).toHaveBeenCalledWith('Nome já em uso');
     });
 
-    it('deve atualizar local existente e notificar com sucesso', async () => {
+    it('deve atualizar local existente e atualizar o signal em memória sem GET redundante', async () => {
       const updatedLocal: Local = { ...mockLocais[0], local: 'Abrigo Central Reformado' };
       const queryBuilderUpdate = {
         update: vi.fn().mockReturnThis(),
@@ -217,18 +213,13 @@ describe('LocaisService (Gestão de Locais e Integração ViaCEP)', () => {
         select: vi.fn().mockReturnThis(),
         single: vi.fn().mockResolvedValue({ data: updatedLocal, error: null }),
       };
-      const queryBuilderFetch = {
-        select: vi.fn().mockReturnThis(),
-        order: vi.fn().mockResolvedValue({ data: [updatedLocal], error: null }),
-      };
-      supabaseMock.client.from
-        .mockReturnValueOnce(queryBuilderUpdate)
-        .mockReturnValueOnce(queryBuilderFetch);
+      supabaseMock.client.from.mockReturnValue(queryBuilderUpdate);
 
       const dto: LocalUpdateDto = { local: 'Abrigo Central Reformado' };
       const result = await service.updateLocal(1, dto);
 
       expect(result).toEqual(updatedLocal);
+      expect(supabaseMock.client.from).toHaveBeenCalledTimes(1);
       expect(toastMock.success).toHaveBeenCalledWith(
         'Local "Abrigo Central Reformado" atualizado com sucesso!',
       );

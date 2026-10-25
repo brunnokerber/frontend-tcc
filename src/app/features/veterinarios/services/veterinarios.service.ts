@@ -102,7 +102,7 @@ export class VeterinariosService {
 
       const created = data as Veterinario;
       this.toast.success(`Veterinário(a) "${created.nome}" cadastrado(a) com sucesso!`);
-      await this.fetchVeterinarios();
+      this.veterinariosSignal.update((list) => [created, ...list]);
       return created;
     } catch (err: unknown) {
       const msg = extractErrorMessage(err, 'Erro ao cadastrar o veterinário.');
@@ -129,7 +129,9 @@ export class VeterinariosService {
 
       const updated = data as Veterinario;
       this.toast.success(`Veterinário(a) "${updated.nome}" atualizado(a) com sucesso!`);
-      await this.fetchVeterinarios();
+      this.veterinariosSignal.update((list) =>
+        list.map((v) => (v.id === updated.id ? updated : v)),
+      );
       return updated;
     } catch (err: unknown) {
       const msg = extractErrorMessage(err, 'Erro ao atualizar o veterinário.');

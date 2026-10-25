@@ -24,6 +24,9 @@ export class PetsService {
   private readonly cachedPetSignal = signal<Pet | null>(null);
   public readonly cachedPet = this.cachedPetSignal.asReadonly();
 
+  // Cache em memória para URLs assinadas temporárias do Supabase Storage
+  private readonly signedUrlsCache = new Map<string, { url: string; expiresAt: number }>();
+
   async fetchPets(filter?: PetFilter): Promise<Pet[]> {
     this.loadingSignal.set(true);
     this.errorSignal.set(null);
@@ -181,8 +184,42 @@ export class PetsService {
   }
 
   /**
+   * Obtém a URL assinada de uma foto caso ela já esteja disponível no cache em memória.
+   * Retorna síncronamente a URL válida ou null se não encontrada/expirada.
+   */
+  getCachedSignedFotoUrl(caminhoFoto: string | null | undefined): string | null {
+    if (!caminhoFoto || !caminhoFoto.trim()) {
+      return null;
+    }
+    const key = caminhoFoto.trim();
+    const cached = this.signedUrlsCache.get(key);
+    if (cached && cached.expiresAt > Date.now() + 60000) {
+      return cached.url;
+    }
+    return null;
+  }
+
+  /**
+   * Registra manualmente uma URL assinada no cache em memória (ex: vinda do state de navegação).
+   */
+  setCachedSignedFotoUrl(
+    caminhoFoto: string | null | undefined,
+    url: string,
+    expiresIn = 3600,
+  ): void {
+    if (!caminhoFoto || !caminhoFoto.trim() || !url) {
+      return;
+    }
+    const key = caminhoFoto.trim();
+    this.signedUrlsCache.set(key, {
+      url,
+      expiresAt: Date.now() + expiresIn * 1000,
+    });
+  }
+
+  /**
    * Gera uma URL assinada temporária (válida por 1 hora por padrão) para visualização
-   * de fotos no bucket privado 'pets' do Supabase Storage.
+   * de fotos no bucket privado 'pets' do Supabase Storage com suporte a cache em memória.
    */
   async getSignedFotoUrl(
     caminhoFoto: string | null | undefined,
@@ -192,15 +229,28 @@ export class PetsService {
       return null;
     }
 
+    const key = caminhoFoto.trim();
+    const cachedUrl = this.getCachedSignedFotoUrl(key);
+    if (cachedUrl) {
+      return cachedUrl;
+    }
+
+    const now = Date.now();
+
     try {
       const { data, error } = await this.supabase.client.storage
         .from('pets')
-        .createSignedUrl(caminhoFoto.trim(), expiresIn);
+        .createSignedUrl(key, expiresIn);
 
       if (error || !data?.signedUrl) {
         console.error('Erro ao gerar URL assinada da foto:', error);
         return null;
       }
+
+      this.signedUrlsCache.set(key, {
+        url: data.signedUrl,
+        expiresAt: now + expiresIn * 1000,
+      });
 
       return data.signedUrl;
     } catch (err: unknown) {
@@ -210,17 +260,26 @@ export class PetsService {
   }
 
   /**
-   * Remove uma foto do bucket privado 'pets' no Supabase Storage.
+   * Remove uma foto do bucket privado 'pets' no Supabase Storage e invalida o cache.
    */
   async deletePetFoto(caminhoFoto: string | null | undefined): Promise<void> {
     if (!caminhoFoto || !caminhoFoto.trim()) {
       return;
     }
+    const key = caminhoFoto.trim();
+    this.signedUrlsCache.delete(key);
     try {
-      await this.supabase.client.storage.from('pets').remove([caminhoFoto.trim()]);
+      await this.supabase.client.storage.from('pets').remove([key]);
     } catch (err: unknown) {
       console.warn('Não foi possível remover a foto antiga do storage:', err);
     }
+  }
+
+  /**
+   * Invalida todo o cache de URLs assinadas de fotos
+   */
+  clearFotoCache(): void {
+    this.signedUrlsCache.clear();
   }
 
   async createPet(dto: PetCreateDto): Promise<Pet | null> {

@@ -20,6 +20,11 @@ export class DespesasService {
   public loading = signal<boolean>(false);
   public error = signal<string | null>(null);
 
+  // Cache em memória de despesas associadas a um animal específico
+  private readonly cachedPetIdSignal = signal<number | null>(null);
+  private readonly petDespesasSignal = signal<Despesa[]>([]);
+  public readonly petDespesas = this.petDespesasSignal.asReadonly();
+
   /**
    * Consulta despesas no Supabase com suporte a filtros dinâmicos
    */
@@ -103,6 +108,9 @@ export class DespesasService {
 
       const nova = data as unknown as Despesa;
       this.despesas.update((lista) => [nova, ...lista]);
+      if (this.cachedPetIdSignal() === nova.id_pet) {
+        this.petDespesasSignal.update((lista) => [nova, ...lista]);
+      }
       this.toast.success('Despesa registrada com sucesso!');
       return nova;
     } catch (err: unknown) {
@@ -148,6 +156,19 @@ export class DespesasService {
 
       const atualizada = data as unknown as Despesa;
       this.despesas.update((lista) => lista.map((d) => (d.id === id ? atualizada : d)));
+      if (this.cachedPetIdSignal()) {
+        const petId = this.cachedPetIdSignal();
+        this.petDespesasSignal.update((lista) => {
+          if (atualizada.id_pet === petId) {
+            const exists = lista.some((d) => d.id === id);
+            return exists
+              ? lista.map((d) => (d.id === id ? atualizada : d))
+              : [atualizada, ...lista];
+          } else {
+            return lista.filter((d) => d.id !== id);
+          }
+        });
+      }
       this.toast.success('Despesa atualizada com sucesso!');
       return atualizada;
     } catch (err: unknown) {
@@ -172,6 +193,9 @@ export class DespesasService {
       }
 
       this.despesas.update((lista) => lista.filter((d) => d.id !== id));
+      if (this.cachedPetIdSignal()) {
+        this.petDespesasSignal.update((lista) => lista.filter((d) => d.id !== id));
+      }
       this.toast.success('Despesa excluída com sucesso!');
       return true;
     } catch (err: unknown) {
@@ -187,9 +211,13 @@ export class DespesasService {
   }
 
   /**
-   * Consulta todas as despesas institucionais vinculadas a um animal específico
+   * Consulta todas as despesas institucionais vinculadas a um animal específico com cache
    */
-  async getDespesasByPetId(petId: number): Promise<Despesa[]> {
+  async getDespesasByPetId(petId: number, forceRefresh = false): Promise<Despesa[]> {
+    if (!forceRefresh && this.cachedPetIdSignal() === petId) {
+      return this.petDespesasSignal();
+    }
+
     try {
       const { data, error } = await this.supabase.client
         .from('despesas')
@@ -202,7 +230,10 @@ export class DespesasService {
         throw error;
       }
 
-      return (data as unknown as Despesa[]) || [];
+      const list = (data as unknown as Despesa[]) || [];
+      this.petDespesasSignal.set(list);
+      this.cachedPetIdSignal.set(petId);
+      return list;
     } catch (err: unknown) {
       const msg = extractErrorMessage(err, 'Erro ao carregar despesas vinculadas ao animal.');
       this.toast.error(msg);

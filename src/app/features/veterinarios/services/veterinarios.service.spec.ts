@@ -157,25 +157,21 @@ describe('VeterinariosService (Gestão de Profissionais Veterinários)', () => {
   });
 
   describe('createVeterinario e updateVeterinario', () => {
-    it('deve cadastrar novo veterinário e notificar com toast de sucesso', async () => {
+    it('deve cadastrar novo veterinário e atualizar o signal em memória sem GET redundante', async () => {
       const novoVet: Veterinario = { id: 3, nome: 'Dr. Roberto', crmv: '11111' };
       const queryBuilderInsert = {
         insert: vi.fn().mockReturnThis(),
         select: vi.fn().mockReturnThis(),
         single: vi.fn().mockResolvedValue({ data: novoVet, error: null }),
       };
-      const queryBuilderFetch = {
-        select: vi.fn().mockReturnThis(),
-        order: vi.fn().mockResolvedValue({ data: [...mockVeterinarios, novoVet], error: null }),
-      };
-      supabaseMock.client.from
-        .mockReturnValueOnce(queryBuilderInsert)
-        .mockReturnValueOnce(queryBuilderFetch);
+      supabaseMock.client.from.mockReturnValue(queryBuilderInsert);
 
       const dto: VeterinarioCreateDto = { nome: 'Dr. Roberto', crmv: '11111' };
       const created = await service.createVeterinario(dto);
 
       expect(created).toEqual(novoVet);
+      expect(supabaseMock.client.from).toHaveBeenCalledTimes(1);
+      expect(service.veterinarios()).toContainEqual(novoVet);
       expect(toastMock.success).toHaveBeenCalledWith(
         'Veterinário(a) "Dr. Roberto" cadastrado(a) com sucesso!',
       );
@@ -197,7 +193,7 @@ describe('VeterinariosService (Gestão de Profissionais Veterinários)', () => {
       expect(toastMock.error).toHaveBeenCalledWith('CRMV já existente');
     });
 
-    it('deve atualizar dados do veterinário existente', async () => {
+    it('deve atualizar dados do veterinário existente e atualizar o signal em memória sem GET redundante', async () => {
       const updatedVet: Veterinario = { ...mockVeterinarios[0], clinica: 'Clínica Nova' };
       const queryBuilderUpdate = {
         update: vi.fn().mockReturnThis(),
@@ -205,18 +201,13 @@ describe('VeterinariosService (Gestão de Profissionais Veterinários)', () => {
         select: vi.fn().mockReturnThis(),
         single: vi.fn().mockResolvedValue({ data: updatedVet, error: null }),
       };
-      const queryBuilderFetch = {
-        select: vi.fn().mockReturnThis(),
-        order: vi.fn().mockResolvedValue({ data: [updatedVet], error: null }),
-      };
-      supabaseMock.client.from
-        .mockReturnValueOnce(queryBuilderUpdate)
-        .mockReturnValueOnce(queryBuilderFetch);
+      supabaseMock.client.from.mockReturnValue(queryBuilderUpdate);
 
       const dto: VeterinarioUpdateDto = { clinica: 'Clínica Nova' };
       const result = await service.updateVeterinario(1, dto);
 
       expect(result).toEqual(updatedVet);
+      expect(supabaseMock.client.from).toHaveBeenCalledTimes(1);
       expect(toastMock.success).toHaveBeenCalledWith(
         'Veterinário(a) "Dra. Camila Santos" atualizado(a) com sucesso!',
       );

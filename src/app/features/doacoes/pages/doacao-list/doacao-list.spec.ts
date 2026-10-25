@@ -195,12 +195,47 @@ describe('DoacaoListComponent', () => {
     vi.restoreAllMocks();
   });
 
-  describe('Inicialização e KPIs', () => {
-    it('deve carregar dados de insumos, direcionamentos, locais e doações monetárias ao inicializar', () => {
-      expect(doacoesServiceMock.fetchDoacoes).toHaveBeenCalled();
+  describe('Inicialização e Lazy Loading de Abas', () => {
+    it('deve inicializar com a aba 0 (Insumos) selecionada por padrão', () => {
+      expect(component.selectedTabIndex()).toBe(0);
+    });
+
+    it('deve alternar a aba ativa ao invocar onTabChange', () => {
+      component.onTabChange(1);
+      expect(component.selectedTabIndex()).toBe(1);
+
+      component.onTabChange(2);
+      expect(component.selectedTabIndex()).toBe(2);
+    });
+
+    it('deve acionar a atualização da aba ativa ao invocar onDataChanged', () => {
+      const insumosSpy = vi.fn();
+      const monetariaSpy = vi.fn();
+      const carregarLocaisSpy = vi.fn();
+
+      component.insumosTab = { applyFilters: insumosSpy } as unknown as typeof component.insumosTab;
+      component.monetariaTab = {
+        applyFiltersMonetaria: monetariaSpy,
+      } as unknown as typeof component.monetariaTab;
+      component.direcionamentosTab = {
+        carregarLocais: carregarLocaisSpy,
+      } as unknown as typeof component.direcionamentosTab;
+
+      // Aba 0
+      component.selectedTabIndex.set(0);
+      component.onDataChanged();
+      expect(insumosSpy).toHaveBeenCalledWith(true);
+
+      // Aba 1
+      component.selectedTabIndex.set(1);
+      component.onDataChanged();
+      expect(monetariaSpy).toHaveBeenCalledWith(true);
+
+      // Aba 2
+      component.selectedTabIndex.set(2);
+      component.onDataChanged();
+      expect(carregarLocaisSpy).toHaveBeenCalled();
       expect(doacoesServiceMock.fetchDirecionamentos).toHaveBeenCalled();
-      expect(locaisServiceMock.fetchLocais).toHaveBeenCalled();
-      expect(doacoesMonetariasServiceMock.fetchDoacoesMonetarias).toHaveBeenCalled();
     });
 
     it('deve calcular corretamente os KPIs de doações de insumos', () => {

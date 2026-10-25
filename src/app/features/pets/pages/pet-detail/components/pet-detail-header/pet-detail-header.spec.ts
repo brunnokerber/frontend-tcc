@@ -90,4 +90,28 @@ describe('PetDetailHeaderComponent', () => {
       nome: 'Pipoca',
     });
   });
+
+  it('deve emitir evento de emitirRelatorio com adotante', () => {
+    const relatorioSpy = vi.fn();
+    component.emitirRelatorio.subscribe(relatorioSpy);
+
+    component.onGerarFichaAdotante();
+    expect(relatorioSpy).toHaveBeenCalledWith('adotante');
+  });
+
+  it('deve emitir evento de emitirRelatorio com completa', () => {
+    const relatorioSpy = vi.fn();
+    component.emitirRelatorio.subscribe(relatorioSpy);
+
+    component.onGerarFichaCompleta();
+    expect(relatorioSpy).toHaveBeenCalledWith('completa');
+  });
+
+  it('deve emitir evento de emitirRelatorio com csv', () => {
+    const relatorioSpy = vi.fn();
+    component.emitirRelatorio.subscribe(relatorioSpy);
+
+    component.onExportarCsv();
+    expect(relatorioSpy).toHaveBeenCalledWith('csv');
+  });
 });

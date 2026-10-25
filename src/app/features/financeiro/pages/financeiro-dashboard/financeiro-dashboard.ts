@@ -205,15 +205,16 @@ export default class FinanceiroDashboardComponent implements OnInit {
 
   openNovaDespesaDialog(): void {
     const ref = this.dialog.open(DespesaDialogComponent, {
-      width: '760px',
+      width: '880px',
       maxWidth: '96vw',
+      maxHeight: '94vh',
       disableClose: true,
       autoFocus: false,
     });
 
-    ref.afterClosed().subscribe(async (salvou: boolean) => {
-      if (salvou) {
-        await this.carregarDados();
+    ref.afterClosed().subscribe(async (res) => {
+      if (res) {
+        await this.financeiroService.carregarFluxoCaixa();
       }
     });
   }

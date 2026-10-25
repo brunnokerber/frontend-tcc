@@ -309,6 +309,38 @@ describe('DespesasService (Gestão de Despesas Gerais da ONG)', () => {
       expect(result).toEqual(petDespesas);
     });
 
+    it('deve retornar do cache em chamadas consecutivas para o mesmo petId sem forceRefresh', async () => {
+      const petDespesas = [mockDespesas[1]];
+      const queryBuilder = {
+        select: vi.fn().mockReturnThis(),
+        eq: vi.fn().mockReturnThis(),
+        order: vi.fn().mockReturnThis(),
+      };
+      queryBuilder.order
+        .mockReturnValueOnce(queryBuilder)
+        .mockResolvedValueOnce({ data: petDespesas, error: null });
+
+      supabaseMock.client.from.mockReturnValue(queryBuilder);
+
+      // Primeira chamada - busca no banco
+      const result1 = await service.getDespesasByPetId(10);
+      expect(result1).toEqual(petDespesas);
+      expect(supabaseMock.client.from).toHaveBeenCalledTimes(1);
+
+      // Segunda chamada - deve retornar do cache sem chamar o Supabase
+      const result2 = await service.getDespesasByPetId(10);
+      expect(result2).toEqual(petDespesas);
+      expect(supabaseMock.client.from).toHaveBeenCalledTimes(1);
+
+      // Terceira chamada com forceRefresh = true - deve re-consultar o Supabase
+      queryBuilder.order
+        .mockReturnValueOnce(queryBuilder)
+        .mockResolvedValueOnce({ data: petDespesas, error: null });
+      const result3 = await service.getDespesasByPetId(10, true);
+      expect(result3).toEqual(petDespesas);
+      expect(supabaseMock.client.from).toHaveBeenCalledTimes(2);
+    });
+
     it('deve retornar lista vazia e exibir toast de erro se consulta falhar', async () => {
       const queryBuilder = {
         select: vi.fn().mockReturnThis(),

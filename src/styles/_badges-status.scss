@@ -17,6 +17,45 @@
 
   --color-status-obito: var(--mat-sys-on-surface-variant);
   --color-status-obito-bg: var(--mat-sys-surface-container-high);
+
+  /* Role Color Variables */
+  --color-role-admin: #5b21b6;
+  --color-role-admin-bg: rgba(103, 58, 183, 0.12);
+  --color-role-admin-border: rgba(103, 58, 183, 0.28);
+  --color-role-admin-solid: #673ab7;
+
+  --color-role-user: #0369a1;
+  --color-role-user-bg: rgba(2, 132, 199, 0.12);
+  --color-role-user-border: rgba(2, 132, 199, 0.28);
+  --color-role-user-solid: #0284c7;
+}
+
+html.dark-theme,
+[data-bs-theme='dark'] {
+  --color-status-success: #4ade80;
+  --color-status-success-bg: rgba(74, 222, 128, 0.16);
+
+  --color-status-warning: #fbbf24;
+  --color-status-warning-bg: rgba(251, 191, 36, 0.16);
+
+  --color-status-quarentena: #fb923c;
+  --color-status-quarentena-bg: rgba(251, 146, 60, 0.16);
+
+  --color-status-adopted: #fb7185;
+  --color-status-adopted-bg: rgba(251, 113, 133, 0.16);
+
+  --color-status-info: #38bdf8;
+  --color-status-info-bg: rgba(56, 189, 248, 0.16);
+
+  --color-role-admin: #c4b5fd;
+  --color-role-admin-bg: rgba(179, 157, 219, 0.18);
+  --color-role-admin-border: rgba(179, 157, 219, 0.35);
+  --color-role-admin-solid: #7e57c2;
+
+  --color-role-user: #7dd3fc;
+  --color-role-user-bg: rgba(56, 189, 248, 0.16);
+  --color-role-user-border: rgba(56, 189, 248, 0.35);
+  --color-role-user-solid: #0284c7;
 }
 
 .text-status-success {
@@ -107,4 +146,67 @@
   background-color: var(--color-status-obito-bg);
   color: var(--color-status-obito);
   border: 1px solid var(--mat-sys-outline-variant);
+}
+
+/* Role Typography & Background Utilities */
+.text-role-admin {
+  color: var(--color-role-admin);
+}
+
+.text-role-user {
+  color: var(--color-role-user);
+}
+
+.bg-role-admin {
+  background-color: var(--color-role-admin-bg);
+  color: var(--color-role-admin);
+}
+
+.bg-role-user {
+  background-color: var(--color-role-user-bg);
+  color: var(--color-role-user);
+}
+
+.bg-role-admin-solid {
+  background-color: var(--color-role-admin-solid);
+  color: #ffffff;
+}
+
+.bg-role-user-solid {
+  background-color: var(--color-role-user-solid);
+  color: #ffffff;
+}
+
+.border-role-admin {
+  border-color: var(--color-role-admin-border);
+}
+
+.border-role-user {
+  border-color: var(--color-role-user-border);
+}
+
+/* Badges Padronizados de Perfis */
+.badge-role-admin {
+  background-color: var(--color-role-admin-bg);
+  color: var(--color-role-admin);
+  border: 1px solid var(--color-role-admin-border);
+  font-weight: 600;
+}
+
+.badge-role-user {
+  background-color: var(--color-role-user-bg);
+  color: var(--color-role-user);
+  border: 1px solid var(--color-role-user-border);
+  font-weight: 600;
+}
+
+/* Status Alert Banners */
+.status-banner-warning {
+  background-color: var(--color-status-warning-bg);
+  border-color: var(--color-status-warning);
+}
+
+.status-banner-success {
+  background-color: var(--color-status-success-bg);
+  border-color: var(--color-status-success);
 }

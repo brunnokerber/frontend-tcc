@@ -47,10 +47,11 @@ Ao concluir qualquer tarefa que envolva nova feature, alteração de regras de n
 
 ### 3. Qualidade de Código, Tipagem & Linting (ESLint)
 - **TypeScript Estrito & Zero `any`:** É estritamente proibido o uso de `any` no código de produção. A regra `@typescript-eslint/no-explicit-any: "error"` está ativa e bloqueia qualquer ocorrência de `any`. Utilize `unknown` com type guards (`err instanceof Error`, `extractErrorMessage`) ou tipagens explícitas.
+- **Detecção e Remoção de Funções e Variáveis Não Utilizadas (`warn`):** A regra `@typescript-eslint/no-unused-vars` está configurada como `"warn"` para sinalizar funções, métodos e variáveis ociosas. Ao executar `npm run lint`, o assistente de IA deve obrigatoriamente inspecionar e avaliar todos os warnings reportados, eliminando códigos mortos antes da conclusão da tarefa.
 - **Execução Mandatória do Linter:** O assistente de IA **deve obrigatoriamente executar `npm run lint`** para assegurar que nenhum erro de sintaxe, acessibilidade ou tipagem fraca passe despercebido.
 - **Tratamento de Erros:** Sempre trate respostas de erro da API/Supabase fornecendo feedback visual ao usuário (snackbars/toasts).
 - **Acessibilidade e Design Responsivo:** Garantir conformidade com mobile-first, suporte a tema claro/escuro e acessibilidade (contrastes, labels e tags semânticas).
-- **Boas Práticas de CSS/SCSS:** **Evitar ao máximo o uso de `!important`** em estilizações. Priorize a especificidade correta de seletores, variáveis CSS (`var(--mat-sys-*)`) e herança limpa do Design System.
+- **Boas Práticas de CSS/SCSS e Limpeza de Classes Órfãs:** **Evitar ao máximo o uso de `!important`** em estilizações. Priorize a especificidade correta de seletores, variáveis CSS (`var(--mat-sys-*)`) e herança limpa do Design System. Como o ESLint não possui suporte a cruzamento AST de arquivos `.scss` com templates Angular, o assistente de IA deve revisar ativamente os arquivos `.scss` ao refatorar templates HTML, removendo classes ou seletores não utilizados (*dead CSS*).
 
 ### 4. Estilo e Formatação de Código (Prettier)
 - **Padronização Automática:** Todo o código TypeScript, HTML, SCSS e JSON do projeto deve seguir estritamente as regras definidas no `.prettierrc`.
@@ -61,6 +62,14 @@ Ao concluir qualquer tarefa que envolva nova feature, alteração de regras de n
 - **Execução Mandatória contra Regressões:** O assistente de IA **deve obrigatoriamente executar `npm test` (ou `npm run test:coverage`)** ao finalizar novas *features* ou refatorações para certificar que os testes existentes e novos passam com 100% de sucesso sem quebras.
 - **Padrão Zoneless nos Testes:** Seguir o padrão desacoplado do Angular 20, instanciando o `TestBed` com `provideZonelessChangeDetection()` ou herdando a infraestrutura global em `src/test-setup.ts`.
 
+### 6. Otimização de Rede e Gestão Reativa de Estado (Mutação com Retorno vs. Novo GET)
+- **Priorização do Retorno de Mutações (`INSERT` / `UPDATE` / `PATCH`):** Ao persistir novos dados ou atualizar registros via cliente Supabase (usando `.insert(...).select().single()` ou `.update(...).select().single()`), priorize utilizar o objeto retornado pela própria mutação para sincronizar o estado reativo local (`Signals`), atualizando arrays em memória (`signal.update(...)`) ou repassando a entidade atualizada ao fechar modais/diálogos.
+- **Eliminação de `GET` Redundante:** Evite realizar uma nova requisição `GET` completa de listagem logo após uma inserção ou alteração bem-sucedida caso os dados retornados na resposta já contenham a entidade íntegra. Isso reduz a latência percebida, preserva cotas de banco de dados e economiza tráfego de rede.
+- **Exceções Justificadas:** O disparo de novo `GET` após mutações só é justificável quando:
+  1. A operação depender de *views* agregadas ou triggers de banco que calculem campos virtuais complexos não retornados diretamente pela tabela base;
+  2. Filtros e ordenações server-side ativos exigirem reorganização estrutural imediata que inviabilize a inserção posicional em memória;
+  3. Mutações destrutivas (`DELETE`) que exijam recalibração de paginação server-side.
+
 ---
 
 ## 📋 Checklist Obrigatório de Finalização de Tarefa
@@ -70,6 +79,8 @@ Antes de considerar uma resposta ou feature concluída, a IA deve verificar:
 - [ ] O linter foi executado e aprovado com 0 erros (`npm run lint`), garantindo tipagem estrita sem `any`?
 - [ ] A suíte de testes unitários foi executada e aprovada com 100% de sucesso (`npm test` / `npm run test:coverage`), garantindo ausência de regressões?
 - [ ] Novos testes unitários (`.spec.ts`) foram criados ou atualizados para cobrir as regras de negócio implementadas?
+- [ ] Foi priorizado o aproveitamento do retorno de `insert`/`update`/`patch` para sincronizar o estado local, evitando requisições `GET` redundantes?
+- [ ] Foram verificados e eliminados warnings do linter (funções/variáveis ociosas) e classes SCSS órfãs decorrentes da alteração?
 - [ ] A formatação foi padronizada executando o Prettier (`npm run format`) ao final da execução após a validação do build?
 - [ ] A nova funcionalidade está devidamente tipada sem uso de `any`?
 - [ ] As estilizações respeitam as boas práticas de CSS sem uso desnecessário de `!important`?

@@ -3,7 +3,7 @@ import { Component, computed, input } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 
 export type StatCardVariant =
-  'primary' | 'success' | 'warning' | 'danger' | 'info' | 'adopted' | 'obito';
+  'primary' | 'success' | 'warning' | 'danger' | 'info' | 'adopted' | 'obito' | 'purple';
 
 @Component({
   selector: 'app-stat-card, app-kpi-card',
@@ -65,6 +65,8 @@ export class StatCardComponent {
         return 'text-status-adopted';
       case 'obito':
         return 'text-status-obito';
+      case 'purple':
+        return 'text-role-admin';
       case 'primary':
       default:
         return 'text-surface-main';
@@ -93,6 +95,8 @@ export class StatCardComponent {
         return 'bg-status-adopted';
       case 'obito':
         return 'bg-status-obito';
+      case 'purple':
+        return 'bg-role-admin';
       case 'primary':
       default:
         return 'bg-status-primary';

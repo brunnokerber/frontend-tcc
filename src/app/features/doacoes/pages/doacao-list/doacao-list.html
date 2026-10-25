@@ -30,16 +30,18 @@
   </app-page-header>
 
   <!-- ABAS DO MÓDULO DE DOAÇÕES (COMPOSIÇÃO DE SUBCOMPONENTES) -->
-  <mat-tab-group animationDuration="200ms" class="doacoes-tabs shadow-sm rounded-3">
+  <mat-tab-group
+    [selectedIndex]="selectedTabIndex()"
+    (selectedIndexChange)="onTabChange($event)"
+    animationDuration="200ms"
+    class="doacoes-tabs shadow-sm rounded-3"
+  >
     <!-- ABA 1: DOAÇÕES E DISTRIBUIÇÃO DE INSUMOS -->
     <mat-tab>
       <ng-template mat-tab-label>
         <div class="d-flex align-items-center gap-2 py-2">
           <mat-icon class="fs-5">inventory_2</mat-icon>
           <span class="fw-semibold">Insumos e Rateio</span>
-          <span class="badge bg-primary-subtle text-primary border border-primary small">
-            {{ totalDoacoes() }}
-          </span>
         </div>
       </ng-template>
 
@@ -54,9 +56,6 @@
         <div class="d-flex align-items-center gap-2 py-2">
           <mat-icon class="fs-5">payments</mat-icon>
           <span class="fw-semibold">Doações em Dinheiro</span>
-          <span class="badge bg-success-subtle text-success border border-success small">
-            {{ totalDoacoesMonetarias() }}
-          </span>
         </div>
       </ng-template>
 
@@ -71,9 +70,6 @@
         <div class="d-flex align-items-center gap-2 py-2">
           <mat-icon class="fs-5">local_shipping</mat-icon>
           <span class="fw-semibold">Direcionamentos por Local</span>
-          <span class="badge bg-warning-subtle text-warning border border-warning small">
-            {{ totalDirecionamentos() }}
-          </span>
         </div>
       </ng-template>
 

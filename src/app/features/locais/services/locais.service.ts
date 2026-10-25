@@ -96,7 +96,7 @@ export class LocaisService {
 
       const created = data as Local;
       this.toast.success(`Local "${created.local}" cadastrado com sucesso!`);
-      await this.fetchLocais();
+      this.locaisSignal.update((list) => [created, ...list]);
       return created;
     } catch (err: unknown) {
       const msg = extractErrorMessage(err, 'Erro ao cadastrar o local.');
@@ -126,7 +126,7 @@ export class LocaisService {
 
       const updated = data as Local;
       this.toast.success(`Local "${updated.local}" atualizado com sucesso!`);
-      await this.fetchLocais();
+      this.locaisSignal.update((list) => list.map((l) => (l.id === updated.id ? updated : l)));
       return updated;
     } catch (err: unknown) {
       const msg = extractErrorMessage(err, 'Erro ao atualizar o local.');

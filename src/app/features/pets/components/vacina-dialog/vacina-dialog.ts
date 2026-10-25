@@ -198,8 +198,9 @@ export class VacinaDialogComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe((newVet: Veterinario | undefined) => {
       if (newVet && newVet.id) {
-        this.veterinarios.update((list) => [newVet, ...list]);
+        this.veterinarios.update((list) => [newVet, ...list.filter((v) => v.id !== newVet.id)]);
         this.vacinaForm.controls.id_veterinario.setValue(newVet.id);
+        this.toast.info(`Veterinário(a) "${newVet.nome}" selecionado(a) automaticamente.`);
       }
     });
   }

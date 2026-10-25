@@ -84,30 +84,26 @@
         class="mb-3 p-2 rounded-2 border d-flex align-items-center justify-content-between flex-wrap gap-2"
         [ngClass]="
           vacinaForm.controls.data_aplicacao.value
-            ? 'bg-success-subtle border-success'
-            : 'bg-warning-subtle border-warning'
+            ? 'status-banner-success'
+            : 'status-banner-warning'
         "
       >
         <div class="d-flex align-items-center gap-2">
           <mat-icon
-            [class.text-success]="vacinaForm.controls.data_aplicacao.value"
-            [class.text-warning]="!vacinaForm.controls.data_aplicacao.value"
+            [class.text-status-success]="vacinaForm.controls.data_aplicacao.value"
+            [class.text-status-warning]="!vacinaForm.controls.data_aplicacao.value"
           >
             {{ vacinaForm.controls.data_aplicacao.value ? 'verified' : 'schedule' }}
           </mat-icon>
           <div>
-            <span
-              class="fw-semibold small d-block"
-              [class.text-success]="vacinaForm.controls.data_aplicacao.value"
-              [class.text-dark]="!vacinaForm.controls.data_aplicacao.value"
-            >
+            <span class="fw-semibold small d-block text-surface-main">
               {{
                 vacinaForm.controls.data_aplicacao.value
                   ? 'Vacina Aplicada'
                   : 'Vacina Prevista (Pendente)'
               }}
             </span>
-            <span class="small text-muted" style="font-size: 0.75rem">
+            <span class="small text-surface-muted" style="font-size: 0.75rem">
               {{
                 vacinaForm.controls.data_aplicacao.value
                   ? 'Dose já administrada ao animal'

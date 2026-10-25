@@ -35,7 +35,7 @@
         label="Administradores"
         [value]="totalAdmins()"
         icon="admin_panel_settings"
-        variant="warning"
+        variant="purple"
       />
     </div>
 
@@ -196,8 +196,8 @@
                 <div class="d-flex align-items-center gap-3">
                   <div
                     class="user-avatar-circle rounded-circle d-flex align-items-center justify-content-center text-white"
-                    [class.bg-primary]="usr.role === 'admin'"
-                    [class.bg-secondary]="usr.role !== 'admin'"
+                    [class.bg-role-admin-solid]="usr.role === 'admin'"
+                    [class.bg-role-user-solid]="usr.role !== 'admin'"
                   >
                     <mat-icon>{{
                       usr.role === 'admin' ? 'admin_panel_settings' : 'person'
@@ -227,12 +227,8 @@
                 <div class="d-flex align-items-center gap-1">
                   <span
                     class="badge d-inline-flex align-items-center gap-1"
-                    [class.bg-warning-subtle]="usr.role === 'admin'"
-                    [class.text-warning]="usr.role === 'admin'"
-                    [class.border-warning]="usr.role === 'admin'"
-                    [class.bg-info-subtle]="usr.role === 'user'"
-                    [class.text-info]="usr.role === 'user'"
-                    [class.border-info]="usr.role === 'user'"
+                    [class.badge-role-admin]="usr.role === 'admin'"
+                    [class.badge-role-user]="usr.role !== 'admin'"
                   >
                     <mat-icon style="font-size: 14px; width: 14px; height: 14px">
                       {{ usr.role === 'admin' ? 'shield' : 'person' }}
@@ -361,8 +357,8 @@
                 <div class="d-flex align-items-center gap-2 overflow-hidden">
                   <div
                     class="user-avatar-circle rounded-circle d-flex align-items-center justify-content-center text-white"
-                    [class.bg-primary]="usr.role === 'admin'"
-                    [class.bg-secondary]="usr.role !== 'admin'"
+                    [class.bg-role-admin-solid]="usr.role === 'admin'"
+                    [class.bg-role-user-solid]="usr.role !== 'admin'"
                   >
                     <mat-icon>{{
                       usr.role === 'admin' ? 'admin_panel_settings' : 'person'
@@ -390,10 +386,8 @@
               >
                 <span
                   class="badge small"
-                  [class.bg-warning-subtle]="usr.role === 'admin'"
-                  [class.text-warning]="usr.role === 'admin'"
-                  [class.bg-info-subtle]="usr.role === 'user'"
-                  [class.text-info]="usr.role === 'user'"
+                  [class.badge-role-admin]="usr.role === 'admin'"
+                  [class.badge-role-user]="usr.role !== 'admin'"
                 >
                   {{ usr.role === 'admin' ? 'Administrador' : 'Operador' }}
                 </span>

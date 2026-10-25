@@ -154,10 +154,11 @@ export default class PetFormComponent implements OnInit {
         this.isEditing.set(true);
         this.petId.set(id);
 
-        // Otimização: Reaproveitar dados de pet e entrada vindos da tela anterior (state do Router)
+        // Otimização: Reaproveitar dados de pet e imagem vindos da tela anterior (state do Router ou cache do serviço)
         const statePet = history.state?.pet as Pet | undefined;
+        const stateFotoUrl = (history.state?.fotoUrl as string | undefined) || null;
         if (statePet && statePet.id === id) {
-          this.setPetFormData(statePet);
+          this.setPetFormData(statePet, stateFotoUrl);
         } else {
           this.loadPetData(id);
         }
@@ -165,7 +166,7 @@ export default class PetFormComponent implements OnInit {
     }
   }
 
-  private setPetFormData(pet: Pet) {
+  private setPetFormData(pet: Pet, initialFotoUrl?: string | null) {
     this.existingPet.set(pet);
 
     // Se o usuário não for administrador na edição, desabilita validação ativa dos campos de entrada
@@ -181,14 +182,24 @@ export default class PetFormComponent implements OnInit {
     // Preencher dados do formulário
     const firstEntrada = pet.entradas && pet.entradas.length > 0 ? pet.entradas[0] : null;
 
-    // Foto de perfil existente
+    // Foto de perfil existente com reaproveitamento imediato de cache
     if (pet.foto_url) {
       this.existingPhotoPath.set(pet.foto_url);
-      this.petsService.getSignedFotoUrl(pet.foto_url).then((url) => {
-        if (url && !this.selectedPhotoFile()) {
-          this.photoPreviewUrl.set(url);
+
+      const cachedUrl = initialFotoUrl || this.petsService.getCachedSignedFotoUrl(pet.foto_url);
+
+      if (cachedUrl) {
+        this.photoPreviewUrl.set(cachedUrl);
+        if (initialFotoUrl) {
+          this.petsService.setCachedSignedFotoUrl(pet.foto_url, initialFotoUrl);
         }
-      });
+      } else {
+        this.petsService.getSignedFotoUrl(pet.foto_url).then((url) => {
+          if (url && !this.selectedPhotoFile() && !this.photoRemoved()) {
+            this.photoPreviewUrl.set(url);
+          }
+        });
+      }
     } else {
       this.existingPhotoPath.set(null);
       this.photoPreviewUrl.set(null);
@@ -298,7 +309,8 @@ export default class PetFormComponent implements OnInit {
       return;
     }
 
-    this.setPetFormData(pet);
+    const cachedUrl = pet.foto_url ? this.petsService.getCachedSignedFotoUrl(pet.foto_url) : null;
+    this.setPetFormData(pet, cachedUrl);
   }
 
   async onSubmit() {
