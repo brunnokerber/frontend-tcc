@@ -257,6 +257,7 @@
       <div class="col-12">
         <mat-form-field appearance="outline" class="w-100" subscriptSizing="dynamic">
           <mat-label>Custo da Dose (R$) - Opcional</mat-label>
+          <mat-icon matPrefix class="me-2">payments</mat-icon>
           <input
             matInput
             type="number"
@@ -265,13 +266,20 @@
             formControlName="custo"
             placeholder="0,00"
           />
-          <span matTextPrefix class="me-1">R$&nbsp;</span>
-          <mat-icon matSuffix>payments</mat-icon>
           @if (vacinaForm.controls.custo.touched && vacinaForm.controls.custo.errors) {
             <mat-error>{{ vacinaForm.controls.custo | formError }}</mat-error>
           }
         </mat-form-field>
       </div>
+
+      @if (isEditing() && data.vacina?.updated_at) {
+        <div class="col-12 pt-1">
+          <app-audit-badge
+            [updatedAt]="data.vacina?.updated_at"
+            [updatedBy]="data.vacina?.updated_by"
+          ></app-audit-badge>
+        </div>
+      }
     </div>
 
     <!-- Ações no Rodapé -->
@@ -280,7 +288,7 @@
       class="d-flex align-items-center justify-content-between w-100 flex-wrap gap-2"
     >
       <div>
-        @if (isEditing()) {
+        @if (isEditing() && isAdmin()) {
           <button
             type="button"
             mat-button

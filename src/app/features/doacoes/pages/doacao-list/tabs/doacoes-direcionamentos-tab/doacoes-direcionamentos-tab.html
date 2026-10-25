@@ -1,0 +1,146 @@
+<div class="p-3 p-md-4">
+  <!-- BARRA DE FILTRO POR LOCAL -->
+  <div class="row g-3 align-items-center mb-4">
+    <div class="col-12 col-md-5">
+      <mat-form-field appearance="outline" class="w-100">
+        <mat-label>Filtrar por Local Parceiro</mat-label>
+        <mat-select
+          [ngModel]="localFilterConsolidado()"
+          (ngModelChange)="localFilterConsolidado.set($event); pageIndexDirecionamentos.set(0)"
+        >
+          <mat-option value="todos">Todos os Locais</mat-option>
+          @for (loc of locaisList(); track loc.id) {
+            <mat-option [value]="loc.id"> {{ loc.local }} ({{ loc.tipo_local }}) </mat-option>
+          }
+        </mat-select>
+        <mat-icon matPrefix class="me-2">location_on</mat-icon>
+      </mat-form-field>
+    </div>
+
+    <div class="col-12 col-md-7 d-flex align-items-center justify-content-md-end">
+      <span class="text-surface-muted small">
+        Exibindo <strong>{{ filteredDirecionamentos().length }}</strong> remessa(s) registrada(s)
+      </span>
+    </div>
+  </div>
+
+  @if (pagedDirecionamentos().length === 0) {
+    <div class="empty-state text-center py-5 px-3 rounded-3 border">
+      <mat-icon class="text-surface-muted mb-2" style="font-size: 36px; width: 36px; height: 36px">
+        local_shipping
+      </mat-icon>
+      <h6 class="fw-bold text-surface-main">Nenhum direcionamento encontrado</h6>
+      <p class="text-surface-muted small mb-0">
+        {{
+          localFilterConsolidado() !== 'todos'
+            ? 'Este local ainda não recebeu nenhum insumo ou suprimento de doações.'
+            : 'Nenhum direcionamento de doações foi realizado ainda no sistema.'
+        }}
+      </p>
+    </div>
+  } @else {
+    <!-- TABELA DIRETA DA RELAÇÃO INTERMEDIÁRIA -->
+    <div class="table-responsive rounded-3 border mb-3">
+      <table class="table align-middle table-hover mb-0 doacoes-table">
+        <thead class="small fw-semibold">
+          <tr>
+            <th scope="col">Local de Destino</th>
+            <th scope="col">Doação de Origem</th>
+            <th scope="col" class="text-center">Volume Recebido</th>
+            <th scope="col" class="text-center">Data do Envio</th>
+            <th scope="col" class="text-end" style="width: 100px">Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (direc of pagedDirecionamentos(); track direc.id) {
+            <tr>
+              <!-- Local -->
+              <td>
+                <div class="d-flex align-items-center gap-2">
+                  <mat-icon class="text-primary fs-5">location_on</mat-icon>
+                  <div>
+                    <div class="fw-bold text-surface-main">
+                      {{ direc.local?.local || 'Local #' + direc.id_local }}
+                    </div>
+                    <span
+                      class="badge bg-surface-subtle text-surface-muted border border-surface small"
+                    >
+                      {{ direc.local?.tipo_local || 'Estabelecimento' }}
+                    </span>
+                  </div>
+                </div>
+              </td>
+
+              <!-- Doação Origem -->
+              <td>
+                <div class="d-flex flex-column">
+                  <div class="d-flex align-items-center gap-2">
+                    <span class="fw-semibold text-surface-main">
+                      {{ direc.doacao?.doador || 'Doador #' + direc.id_doacao }}
+                    </span>
+                    @if (direc.doacao?.tipo_doacao) {
+                      <span
+                        class="badge bg-primary-subtle text-primary border border-primary-subtle small"
+                      >
+                        {{ direc.doacao?.tipo_doacao }}
+                      </span>
+                    }
+                  </div>
+                  <span class="text-surface-muted small">
+                    Doação Original #{{ direc.id_doacao }} &bull; Total: {{ direc.doacao?.volume }}
+                    {{ direc.doacao?.unidade_medida }}
+                  </span>
+                </div>
+              </td>
+
+              <!-- Volume Recebido -->
+              <td class="text-center">
+                <span class="badge bg-success-subtle text-success fs-6 fw-bold px-2 py-1">
+                  {{ direc.volume }} {{ direc.doacao?.unidade_medida || '' }}
+                </span>
+              </td>
+
+              <!-- Data -->
+              <td class="text-center small text-surface-muted">
+                {{ direc.created_at | date: 'dd/MM/yyyy HH:mm' }}
+              </td>
+
+              <!-- Ações -->
+              <td class="text-end">
+                <button
+                  type="button"
+                  mat-icon-button
+                  [disabled]="!isAdmin()"
+                  (click)="
+                    confirmDeleteDirecionamento(direc, direc.doacao?.unidade_medida || '', $event)
+                  "
+                  [matTooltip]="
+                    isAdmin()
+                      ? 'Excluir este direcionamento (estorna o volume para a doação)'
+                      : 'Apenas administradores podem excluir direcionamentos'
+                  "
+                >
+                  <mat-icon [class.text-danger]="isAdmin()" [class.text-surface-muted]="!isAdmin()"
+                    >delete</mat-icon
+                  >
+                </button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <!-- PAGINADOR DA ABA 2 -->
+    <mat-paginator
+      [length]="filteredDirecionamentos().length"
+      [pageIndex]="pageIndexDirecionamentos()"
+      [pageSize]="pageSizeDirecionamentos()"
+      [pageSizeOptions]="pageSizeOptions"
+      (page)="onPageChangeDirecionamentos($event)"
+      showFirstLastButtons
+      aria-label="Página de direcionamentos consolidados"
+      class="rounded-3 border"
+    ></mat-paginator>
+  }
+</div>

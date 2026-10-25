@@ -225,6 +225,7 @@
           <div class="col-12 col-md-4">
             <mat-form-field appearance="outline" class="w-100">
               <mat-label>Valor de Auxílio (R$)</mat-label>
+              <mat-icon matPrefix class="me-2">payments</mat-icon>
               <input
                 id="valor_auxilio"
                 matInput
@@ -235,8 +236,6 @@
                 placeholder="0,00"
                 aria-label="Valor de Auxílio em Reais"
               />
-              <span matTextPrefix class="me-1">R$&nbsp;</span>
-              <mat-icon matSuffix>payments</mat-icon>
               <mat-hint>Custo de hospedagem ou diária acordada</mat-hint>
               @if (
                 petLocalForm.controls.valor_auxilio.touched &&

@@ -157,6 +157,53 @@ describe('PetsService (Gestão de Pets e Entradas)', () => {
       expect(service.cachedPet()).toEqual(mockPets[1]);
     });
 
+    it('deve buscar do Supabase com relacionamento de editor (updated_by)', async () => {
+      const mockPetWithEditor = {
+        ...mockPets[1],
+        updated_by: 'user-uuid-123',
+        editor: { id: 'user-uuid-123', email: 'voluntario@ong.org', role: 'user' },
+      };
+      const queryBuilder: any = {
+        select: vi.fn().mockReturnThis(),
+        eq: vi.fn().mockReturnThis(),
+        single: vi.fn().mockResolvedValue({ data: mockPetWithEditor, error: null }),
+      };
+      supabaseMock.client.from.mockReturnValue(queryBuilder);
+
+      const pet = await service.getPetById(2, true);
+
+      expect(queryBuilder.select).toHaveBeenCalledWith(
+        '*, editor:updated_by(id, email, role), entradas(*)',
+      );
+      expect(pet).toEqual(mockPetWithEditor);
+      expect(pet?.updated_by).toBe('user-uuid-123');
+      expect(pet?.editor?.email).toBe('voluntario@ong.org');
+    });
+
+    it('deve executar fallback sem relacionamento editor caso ocorra erro no primeiro select', async () => {
+      const fallbackBuilder: any = {
+        select: vi.fn().mockReturnThis(),
+        eq: vi.fn().mockReturnThis(),
+        single: vi.fn().mockResolvedValue({ data: mockPets[1], error: null }),
+      };
+      const primaryBuilder: any = {
+        select: vi.fn().mockReturnThis(),
+        eq: vi.fn().mockReturnThis(),
+        single: vi.fn().mockResolvedValue({ data: null, error: new Error('FK unmapped') }),
+      };
+      supabaseMock.client.from
+        .mockReturnValueOnce(primaryBuilder)
+        .mockReturnValueOnce(fallbackBuilder);
+
+      const pet = await service.getPetById(2, true);
+
+      expect(primaryBuilder.select).toHaveBeenCalledWith(
+        '*, editor:updated_by(id, email, role), entradas(*)',
+      );
+      expect(fallbackBuilder.select).toHaveBeenCalledWith('*, entradas(*)');
+      expect(pet).toEqual(mockPets[1]);
+    });
+
     it('deve retornar null e exibir toast de erro se a consulta de pet por ID falhar', async () => {
       const queryBuilder: any = {
         select: vi.fn().mockReturnThis(),

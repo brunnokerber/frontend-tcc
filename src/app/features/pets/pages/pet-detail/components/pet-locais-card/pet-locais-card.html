@@ -1,0 +1,97 @@
+<div class="section-card p-3 p-md-4 rounded-3 shadow-xs">
+  <div
+    class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3 pb-2 border-bottom border-surface"
+  >
+    <div class="d-flex align-items-center gap-2">
+      <mat-icon class="text-info">location_on</mat-icon>
+      <div>
+        <h2 class="h5 fw-bold mb-0">Locais de Passagem</h2>
+        <span class="text-surface-muted small"
+          >Histórico de lares temporários, clínicas e acolhimentos</span
+        >
+      </div>
+    </div>
+
+    <div class="d-flex align-items-center gap-2 flex-wrap">
+      <button mat-stroked-button color="primary" (click)="onAdd()" class="btn-sm rounded-3">
+        <mat-icon>add</mat-icon> Adicionar Local
+      </button>
+    </div>
+  </div>
+
+  @if (loading()) {
+    <div class="text-center py-4">
+      <mat-spinner diameter="32" class="mx-auto"></mat-spinner>
+    </div>
+  } @else if (sortedLocais().length > 0) {
+    <div class="timeline-container">
+      @for (loc of sortedLocais(); track loc.id || $index) {
+        <div class="timeline-item p-3 mb-2 rounded-2 border border-surface bg-surface-subtle">
+          <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
+            <div>
+              <div class="fw-bold text-surface-main">
+                {{ loc.locais?.local || 'Local #' + loc.id_local }}
+                @if (loc.locais?.tipo_local) {
+                  <span class="badge bg-secondary-subtle text-secondary ms-1">{{
+                    loc.locais?.tipo_local
+                  }}</span>
+                }
+              </div>
+              <div class="text-surface-muted small mt-1">
+                @if (loc.data_saida) {
+                  <span>Saída: {{ loc.data_saida | date: 'dd/MM/yyyy' }}</span>
+                }
+                @if (loc.data_reentrada) {
+                  <span class="ms-2"
+                    >&bull; Reentrada: {{ loc.data_reentrada | date: 'dd/MM/yyyy' }}</span
+                  >
+                }
+              </div>
+              @if (loc.motivo_saida) {
+                <div class="small mt-1">
+                  <span class="text-surface-muted">Motivo:</span> {{ loc.motivo_saida }}
+                </div>
+              }
+              @if (loc.obs) {
+                <div class="small text-surface-muted fst-italic mt-1">"{{ loc.obs }}"</div>
+              }
+            </div>
+
+            <div class="text-end">
+              @if (loc.valor_auxilio) {
+                <span
+                  class="badge bg-primary-subtle text-primary border border-primary-subtle d-block mb-1"
+                >
+                  Auxílio: {{ loc.valor_auxilio | currency: 'BRL' : 'symbol' : '1.2-2' }}
+                </span>
+              }
+              <button
+                mat-icon-button
+                (click)="onEdit(loc)"
+                matTooltip="Editar Passagem"
+                class="btn-sm"
+              >
+                <mat-icon>edit</mat-icon>
+              </button>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  } @else {
+    <div class="empty-state p-4 text-center rounded-2 border border-surface bg-surface-subtle">
+      <mat-icon class="text-surface-muted mb-2" style="font-size: 36px; width: 36px; height: 36px"
+        >holiday_village</mat-icon
+      >
+      <p class="mb-1 fw-semibold text-surface-main">Nenhum histórico de local de passagem</p>
+      <p class="text-surface-muted small mb-2">
+        Registre quando o animal for encaminhado a lares temporários ou clínicas.
+      </p>
+      <div class="d-flex align-items-center justify-content-center gap-2 flex-wrap">
+        <button mat-stroked-button color="primary" (click)="onAdd()" class="btn-sm rounded-3">
+          <mat-icon>add</mat-icon> Registrar Passagem
+        </button>
+      </div>
+    </div>
+  }
+</div>

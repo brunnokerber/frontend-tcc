@@ -284,4 +284,48 @@ describe('ConsultasExamesService (Histórico Clínico e Procedimentos)', () => {
       expect(service.consultas()).toEqual([]);
     });
   });
+
+  describe('deleteConsultaExame', () => {
+    it('deve remover procedimento com sucesso, disparar toast e atualizar signal', async () => {
+      // Pré-carrega consultas
+      const queryBuilderGet = {
+        select: vi.fn().mockReturnThis(),
+        eq: vi.fn().mockReturnThis(),
+        order: vi.fn().mockResolvedValue({ data: [...mockConsultas], error: null }),
+      };
+      supabaseMock.client.from.mockReturnValueOnce(queryBuilderGet);
+      await service.getConsultasExamesByPetId(10);
+      expect(service.consultas().find((c) => c.id === 1)).toBeDefined();
+
+      const queryBuilderDelete = {
+        delete: vi.fn().mockReturnThis(),
+        eq: vi.fn().mockResolvedValue({ error: null }),
+      };
+      supabaseMock.client.from.mockReturnValue(queryBuilderDelete);
+
+      const ok = await service.deleteConsultaExame(1);
+
+      expect(ok).toBe(true);
+      expect(supabaseMock.client.from).toHaveBeenCalledWith('consultas_exames');
+      expect(queryBuilderDelete.delete).toHaveBeenCalled();
+      expect(queryBuilderDelete.eq).toHaveBeenCalledWith('id', 1);
+      expect(toastMock.success).toHaveBeenCalledWith(
+        'Registro de procedimento/consulta excluído com sucesso!',
+      );
+      expect(service.consultas().find((c) => c.id === 1)).toBeUndefined();
+    });
+
+    it('deve disparar toast e retornar false se a exclusão falhar', async () => {
+      const queryBuilderDelete = {
+        delete: vi.fn().mockReturnThis(),
+        eq: vi.fn().mockResolvedValue({ error: { message: 'Erro violação FK' } }),
+      };
+      supabaseMock.client.from.mockReturnValue(queryBuilderDelete);
+
+      const ok = await service.deleteConsultaExame(999);
+
+      expect(ok).toBe(false);
+      expect(toastMock.error).toHaveBeenCalledWith('Erro violação FK');
+    });
+  });
 });

@@ -1,0 +1,17 @@
+.section-card {
+  background-color: var(--mat-sys-surface-container-lowest);
+  border: 1px solid var(--mat-sys-outline-variant);
+  transition: box-shadow 0.2s ease-in-out;
+}
+
+.btn-sm {
+  font-size: 0.8125rem;
+}
+
+.timeline-item {
+  transition: background-color 0.2s;
+
+  &:hover {
+    background-color: var(--mat-sys-surface-container);
+  }
+}

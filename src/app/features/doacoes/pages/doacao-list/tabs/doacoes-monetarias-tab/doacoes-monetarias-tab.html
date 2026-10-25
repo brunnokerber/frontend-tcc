@@ -1,0 +1,320 @@
+<div class="p-3 p-md-4">
+  <!-- CARDS DE INDICADORES / KPIS (MONETÁRIAS) -->
+  <div class="row g-3 mb-4">
+    <div class="col-12 col-sm-6 col-xl-3">
+      <app-stat-card
+        label="Total Arrecadado"
+        [value]="formatCurrency(doacoesMonetariasService.totalArrecadado())"
+        icon="payments"
+        variant="success"
+      ></app-stat-card>
+    </div>
+
+    <div class="col-12 col-sm-6 col-xl-3">
+      <app-stat-card
+        label="Total de Doações"
+        [value]="doacoesMonetariasService.totalDoacoesCount()"
+        icon="receipt_long"
+        variant="primary"
+      ></app-stat-card>
+    </div>
+
+    <div class="col-12 col-sm-6 col-xl-3">
+      <app-stat-card
+        label="Média por Doação"
+        [value]="formatCurrency(doacoesMonetariasService.mediaPorDoacao())"
+        icon="analytics"
+        variant="info"
+      ></app-stat-card>
+    </div>
+
+    <div class="col-12 col-sm-6 col-xl-3">
+      <app-stat-card
+        label="Maior Doação"
+        [value]="formatCurrency(doacoesMonetariasService.maiorDoacao())"
+        icon="trending_up"
+        variant="warning"
+      ></app-stat-card>
+    </div>
+  </div>
+
+  <!-- PAINEL DE FILTRO E BUSCA (MONETÁRIAS) -->
+  <app-filter-panel
+    (search)="applyFiltersMonetaria()"
+    (clear)="clearFiltersMonetaria()"
+    [loading]="doacoesMonetariasService.loading()"
+    [clearDisabled]="!searchValueMonetaria() && !dataInicioMonetaria() && !dataFimMonetaria()"
+    actionsColClass="col-12 col-md-4 col-xl-2 ms-auto"
+  >
+    <!-- Coluna 1: Campo de Busca -->
+    <div class="col-12 col-sm-6 col-md-3 col-xl-2">
+      <label
+        for="monetaria-filter-field"
+        class="form-label small fw-semibold text-surface-muted mb-1 text-truncate d-block"
+      >
+        Buscar por
+      </label>
+      <select
+        id="monetaria-filter-field"
+        class="form-select bg-surface-card text-surface-main border-surface"
+        [ngModel]="searchFieldMonetaria()"
+        (ngModelChange)="onSearchFieldMonetariaChange($event)"
+        name="searchFieldMonetaria"
+      >
+        @for (field of searchFieldsMonetaria; track field.value) {
+          <option [value]="field.value">{{ field.label }}</option>
+        }
+      </select>
+    </div>
+
+    <!-- Coluna 2: Termo de Busca -->
+    <div class="col-12 col-sm-6 col-md-5 col-xl-4">
+      <label
+        for="monetaria-filter-value"
+        class="form-label small fw-semibold text-surface-muted mb-1 text-truncate d-block"
+      >
+        Termo de Pesquisa
+      </label>
+      <div class="input-group">
+        <span class="input-group-text bg-surface-subtle border-end-0 border-surface">
+          <i class="bi bi-search"></i>
+        </span>
+        <input
+          id="monetaria-filter-value"
+          type="text"
+          class="form-control border-start-0 border-surface bg-surface-card text-surface-main"
+          [placeholder]="getSearchPlaceholderMonetaria()"
+          [ngModel]="searchValueMonetaria()"
+          (ngModelChange)="searchValueMonetaria.set($event)"
+          name="searchValueMonetaria"
+        />
+        @if (searchValueMonetaria()) {
+          <button
+            class="btn btn-outline-secondary border-start-0 border-surface"
+            type="button"
+            (click)="searchValueMonetaria.set('')"
+            matTooltip="Limpar busca"
+          >
+            <i class="bi bi-x-lg"></i>
+          </button>
+        }
+      </div>
+    </div>
+
+    <!-- Coluna 3: Data Início -->
+    <div class="col-12 col-sm-6 col-md-2 col-xl-2">
+      <label
+        for="monetaria-filter-data-inicio"
+        class="form-label small fw-semibold text-surface-muted mb-1 text-truncate d-block"
+      >
+        A partir de
+      </label>
+      <input
+        id="monetaria-filter-data-inicio"
+        type="date"
+        class="form-control border-surface bg-surface-card text-surface-main"
+        [ngModel]="dataInicioMonetaria()"
+        (ngModelChange)="dataInicioMonetaria.set($event)"
+        name="dataInicioMonetaria"
+      />
+    </div>
+
+    <!-- Coluna 4: Data Fim -->
+    <div class="col-12 col-sm-6 col-md-2 col-xl-2">
+      <label
+        for="monetaria-filter-data-fim"
+        class="form-label small fw-semibold text-surface-muted mb-1 text-truncate d-block"
+      >
+        Até
+      </label>
+      <input
+        id="monetaria-filter-data-fim"
+        type="date"
+        class="form-control border-surface bg-surface-card text-surface-main"
+        [ngModel]="dataFimMonetaria()"
+        (ngModelChange)="dataFimMonetaria.set($event)"
+        name="dataFimMonetaria"
+      />
+    </div>
+  </app-filter-panel>
+
+  <!-- SPINNER DE CARREGAMENTO -->
+  @if (doacoesMonetariasService.loading()) {
+    <div class="d-flex flex-column align-items-center justify-content-center py-5">
+      <mat-spinner diameter="42"></mat-spinner>
+      <p class="mt-3 text-surface-muted small">Carregando doações em dinheiro...</p>
+    </div>
+  } @else if (pagedDoacoesMonetarias().length === 0) {
+    <!-- ESTADO VAZIO -->
+    <div class="empty-state text-center py-5 px-3 rounded-3 border">
+      <div class="empty-icon-circle mx-auto mb-3 d-flex align-items-center justify-content-center">
+        <mat-icon class="text-surface-muted" style="font-size: 36px; width: 36px; height: 36px">
+          payments
+        </mat-icon>
+      </div>
+      <h5 class="fw-bold text-surface-main mb-1">Nenhuma doação em dinheiro encontrada</h5>
+      <p class="text-surface-muted small mb-3">
+        {{
+          searchValueMonetaria() || dataInicioMonetaria() || dataFimMonetaria()
+            ? 'Nenhum registro financeiro corresponde aos filtros aplicados.'
+            : 'Nenhuma doação monetária foi registrada no sistema até o momento.'
+        }}
+      </p>
+      @if (searchValueMonetaria() || dataInicioMonetaria() || dataFimMonetaria()) {
+        <button mat-stroked-button (click)="clearFiltersMonetaria()">Limpar Filtros</button>
+      } @else {
+        <button mat-flat-button color="primary" (click)="openDoacaoMonetariaDialog()">
+          <mat-icon class="me-1">payments</mat-icon>
+          <span>Registrar Primeira Doação</span>
+        </button>
+      }
+    </div>
+  } @else {
+    <!-- TABELA DE DOAÇÕES MONETÁRIAS -->
+    <div class="table-responsive rounded-3 border mb-3">
+      <table class="table align-middle table-hover mb-0 doacoes-table">
+        <thead class="small fw-semibold">
+          <tr>
+            <th scope="col" style="width: 50px" class="text-center">#</th>
+            <th scope="col">Doador & Contato</th>
+            <th scope="col" class="text-center" style="width: 160px">Valor Doado</th>
+            <th scope="col" class="text-center" style="width: 140px">Data da Doação</th>
+            <th scope="col" style="min-width: 250px">Observações</th>
+            <th scope="col" class="text-end" style="width: 120px">Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (item of pagedDoacoesMonetarias(); track item.id) {
+            <tr>
+              <!-- ID -->
+              <td class="text-center">
+                <span
+                  class="badge bg-surface-subtle text-surface-muted border border-surface small"
+                >
+                  #{{ item.id }}
+                </span>
+              </td>
+
+              <!-- Doador e Contato -->
+              <td>
+                <div class="d-flex flex-column">
+                  <span class="fw-bold text-surface-main fs-6">{{ item.doador }}</span>
+
+                  @if (item.telefone) {
+                    <div class="d-flex align-items-center gap-2 mt-1">
+                      <span class="text-surface-muted small d-inline-flex align-items-center gap-1">
+                        <mat-icon style="font-size: 14px; width: 14px; height: 14px"
+                          >phone</mat-icon
+                        >
+                        <span>{{ formatPhone(item.telefone) }}</span>
+                      </span>
+
+                      <!-- Botão WhatsApp -->
+                      <a
+                        [href]="getWhatsAppLink(item.telefone)"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="btn-icon-link text-success"
+                        matTooltip="Conversar no WhatsApp"
+                      >
+                        <i class="bi bi-whatsapp"></i>
+                      </a>
+
+                      <!-- Botão Copiar -->
+                      <button
+                        type="button"
+                        class="btn-icon-link text-surface-muted"
+                        matTooltip="Copiar telefone"
+                        (click)="copyPhone(item.telefone, $event)"
+                      >
+                        <mat-icon style="font-size: 14px; width: 14px; height: 14px"
+                          >content_copy</mat-icon
+                        >
+                      </button>
+                    </div>
+                  } @else {
+                    <span class="text-surface-muted small fst-italic">Sem telefone cadastrado</span>
+                  }
+                </div>
+              </td>
+
+              <!-- Valor Doado -->
+              <td class="text-center">
+                <span
+                  class="badge bg-success-subtle text-success fs-6 fw-bold px-3 py-2 border border-success-subtle"
+                >
+                  {{ formatCurrency(item.valor) }}
+                </span>
+              </td>
+
+              <!-- Data da Doação -->
+              <td class="text-center">
+                <span class="text-surface-main fw-semibold">
+                  {{ item.data_doacao | date: 'dd/MM/yyyy' }}
+                </span>
+              </td>
+
+              <!-- Observações -->
+              <td>
+                @if (item.observacoes) {
+                  <span class="text-surface-main small">{{ item.observacoes }}</span>
+                } @else {
+                  <span class="text-surface-muted small fst-italic"
+                    >Nenhuma observação registrada</span
+                  >
+                }
+              </td>
+
+              <!-- Ações -->
+              <td class="text-end">
+                <div class="d-inline-flex align-items-center gap-1">
+                  <!-- Editar Doação Monetária -->
+                  <button
+                    type="button"
+                    mat-icon-button
+                    (click)="openDoacaoMonetariaDialog(item)"
+                    matTooltip="Editar doação em dinheiro"
+                  >
+                    <mat-icon class="text-primary">edit</mat-icon>
+                  </button>
+
+                  <!-- Excluir Doação Monetária (Admin Only) -->
+                  <button
+                    type="button"
+                    mat-icon-button
+                    [disabled]="!isAdmin()"
+                    (click)="confirmDeleteDoacaoMonetaria(item, $event)"
+                    [matTooltip]="
+                      isAdmin()
+                        ? 'Excluir doação'
+                        : 'Apenas administradores podem excluir doações monetárias'
+                    "
+                  >
+                    <mat-icon
+                      [class.text-danger]="isAdmin()"
+                      [class.text-surface-muted]="!isAdmin()"
+                    >
+                      delete
+                    </mat-icon>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <!-- PAGINADOR DA ABA MONETÁRIA -->
+    <mat-paginator
+      [length]="totalDoacoesMonetarias()"
+      [pageIndex]="pageIndexMonetaria()"
+      [pageSize]="pageSizeMonetaria()"
+      [pageSizeOptions]="pageSizeOptions"
+      (page)="onPageChangeMonetaria($event)"
+      showFirstLastButtons
+      aria-label="Página de doações em dinheiro"
+      class="rounded-3 border"
+    ></mat-paginator>
+  }
+</div>

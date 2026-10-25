@@ -1,14 +1,21 @@
 :root {
-  --app-form-icon-color: #64748b;
-  --app-form-icon-hover: #1e293b;
+  --app-form-icon-color: var(--mat-sys-primary, #0284c7);
+  --app-form-icon-hover: var(--mat-sys-primary, #0284c7);
   --app-form-icon-focus: var(--mat-sys-primary, #0284c7);
+}
+
+html.dark-theme,
+[data-bs-theme='dark'] {
+  --app-form-icon-color: var(--mat-sys-primary, #38bdf8);
+  --app-form-icon-hover: var(--mat-sys-primary, #38bdf8);
+  --app-form-icon-focus: var(--mat-sys-primary, #38bdf8);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --app-form-icon-color: #cbd5e1;
-    --app-form-icon-hover: #f8fafc;
-    --app-form-icon-focus: #38bdf8;
+    --app-form-icon-color: var(--mat-sys-primary, #38bdf8);
+    --app-form-icon-hover: var(--mat-sys-primary, #38bdf8);
+    --app-form-icon-focus: var(--mat-sys-primary, #38bdf8);
   }
 }
 
@@ -32,7 +39,10 @@ mat-select,
   .mat-mdc-form-field-icon-suffix,
   [matPrefix],
   [matSuffix] {
-    color: var(--app-form-icon-color);
+    &:not(.text-success):not(.text-danger):not(.text-warning):not(.text-info) {
+      color: var(--app-form-icon-color);
+      transition: color 0.15s ease-in-out;
+    }
   }
 
   &:hover {
@@ -40,7 +50,9 @@ mat-select,
     .mat-mdc-form-field-icon-suffix,
     [matPrefix],
     [matSuffix] {
-      color: var(--app-form-icon-hover);
+      &:not(.text-success):not(.text-danger):not(.text-warning):not(.text-info) {
+        color: var(--app-form-icon-hover);
+      }
     }
   }
 
@@ -49,7 +61,9 @@ mat-select,
     .mat-mdc-form-field-icon-suffix,
     [matPrefix],
     [matSuffix] {
-      color: var(--app-form-icon-focus);
+      &:not(.text-success):not(.text-danger):not(.text-warning):not(.text-info) {
+        color: var(--app-form-icon-focus);
+      }
     }
   }
 }
@@ -73,8 +87,8 @@ mat-select,
   }
 
   &::placeholder {
-    color: var(--app-form-icon-color);
-    opacity: 0.8;
+    color: var(--mat-sys-on-surface-variant);
+    opacity: 0.7;
   }
 }
 

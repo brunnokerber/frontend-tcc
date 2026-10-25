@@ -1,0 +1,213 @@
+<header class="main-navbar shadow-sm sticky-top">
+  <div class="container-fluid px-3 px-md-4">
+    <div class="d-flex align-items-center justify-content-between py-2">
+      <!-- Logo / Marca -->
+      <a
+        routerLink="/pets"
+        class="brand-link d-flex align-items-center gap-2 text-decoration-none"
+        (click)="closeMobileMenu()"
+      >
+        <div class="brand-logo-wrapper">
+          <img
+            src="/logo_ong.jpg"
+            [alt]="ongName + ' Logo'"
+            class="brand-logo"
+            width="40"
+            height="40"
+          />
+        </div>
+        <div class="d-flex flex-column">
+          <span class="brand-title fw-bold">{{ ongName }}</span>
+          <span class="brand-subtitle small d-none d-sm-inline">Gestão Animal</span>
+        </div>
+      </a>
+
+      <!-- Navegação Desktop -->
+      <nav class="d-none d-xl-flex align-items-center gap-1 nav-links-desktop">
+        <a
+          routerLink="/pets"
+          routerLinkActive="active"
+          class="nav-btn d-flex align-items-center gap-2 text-decoration-none px-3 py-2 rounded-3"
+        >
+          <mat-icon class="fs-5">pets</mat-icon>
+          <span>Pets</span>
+        </a>
+        <a
+          routerLink="/calendario-vacinal"
+          routerLinkActive="active"
+          class="nav-btn d-flex align-items-center gap-2 text-decoration-none px-3 py-2 rounded-3"
+        >
+          <mat-icon class="fs-5">calendar_month</mat-icon>
+          <span>Calendário</span>
+        </a>
+        <a
+          routerLink="/veterinarios"
+          routerLinkActive="active"
+          class="nav-btn d-flex align-items-center gap-2 text-decoration-none px-3 py-2 rounded-3"
+        >
+          <mat-icon class="fs-5">medical_services</mat-icon>
+          <span>Veterinários</span>
+        </a>
+        <a
+          routerLink="/locais"
+          routerLinkActive="active"
+          class="nav-btn d-flex align-items-center gap-2 text-decoration-none px-3 py-2 rounded-3"
+        >
+          <mat-icon class="fs-5">location_on</mat-icon>
+          <span>Locais</span>
+        </a>
+        <a
+          routerLink="/doacoes"
+          routerLinkActive="active"
+          class="nav-btn d-flex align-items-center gap-2 text-decoration-none px-3 py-2 rounded-3"
+        >
+          <mat-icon class="fs-5">inventory_2</mat-icon>
+          <span>Doações</span>
+        </a>
+
+        @if (isAdmin()) {
+          <a
+            routerLink="/voluntarios"
+            routerLinkActive="active"
+            class="nav-btn d-flex align-items-center gap-2 text-decoration-none px-3 py-2 rounded-3"
+          >
+            <mat-icon class="fs-5">volunteer_activism</mat-icon>
+            <span>Voluntários</span>
+          </a>
+        }
+      </nav>
+
+      <!-- Ações do Usuário Desktop & Botão Mobile -->
+      <div class="d-flex align-items-center gap-2">
+        <!-- Botão de Abertura do Sidenav de Perfil do Usuário -->
+        <button
+          type="button"
+          class="user-profile-btn d-flex align-items-center gap-2 p-1 pe-2 rounded-pill border-0 bg-transparent cursor-pointer"
+          (click)="onOpenUserSidenav()"
+          matTooltip="Abrir painel do usuário e opções de tema"
+        >
+          <div
+            class="user-avatar text-white rounded-circle d-flex align-items-center justify-content-center"
+          >
+            <mat-icon>person</mat-icon>
+          </div>
+          <div class="user-info d-none d-sm-flex flex-column text-start">
+            <span class="user-email small fw-semibold text-truncate" style="max-width: 140px">{{
+              user?.email || 'Usuário'
+            }}</span>
+            <span class="user-role text-surface-muted" style="font-size: 0.72rem">{{
+              user?.role === 'admin' ? 'Administrador' : 'Operador'
+            }}</span>
+          </div>
+          <mat-icon class="text-surface-muted d-none d-sm-inline fs-6">expand_more</mat-icon>
+        </button>
+
+        <!-- Botão Hamburger Mobile / Tablet -->
+        <button
+          mat-icon-button
+          class="d-xl-none ms-1"
+          (click)="toggleMobileMenu()"
+          aria-label="Abrir menu de navegação"
+        >
+          <mat-icon>{{ mobileMenuOpen() ? 'close' : 'menu' }}</mat-icon>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Menu Mobile / Tablet Dropdown -->
+  @if (mobileMenuOpen()) {
+    <div class="mobile-menu d-xl-none border-top px-3 py-3 animate-fade-in">
+      <div class="d-flex flex-column gap-2 mb-3">
+        <a
+          routerLink="/pets"
+          routerLinkActive="active"
+          class="mobile-nav-link d-flex align-items-center gap-3 p-2 rounded-3 text-decoration-none"
+          (click)="closeMobileMenu()"
+        >
+          <mat-icon>pets</mat-icon>
+          <span class="fw-medium">Lista de Pets</span>
+        </a>
+        <a
+          routerLink="/calendario-vacinal"
+          routerLinkActive="active"
+          class="mobile-nav-link d-flex align-items-center gap-3 p-2 rounded-3 text-decoration-none"
+          (click)="closeMobileMenu()"
+        >
+          <mat-icon>calendar_month</mat-icon>
+          <span class="fw-medium">Calendário Vacinal</span>
+        </a>
+        <a
+          routerLink="/veterinarios"
+          routerLinkActive="active"
+          class="mobile-nav-link d-flex align-items-center gap-3 p-2 rounded-3 text-decoration-none"
+          (click)="closeMobileMenu()"
+        >
+          <mat-icon>medical_services</mat-icon>
+          <span class="fw-medium">Veterinários</span>
+        </a>
+        <a
+          routerLink="/locais"
+          routerLinkActive="active"
+          class="mobile-nav-link d-flex align-items-center gap-3 p-2 rounded-3 text-decoration-none"
+          (click)="closeMobileMenu()"
+        >
+          <mat-icon>location_on</mat-icon>
+          <span class="fw-medium">Locais</span>
+        </a>
+        <a
+          routerLink="/doacoes"
+          routerLinkActive="active"
+          class="mobile-nav-link d-flex align-items-center gap-3 p-2 rounded-3 text-decoration-none"
+          (click)="closeMobileMenu()"
+        >
+          <mat-icon>inventory_2</mat-icon>
+          <span class="fw-medium">Doações</span>
+        </a>
+
+        @if (isAdmin()) {
+          <a
+            routerLink="/voluntarios"
+            routerLinkActive="active"
+            class="mobile-nav-link d-flex align-items-center gap-3 p-2 rounded-3 text-decoration-none"
+            (click)="closeMobileMenu()"
+          >
+            <mat-icon>volunteer_activism</mat-icon>
+            <span class="fw-medium">Quadro de Voluntários</span>
+          </a>
+        }
+      </div>
+
+      <div class="border-top pt-3 d-flex align-items-center justify-content-between">
+        <button
+          type="button"
+          class="d-flex align-items-center gap-2 border-0 bg-transparent text-start p-0 cursor-pointer"
+          (click)="onOpenUserSidenav()"
+        >
+          <div
+            class="user-avatar text-white rounded-circle d-flex align-items-center justify-content-center"
+          >
+            <mat-icon>person</mat-icon>
+          </div>
+          <div class="d-flex flex-column">
+            <span class="small fw-semibold text-truncate" style="max-width: 170px">{{
+              user?.email || 'Usuário'
+            }}</span>
+            <span class="user-role text-surface-muted" style="font-size: 0.72rem">
+              Painel &bull; {{ user?.role === 'admin' ? 'Administrador' : 'Operador' }}
+            </span>
+          </div>
+        </button>
+        <button
+          mat-stroked-button
+          color="warn"
+          (click)="logout()"
+          class="d-flex align-items-center gap-1"
+        >
+          <mat-icon>logout</mat-icon>
+          <span>Sair</span>
+        </button>
+      </div>
+    </div>
+  }
+</header>

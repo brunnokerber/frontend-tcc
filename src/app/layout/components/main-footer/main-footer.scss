@@ -1,0 +1,14 @@
+.main-footer {
+  color: var(--mat-sys-on-surface-variant);
+  background-color: var(--mat-sys-surface);
+  border-color: var(--mat-sys-outline-variant);
+
+  .version-badge {
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--mat-sys-on-surface-variant);
+    background-color: var(--mat-sys-surface-container);
+    border-color: var(--mat-sys-outline-variant);
+    letter-spacing: 0.03em;
+  }
+}

@@ -1,0 +1,156 @@
+<div class="section-card p-3 p-md-4 rounded-3 shadow-xs">
+  <div
+    class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3 pb-2 border-bottom border-surface"
+  >
+    <div class="d-flex align-items-center gap-2">
+      <mat-icon class="text-success">vaccines</mat-icon>
+      <div>
+        <h2 class="h5 fw-bold mb-0">Vacinas</h2>
+        <span class="text-surface-muted small">Histórico vacinal e doses agendadas</span>
+      </div>
+    </div>
+
+    <div class="d-flex align-items-center gap-2 flex-wrap">
+      <!-- Toggle de Ordenação -->
+      <mat-button-toggle-group
+        [value]="sortMode()"
+        (change)="setSortMode($event.value)"
+        aria-label="Ordenação de Vacinas"
+        class="toggle-dense"
+      >
+        <mat-button-toggle value="cronologico" matTooltip="Ordenar por Data">
+          <mat-icon class="toggle-icon">calendar_today</mat-icon> Data
+        </mat-button-toggle>
+        <mat-button-toggle value="valor" matTooltip="Ordenar por Maior Valor">
+          <mat-icon class="toggle-icon">attach_money</mat-icon> Valor
+        </mat-button-toggle>
+      </mat-button-toggle-group>
+
+      <!-- Link para o Calendário Vacinal do Pet -->
+      @if (pet(); as petObj) {
+        <a
+          [routerLink]="['/calendario-vacinal']"
+          [queryParams]="{ petId: petObj.id }"
+          mat-stroked-button
+          class="btn-sm rounded-3"
+          matTooltip="Ver calendário de vacinação deste animal"
+        >
+          <mat-icon>calendar_month</mat-icon> Calendário
+        </a>
+      }
+
+      <!-- Botão Adicionar Vacina -->
+      <button mat-stroked-button color="primary" (click)="onAdd()" class="btn-sm rounded-3">
+        <mat-icon>add</mat-icon> Adicionar
+      </button>
+    </div>
+  </div>
+
+  @if (loading()) {
+    <div class="text-center py-4">
+      <mat-spinner diameter="32" class="mx-auto"></mat-spinner>
+    </div>
+  } @else if (sortedVacinas().length > 0) {
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0 custom-detail-table">
+        <thead>
+          <tr>
+            <th>Vacina</th>
+            <th>Data Prevista</th>
+            <th>Data Aplicada</th>
+            <th>Custo</th>
+            <th>Veterinário</th>
+            <th class="text-end">Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (vac of sortedVacinas(); track vac.id || $index) {
+            <tr>
+              <td>
+                <div class="fw-semibold">{{ vac.nome_vacina }}</div>
+              </td>
+              <td>
+                <span class="text-surface-muted small">
+                  {{ vac.data_prevista ? (vac.data_prevista | date: 'dd/MM/yyyy') : '-' }}
+                </span>
+              </td>
+              <td>
+                @if (vac.data_aplicacao) {
+                  <span class="badge bg-success-subtle text-success border border-success-subtle">
+                    {{ vac.data_aplicacao | date: 'dd/MM/yyyy' }}
+                  </span>
+                } @else {
+                  <span class="badge bg-warning-subtle text-warning border border-warning-subtle">
+                    Pendente
+                  </span>
+                }
+              </td>
+              <td>
+                <span class="fw-medium text-surface-main">
+                  {{ vac.custo || 0 | currency: 'BRL' : 'symbol' : '1.2-2' }}
+                </span>
+              </td>
+              <td>
+                @if (vac.veterinario) {
+                  <div class="small">
+                    <strong>{{ vac.veterinario.nome }}</strong>
+                    @if (vac.veterinario.crmv) {
+                      <span class="text-surface-muted d-block" style="font-size: 0.75rem"
+                        >CRMV: {{ vac.veterinario.crmv }}</span
+                      >
+                    }
+                  </div>
+                } @else {
+                  <span class="text-surface-muted small">-</span>
+                }
+              </td>
+              <td class="text-end">
+                <div class="d-inline-flex align-items-center gap-1">
+                  <button
+                    mat-icon-button
+                    (click)="onEdit(vac)"
+                    matTooltip="Editar Vacina"
+                    class="btn-sm"
+                  >
+                    <mat-icon>edit</mat-icon>
+                  </button>
+                  <button
+                    mat-icon-button
+                    [disabled]="!isAdmin()"
+                    (click)="onDelete(vac, $event)"
+                    [matTooltip]="
+                      isAdmin()
+                        ? 'Excluir Vacina'
+                        : 'Apenas administradores podem excluir registros de vacinas'
+                    "
+                    class="btn-sm"
+                  >
+                    <mat-icon
+                      [class.text-danger]="isAdmin()"
+                      [class.text-surface-muted]="!isAdmin()"
+                    >
+                      delete
+                    </mat-icon>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  } @else {
+    <div class="empty-state p-4 text-center rounded-2 border border-surface bg-surface-subtle">
+      <mat-icon class="text-surface-muted mb-2" style="font-size: 36px; width: 36px; height: 36px"
+        >vaccines</mat-icon
+      >
+      <p class="mb-1 fw-semibold text-surface-main">Nenhuma vacina registrada</p>
+      <p class="text-surface-muted small mb-2">
+        Cadastre as vacinas aplicadas ou previstas para este animal.
+      </p>
+      <button mat-stroked-button color="primary" (click)="onAdd()" class="btn-sm">
+        <mat-icon>add</mat-icon> Registrar Vacina
+      </button>
+    </div>
+  }
+</div>

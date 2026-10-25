@@ -19,6 +19,7 @@ import {
   ImageCropperDialogData,
   ImageCropperResult,
 } from '@shared/components/image-cropper-dialog/image-cropper-dialog';
+import { AuditBadgeComponent } from '@shared/components/audit-badge/audit-badge';
 import { DateMaskDirective } from '@shared/directives/date-mask.directive';
 import { FormErrorPipe } from '@shared/pipes/form-error.pipe';
 import { dateSequenceValidator, maxDateTodayValidator } from '@shared/validators/date.validators';
@@ -54,6 +55,7 @@ import { PetsService } from '../../services/pets.service';
     MatDialogModule,
     FormErrorPipe,
     DateMaskDirective,
+    AuditBadgeComponent,
   ],
   templateUrl: './pet-form.html',
   styleUrls: ['./pet-form.scss'],

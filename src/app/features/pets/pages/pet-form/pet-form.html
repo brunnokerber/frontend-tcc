@@ -23,6 +23,16 @@
                 : 'Preencha os dados do animal e o registro de entrada inicial no abrigo.'
             }}
           </p>
+          @if (isEditing() && existingPet(); as petData) {
+            @if (petData.updated_at) {
+              <div class="mt-1">
+                <app-audit-badge
+                  [updatedAt]="petData.updated_at"
+                  [updatedBy]="petData.updated_by"
+                ></app-audit-badge>
+              </div>
+            }
+          }
         </div>
       </div>
     </div>

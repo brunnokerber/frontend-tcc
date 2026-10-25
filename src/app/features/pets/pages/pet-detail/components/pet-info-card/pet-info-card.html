@@ -1,0 +1,241 @@
+@if (pet(); as p) {
+  <div class="section-card p-3 p-md-4 rounded-3 shadow-xs h-100">
+    <div
+      class="d-flex align-items-center justify-content-between mb-3 border-bottom border-surface pb-2"
+    >
+      <div class="d-flex align-items-center gap-2">
+        <mat-icon class="text-primary">info</mat-icon>
+        <h2 class="h5 fw-bold mb-0">Cadastro & Entrada</h2>
+      </div>
+      <button
+        mat-stroked-button
+        color="primary"
+        (click)="onEdit()"
+        matTooltip="Editar dados cadastrais"
+        class="btn-sm rounded-3"
+      >
+        <mat-icon>edit</mat-icon> <span>Editar</span>
+      </button>
+    </div>
+
+    <!-- SUBSEÇÃO 1: Identificação Básica -->
+    <div class="sub-section-block">
+      <div class="sub-section-header d-flex align-items-center gap-2">
+        <mat-icon class="text-primary" style="font-size: 18px; width: 18px; height: 18px"
+          >badge</mat-icon
+        >
+        <h3 class="sub-section-title mb-0">1. Identificação Básica</h3>
+      </div>
+      <div class="info-grid">
+        <div class="info-item">
+          <span class="info-label">Nome do Pet</span>
+          <span class="info-val">{{ p.nome || 'Não informado' }}</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Status</span>
+          <span class="info-val">{{ p.status || 'Não informado' }}</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Espécie</span>
+          <span class="info-val">{{ p.tipo_pet || 'Não informado' }}</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Sexo</span>
+          <span class="info-val">{{ p.sexo || 'Não informado' }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- SUBSEÇÃO 2: Idade & Características Físicas -->
+    <div class="sub-section-block">
+      <div class="sub-section-header d-flex align-items-center gap-2">
+        <mat-icon class="text-primary" style="font-size: 18px; width: 18px; height: 18px"
+          >straighten</mat-icon
+        >
+        <h3 class="sub-section-title mb-0">2. Idade & Características Físicas</h3>
+      </div>
+      <div class="info-grid">
+        <div class="info-item">
+          <span class="info-label">Data de Nascimento</span>
+          <span class="info-val">
+            {{ p.data_nascimento ? (p.data_nascimento | date: 'dd/MM/yyyy') : 'Não informada' }}
+          </span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Fase da Vida</span>
+          <span class="info-val">{{ p.senioridade || 'Não informada' }}</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Raça</span>
+          <span class="info-val">{{ p.raca || 'Não informada' }}</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Porte</span>
+          <span class="info-val">{{ p.porte || 'Não informado' }}</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Cor Majoritária</span>
+          <span class="info-val">{{ p.cor_majoritaria || 'Não informada' }}</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Castração</span>
+          <span class="info-val">
+            {{
+              p.data_castracao
+                ? 'Castrado em ' + (p.data_castracao | date: 'dd/MM/yyyy')
+                : 'Não castrado / Não informado'
+            }}
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- SUBSEÇÃO 3: Identificação & Registros Oficiais -->
+    <div class="sub-section-block">
+      <div class="sub-section-header d-flex align-items-center gap-2">
+        <mat-icon class="text-primary" style="font-size: 18px; width: 18px; height: 18px"
+          >qr_code</mat-icon
+        >
+        <h3 class="sub-section-title mb-0">3. Identificação & Registros</h3>
+      </div>
+      <div class="info-grid">
+        <div class="info-item">
+          <span class="info-label">Número do Chip</span>
+          <span class="info-val">{{ p.chip || 'Não informado' }}</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">RGA</span>
+          <span class="info-val">{{ p.rga || 'Não informado' }}</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Código Moura</span>
+          <span class="info-val">{{ p.moura || 'Não informado' }}</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Prontuário / Drive</span>
+          <span class="info-val">
+            @if (p.link_documentos) {
+              <a
+                [href]="p.link_documentos"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="text-primary text-decoration-none d-inline-flex align-items-center gap-1"
+              >
+                <span>Acessar Link</span>
+                <mat-icon style="font-size: 14px; width: 14px; height: 14px">open_in_new</mat-icon>
+              </a>
+            } @else {
+              Não informado
+            }
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- SUBSEÇÃO 4: Dados de Resgate e Entrada -->
+    <div class="sub-section-block">
+      <div class="sub-section-header d-flex align-items-center gap-2">
+        <mat-icon class="text-primary" style="font-size: 18px; width: 18px; height: 18px"
+          >input</mat-icon
+        >
+        <h3 class="sub-section-title mb-0">4. Registro de Entrada / Resgate</h3>
+      </div>
+      @if (p.entradas && p.entradas.length > 0) {
+        @for (ent of p.entradas; track ent.id || $index) {
+          <div class="info-grid">
+            <div class="info-item">
+              <span class="info-label">Data de Entrada</span>
+              <span class="info-val">{{
+                ent.data_entrada ? (ent.data_entrada | date: 'dd/MM/yyyy') : 'Não informada'
+              }}</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">Local de Origem</span>
+              <span class="info-val">{{ ent.local_origem || 'Não informado' }}</span>
+            </div>
+            <div class="info-item col-span-2">
+              <span class="info-label">Resgatante</span>
+              <span class="info-val">{{ ent.resgatante || 'Não informado' }}</span>
+            </div>
+            <div class="info-item col-span-2">
+              <span class="info-label">Observações da Entrada</span>
+              <p
+                class="info-val text-surface-muted small mb-0 bg-surface-subtle p-2 rounded-2 border border-surface mt-1"
+              >
+                {{ ent.observacoes || 'Nenhuma observação informada.' }}
+              </p>
+            </div>
+          </div>
+        }
+      } @else {
+        <div class="info-grid">
+          <div class="info-item">
+            <span class="info-label">Data de Entrada</span>
+            <span class="info-val">Não informada</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Local de Origem</span>
+            <span class="info-val">Não informado</span>
+          </div>
+          <div class="info-item col-span-2">
+            <span class="info-label">Resgatante</span>
+            <span class="info-val">Não informado</span>
+          </div>
+          <div class="info-item col-span-2">
+            <span class="info-label">Observações da Entrada</span>
+            <p
+              class="info-val text-surface-muted small mb-0 bg-surface-subtle p-2 rounded-2 border border-surface mt-1"
+            >
+              Nenhuma observação informada.
+            </p>
+          </div>
+        </div>
+      }
+    </div>
+
+    <!-- SUBSEÇÃO 5: Auditoria & Rastreabilidade -->
+    <div class="sub-section-block">
+      <div class="sub-section-header d-flex align-items-center gap-2">
+        <mat-icon class="text-primary" style="font-size: 18px; width: 18px; height: 18px"
+          >verified_user</mat-icon
+        >
+        <h3 class="sub-section-title mb-0">5. Auditoria & Rastreabilidade</h3>
+      </div>
+      <div class="info-grid">
+        <div class="info-item">
+          <span class="info-label">Cadastrado em</span>
+          <span class="info-val">
+            {{ p.created_at ? (p.created_at | date: 'dd/MM/yyyy HH:mm') : 'Não informado' }}
+          </span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Última Modificação</span>
+          <span class="info-val">
+            {{ p.updated_at ? (p.updated_at | date: 'dd/MM/yyyy HH:mm') : 'Não informado' }}
+          </span>
+        </div>
+        <div class="info-item col-span-2">
+          <span class="info-label">Último Editor (Autoria)</span>
+          <div
+            class="info-val d-flex align-items-center justify-content-between flex-wrap gap-2 pt-1"
+          >
+            <div class="d-flex align-items-center gap-2 flex-wrap">
+              @if (p.updated_by) {
+                <app-audit-badge
+                  [updatedAt]="p.updated_at"
+                  [updatedBy]="p.updated_by"
+                  [editor]="p.editor"
+                  [showDate]="false"
+                ></app-audit-badge>
+              } @else {
+                <span class="text-surface-muted fst-italic"
+                  >Registro inicial (sem alterações registradas)</span
+                >
+              }
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+}

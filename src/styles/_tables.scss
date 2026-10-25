@@ -8,6 +8,13 @@
   --bs-table-hover-color: var(--mat-sys-on-surface);
   color: var(--mat-sys-on-surface);
 
+  thead th {
+    background-color: var(--mat-sys-surface-container-low);
+    color: var(--mat-sys-on-surface-variant);
+    border-bottom: 2px solid var(--mat-sys-outline-variant);
+    padding: 0.85rem 0.75rem;
+  }
+
   th,
   td {
     vertical-align: middle;

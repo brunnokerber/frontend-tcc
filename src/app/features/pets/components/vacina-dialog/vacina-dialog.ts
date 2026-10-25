@@ -16,10 +16,12 @@ import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSelectModule } from '@angular/material/select';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { AuthService } from '@core/auth/services/auth.service';
 import { ToastService } from '@core/services/toast.service';
 import { VeterinarioDialogComponent } from '@features/veterinarios/components/veterinario-dialog/veterinario-dialog';
 import { Veterinario } from '@features/veterinarios/models/veterinario.model';
 import { VeterinariosService } from '@features/veterinarios/services/veterinarios.service';
+import { AuditBadgeComponent } from '@shared/components/audit-badge/audit-badge';
 import { DialogLayoutComponent } from '@shared/components/dialog-layout/dialog-layout';
 import {
   ConfirmationDialogComponent,
@@ -67,6 +69,7 @@ export interface VacinaDialogData {
     DialogLayoutComponent,
     DateMaskDirective,
     FormErrorPipe,
+    AuditBadgeComponent,
   ],
   templateUrl: './vacina-dialog.html',
   styleUrls: ['./vacina-dialog.scss'],
@@ -79,8 +82,10 @@ export class VacinaDialogComponent implements OnInit {
   private vacinasService = inject(VacinasService);
   private veterinariosService = inject(VeterinariosService);
   private petsService = inject(PetsService);
+  private authService = inject(AuthService);
   private toast = inject(ToastService);
 
+  public isAdmin = this.authService.isAdmin;
   public isSaving = signal<boolean>(false);
   public isDeleting = signal<boolean>(false);
   public loadingVets = signal<boolean>(false);
@@ -270,6 +275,13 @@ export class VacinaDialogComponent implements OnInit {
 
   public async onExcluir(): Promise<void> {
     if (!this.data.vacina?.id || this.isDeleting()) return;
+
+    if (!this.isAdmin()) {
+      this.toast.error(
+        'Apenas administradores possuem permissão para excluir registros de vacinas.',
+      );
+      return;
+    }
 
     const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
       data: {

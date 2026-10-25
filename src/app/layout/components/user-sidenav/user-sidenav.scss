@@ -1,0 +1,97 @@
+.user-sidenav-inner {
+  height: 100%;
+  max-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.user-sidenav-body {
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: thin;
+}
+
+.user-drawer-card,
+.theme-switch-group {
+  background-color: var(--mat-sys-surface-container-low);
+  border: 1px solid var(--mat-sys-outline-variant);
+}
+
+.theme-card,
+.admin-card,
+.account-card {
+  background-color: var(--mat-sys-surface-container-lowest);
+  border-color: var(--mat-sys-outline-variant);
+  color: var(--mat-sys-on-surface);
+}
+
+.user-avatar-large {
+  width: 52px;
+  height: 52px;
+  min-width: 52px;
+  border-radius: 50%;
+  background-color: var(--mat-sys-primary);
+  color: var(--mat-sys-on-primary);
+
+  mat-icon {
+    font-size: 32px;
+    width: 32px;
+    height: 32px;
+    line-height: 32px;
+  }
+}
+
+.theme-switch-btn {
+  background-color: transparent;
+  color: var(--mat-sys-on-surface-variant);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  line-height: 1;
+  transition: all 0.2s ease;
+  cursor: pointer;
+
+  mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+    line-height: 18px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+  }
+
+  span {
+    line-height: 1;
+    display: inline-flex;
+    align-items: center;
+  }
+
+  &:hover {
+    color: var(--mat-sys-on-surface);
+    background-color: var(--mat-sys-surface-container);
+  }
+
+  &.active {
+    background-color: var(--mat-sys-surface-container-highest);
+    color: var(--mat-sys-primary);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+  }
+}
+
+.account-advanced-details {
+  summary {
+    transition: all 0.2s ease;
+    &:hover {
+      background-color: var(--mat-sys-surface-container-low);
+      color: var(--mat-sys-on-surface);
+    }
+  }
+
+  &[open] summary {
+    color: var(--mat-sys-on-surface);
+  }
+}

@@ -1,0 +1,102 @@
+.doacao-row {
+  transition: background-color 0.15s ease-in-out;
+
+  &:hover {
+    background-color: var(--mat-sys-surface-container-low);
+  }
+}
+
+.doacoes-table {
+  --bs-table-bg: var(--mat-sys-surface-container-lowest);
+  --bs-table-hover-bg: var(--mat-sys-surface-container);
+  --bs-table-color: var(--mat-sys-on-surface);
+  background-color: var(--mat-sys-surface-container-lowest);
+  color: var(--mat-sys-on-surface);
+
+  th {
+    background-color: var(--mat-sys-surface-container-low);
+    color: var(--mat-sys-on-surface-variant);
+    border-bottom: 2px solid var(--mat-sys-outline-variant);
+    padding: 0.85rem 0.75rem;
+  }
+
+  td {
+    background-color: var(--mat-sys-surface-container-lowest);
+    padding: 0.85rem 0.75rem;
+    vertical-align: middle;
+    border-bottom: 1px solid var(--mat-sys-outline-variant);
+    color: var(--mat-sys-on-surface);
+  }
+
+  tr:hover td {
+    background-color: var(--mat-sys-surface-container);
+  }
+}
+
+.btn-expand {
+  width: 32px;
+  height: 32px;
+  line-height: 32px;
+}
+
+.expand-icon {
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+
+  &.rotated {
+    transform: rotate(180deg);
+  }
+}
+
+.expanded-detail-row {
+  background-color: var(--mat-sys-surface-container-lowest);
+}
+
+.expanded-panel {
+  background: linear-gradient(
+    180deg,
+    var(--mat-sys-surface-container-low) 0%,
+    var(--mat-sys-surface-container-lowest) 100%
+  );
+}
+
+.panel-icon-circle {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background-color: var(--mat-sys-primary-container);
+}
+
+.empty-state {
+  background-color: var(--mat-sys-surface);
+  border-color: var(--mat-sys-outline-variant);
+}
+
+.empty-icon-circle {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background-color: var(--mat-sys-surface-container-high);
+}
+
+.btn-icon-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  text-decoration: none;
+  background-color: var(--mat-sys-surface-container);
+  transition: all 0.15s ease;
+  border: 0;
+
+  &:hover {
+    transform: scale(1.15);
+  }
+}
+
+.btn-icon-sm {
+  width: 28px;
+  height: 28px;
+  line-height: 28px;
+}

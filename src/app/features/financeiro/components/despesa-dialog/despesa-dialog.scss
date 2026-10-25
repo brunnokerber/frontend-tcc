@@ -1,0 +1,50 @@
+:host {
+  display: block;
+}
+
+.form-section-card {
+  background-color: var(--mat-sys-surface);
+  border-color: var(--mat-sys-outline-variant);
+  transition: border-color 0.2s ease;
+
+  &:hover {
+    border-color: var(--mat-sys-outline);
+  }
+}
+
+.section-badge {
+  width: 36px;
+  height: 36px;
+  min-width: 36px;
+  background-color: var(--mat-sys-primary-container);
+  color: var(--mat-sys-on-primary-container);
+}
+
+.btn-val-pill {
+  font-size: 0.8rem;
+  padding: 0.25rem 0.75rem;
+  border-radius: 999px;
+  background-color: var(--mat-sys-surface-container-high);
+  color: var(--mat-sys-on-surface);
+  border: 1px solid var(--mat-sys-outline-variant);
+  transition: all 0.15s ease-in-out;
+
+  &:hover {
+    background-color: var(--mat-sys-secondary-container);
+    color: var(--mat-sys-on-secondary-container);
+    border-color: var(--mat-sys-primary);
+  }
+
+  &.active {
+    background-color: var(--mat-sys-primary);
+    color: var(--mat-sys-on-primary);
+    border-color: var(--mat-sys-primary);
+    font-weight: 600;
+  }
+}
+
+.pet-select-hint {
+  font-size: 0.75rem;
+  color: var(--mat-sys-on-surface-variant);
+  margin-top: 4px;
+}

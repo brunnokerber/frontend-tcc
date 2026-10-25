@@ -1,0 +1,139 @@
+<div class="section-card p-3 p-md-4 rounded-3 shadow-xs">
+  <div
+    class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3 pb-2 border-bottom border-surface"
+  >
+    <div class="d-flex align-items-center gap-2">
+      <mat-icon class="text-warning">medical_services</mat-icon>
+      <div>
+        <h2 class="h5 fw-bold mb-0">Consultas, Exames & Medicamentos</h2>
+        <span class="text-surface-muted small"
+          >Procedimentos clínicos e tratamentos realizados</span
+        >
+      </div>
+    </div>
+
+    <div class="d-flex align-items-center gap-2 flex-wrap">
+      <!-- Toggle de Ordenação -->
+      <mat-button-toggle-group
+        [value]="sortMode()"
+        (change)="setSortMode($event.value)"
+        aria-label="Ordenação de Procedimentos"
+        class="toggle-dense"
+      >
+        <mat-button-toggle value="cronologico" matTooltip="Ordenar por Data">
+          <mat-icon class="toggle-icon">calendar_today</mat-icon> Data
+        </mat-button-toggle>
+        <mat-button-toggle value="valor" matTooltip="Ordenar por Maior Custo">
+          <mat-icon class="toggle-icon">attach_money</mat-icon> Valor
+        </mat-button-toggle>
+      </mat-button-toggle-group>
+
+      <!-- Botão Adicionar Procedimento -->
+      <button mat-stroked-button color="primary" (click)="onAdd()" class="btn-sm rounded-3">
+        <mat-icon>add</mat-icon> Adicionar
+      </button>
+    </div>
+  </div>
+
+  @if (loading()) {
+    <div class="text-center py-4">
+      <mat-spinner diameter="32" class="mx-auto"></mat-spinner>
+    </div>
+  } @else if (sortedConsultas().length > 0) {
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0 custom-detail-table">
+        <thead>
+          <tr>
+            <th>Operação / Medicamento</th>
+            <th>Tipo</th>
+            <th>Data</th>
+            <th>Custo</th>
+            <th>Veterinário</th>
+            <th class="text-end">Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (proc of sortedConsultas(); track proc.id || $index) {
+            <tr>
+              <td>
+                <div class="fw-semibold">{{ proc.operacao_medicamento }}</div>
+              </td>
+              <td>
+                <span class="badge bg-surface-subtle text-surface-main border border-surface">
+                  {{ proc.tipo_operacao || 'Consulta' }}
+                </span>
+              </td>
+              <td>
+                <span class="text-surface-muted small">
+                  {{ proc.data_realizacao | date: 'dd/MM/yyyy' }}
+                </span>
+              </td>
+              <td>
+                <span class="fw-medium text-surface-main">
+                  {{ proc.custo || 0 | currency: 'BRL' : 'symbol' : '1.2-2' }}
+                </span>
+              </td>
+              <td>
+                @if (proc.veterinario) {
+                  <div class="small">
+                    <strong>{{ proc.veterinario.nome }}</strong>
+                    @if (proc.veterinario.crmv) {
+                      <span class="text-surface-muted d-block" style="font-size: 0.75rem"
+                        >CRMV: {{ proc.veterinario.crmv }}</span
+                      >
+                    }
+                  </div>
+                } @else {
+                  <span class="text-surface-muted small">-</span>
+                }
+              </td>
+              <td class="text-end">
+                <div class="d-inline-flex align-items-center gap-1">
+                  <button
+                    mat-icon-button
+                    (click)="onEdit(proc)"
+                    matTooltip="Editar Registro"
+                    class="btn-sm"
+                  >
+                    <mat-icon>edit</mat-icon>
+                  </button>
+                  <button
+                    mat-icon-button
+                    [disabled]="!isAdmin()"
+                    (click)="onDelete(proc, $event)"
+                    [matTooltip]="
+                      isAdmin()
+                        ? 'Excluir Procedimento'
+                        : 'Apenas administradores podem excluir procedimentos clínicos'
+                    "
+                    class="btn-sm"
+                  >
+                    <mat-icon
+                      [class.text-danger]="isAdmin()"
+                      [class.text-surface-muted]="!isAdmin()"
+                    >
+                      delete
+                    </mat-icon>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  } @else {
+    <div class="empty-state p-4 text-center rounded-2 border border-surface bg-surface-subtle">
+      <mat-icon class="text-surface-muted mb-2" style="font-size: 36px; width: 36px; height: 36px"
+        >medical_services</mat-icon
+      >
+      <p class="mb-1 fw-semibold text-surface-main">Nenhum procedimento ou exame registrado</p>
+      <p class="text-surface-muted small mb-2">
+        Mantenha o histórico médico e cirúrgico do animal atualizado.
+      </p>
+      <button mat-stroked-button color="primary" (click)="onAdd()" class="btn-sm">
+        <mat-icon>add</mat-icon> Registrar Procedimento
+      </button>
+    </div>
+  }
+</div>

@@ -38,7 +38,7 @@ A plataforma foi desenvolvida para solucionar desafios operacionais de ONGs e ab
 
 Acesse os documentos de fundamentação metodológica, modelagem e código-fonte do ecossistema:
 
-* 📄 [**Elicitação e Especificação de Requisitos**](./docs/ELICITACAO_DE_REQUISITOS.md) — 27 Requisitos Funcionais (RF), 19 Regras de Negócio (RN), 10 Requisitos Não-Funcionais (RNF) e Matriz de Rastreabilidade (RTM).
+* 📄 [**Elicitação e Especificação de Requisitos**](./docs/ELICITACAO_DE_REQUISITOS.md) — 37 Requisitos Funcionais (RF), 28 Regras de Negócio (RN), 10 Requisitos Não-Funcionais (RNF) e Matriz de Rastreabilidade (RTM).
 * 🏛️ [**Arquitetura Geral da Solução**](./docs/ARQUITETURA_DO_SISTEMA.md) — Diagrama de arquitetura em 3 camadas (Frontend SPA, Supabase BaaS, DevOps) com script Draw.io nativo.
 * 🗄️ [**Repositório do Backend (Supabase)**](https://github.com/brunnokerber/backend-supabase) — Scripts SQL de migração DDL/DML, modelagem relacional no PostgreSQL, políticas RLS (Row Level Security) e Edge Functions.
 
@@ -66,22 +66,35 @@ frontend-tcc/
 ├── src/
 │   ├── app/
 │   │   ├── core/                # Serviços singleton, auth, guards, interceptors, supabase client
-│   │   │   ├── audit/           # Modelos de auditoria (created_at, updated_at)
+│   │   │   ├── audit/           # Modelos e serviços de auditoria (AuditResolverService com cache e deduplicação)
 │   │   │   ├── auth/            # AuthService, login/reset models, guards (authGuard, adminGuard)
 │   │   │   ├── config/          # Configurações globais (app-version.config centralizado)
 │   │   │   └── services/        # SupabaseService, ThemeService, ToastService, NavigationService
 │   │   ├── features/            # Módulos de negócio da aplicação
+│   │   │   ├── calendario-vacinal/ # Grade mensal e agenda de imunizações
 │   │   │   ├── definir-senha/   # Fluxo de primeiro acesso e recuperação de senha
+│   │   │   ├── doacoes/         # Módulo de doações e rateio de insumos
+│   │   │   │   ├── pages/doacao-list/
+│   │   │   │   │   └── tabs/    # Subcomponentes isolados: insumos-tab, monetarias-tab, direcionamentos-tab
+│   │   │   │   └── components/  # Diálogos modais (insumo, rateio, doação monetária)
+│   │   │   ├── financeiro/      # Painel administrativo financeiro e despesas (apenas Admin)
+│   │   │   │   ├── pages/financeiro-dashboard/
+│   │   │   │   │   └── tabs/    # Subcomponentes isolados: fluxo-tab (gráficos/KPIs), despesas-tab
+│   │   │   │   └── components/  # Diálogo de despesas
 │   │   │   ├── locais/          # Cadastro, listagem e filtros de locais/lares temporários
 │   │   │   ├── login/           # Tela de autenticação
 │   │   │   ├── pets/            # Prontuário, triagem, vacinas, procedimentos e estadias
+│   │   │   │   ├── pages/pet-detail/
+│   │   │   │   │   └── components/ # Subcomponentes: header, info-card, vacinas, procedimentos, locais
+│   │   │   │   └── components/  # Diálogos: adoção e formulários
 │   │   │   ├── usuarios/        # Administração de usuários e convites (apenas Admin)
 │   │   │   ├── veterinarios/    # Cadastro e busca de médicos veterinários
 │   │   │   └── voluntarios/     # Gestão e escalas de voluntários por dia/turno (apenas Admin)
-│   │   ├── layout/              # Shell da aplicação (MainLayout, Sidenav, Header, alternância de tema)
+│   │   ├── layout/              # Shell da aplicação (MainLayout orquestrador)
+│   │   │   └── components/      # MainNavbar, UserSidenav (RBAC), MainFooter
 │   │   └── shared/              # Utilitários, pipes, diretivas e componentes reutilizáveis
 │   │       ├── adapters/        # CustomDateAdapter (formatação brasileira DD/MM/YYYY)
-│   │       ├── components/      # PageHeaderComponent, StatCardComponent (KPIs), FilterPanelComponent, DialogLayout padronizado, ConfirmationDialog e modais utilitários
+│   │       ├── components/      # PageHeaderComponent, StatCardComponent (KPIs), FilterPanelComponent, DialogLayout padronizado, AuditBadgeComponent (popover rico de auditoria), ConfirmationDialog e modais utilitários
 │   │       ├── directives/      # Máscaras de data e formulários
 │   │       ├── pipes/           # FormErrorPipe e pipes de formatação
 │   │       └── utils/           # Manipulação de strings e tratamento de erros do Supabase
@@ -230,7 +243,12 @@ O repositório conta com dois fluxos automatizados integrados: [`.github/workflo
 ### 1. Módulo de Pets (`/pets`)
 * **Listagem com Filtros Dinâmicos e Cards Responsivos:** Pesquisa por nome, espécie (Cachorro, Gato, Outro), sexo, status, senioridade e porte, com tabela desktop e cards móveis adaptáveis dotados de botão primário e menu contextual de ações.
 * **Formulário de Cadastro/Edição:** Registro com cálculo de senioridade em tempo real a partir da data de nascimento.
-* **Prontuário Individual:** Painel consolidado contendo histórico de vacinação, histórico clínico/cirúrgico, histórico de estadias e somatório financeiro total investido no animal.
+* **Prontuário Individual Desacoplado (`PetDetailComponent`):** Painel coordenador modular composto por 5 subcomponentes de responsabilidade única:
+  * **`PetDetailHeaderComponent`:** Resumo executivo, avatar com visualização ampliada em lightbox (`ImagePreviewDialogComponent`), badges de status, contador de dias de acolhimento, totalizador financeiro acumulado, chip de auditoria (`updated_by`) com cópia rápida em 1 clique e ações de editar e adoção.
+  * **`PetInfoCardComponent`:** Dados cadastrais completos, identificadores (Moura, Microchip, RGA), link de documentos em nuvem e histórico completo de resgate/triagem inicial.
+  * **`PetVacinasCardComponent`:** Histórico de vacinas com controle de doses aplicadas/previstas, custos, atalho direto para o Calendário Vacinal e exclusão restrita a administradores.
+  * **`PetProcedimentosCardComponent`:** Histórico clínico/cirúrgico e exames com ordenação dinâmica (cronológica vs. por custo) e governança RBAC de exclusão.
+  * **`PetLocaisCardComponent`:** Histórico de passagens por lares temporários/clínicas com controle de auxílio financeiro e ação de transferência de acomodação.
 
 ### 2. Módulo de Locais e Lares Temporários (`/locais`)
 * Cadastro completo de lares parceiros, clínicas, abrigos e feiras com endereçamento completo.
@@ -239,16 +257,38 @@ O repositório conta com dois fluxos automatizados integrados: [`.github/workflo
 ### 3. Módulo de Veterinários (`/veterinarios`)
 * Cadastro de médicos veterinários e clínicas parceiras por nome, CRMV e telefone de contato.
 
-### 4. Módulo de Administração de Usuários (`/usuarios` — Apenas Admin)
+### 4. Módulo de Doações e Rateio de Insumos (`/doacoes`)
+* **Arquitetura de Abas Modulares (Smart Tabs):** A página principal `DoacaoListComponent` atua como um coordenador desacoplado que renderiza de forma preguiçosa (`<ng-template matTabContent>`) três subcomponentes isolados:
+  * **`DoacoesInsumosTabComponent`:** Gestão de doações físicas e rateio com cálculo de saldo, master-detail para direcionamento por abrigo e ações de estorno com reconstituição automática de saldo.
+  * **`DoacoesMonetariasTabComponent`:** Gestão de doações em dinheiro/PIX (`public.doacoes_monetarias`) com KPIs em tempo real (Total, Média, Maior Doação), filtros por período/doador, atalhos de valores e exclusão restrita a administradores (`is_admin()`).
+  * **`DoacoesDirecionamentosTabComponent`:** Auditoria consolidada de insumos recebidos por abrigo ou clínica parceira.
+
+### 5. Módulo de Calendário Vacinal (`/calendario-vacinal`)
+* Grade mensal interativa e agenda cronológica de doses vacinais previstas, atrasadas e aplicadas.
+* Ação rápida "Aplicar Hoje" e filtragem contextual por pet (`?petId=X`).
+
+### 6. Módulo de Administração de Usuários (`/usuarios` — Apenas Admin)
 * Convite de novos usuários por e-mail com atribuição de perfil (`admin` ou `user`).
 * Desativação lógica com banimento síncrono no Auth sem exclusão de dados de auditoria (*Soft Delete*).
 * Alternância dinâmica de papéis e auto-desativação com encerramento de sessão.
 
-### 5. Módulo de Voluntários e Escalas de Apoio (`/voluntarios` — Apenas Admin)
+### 7. Módulo de Voluntários e Escalas de Apoio (`/voluntarios` — Apenas Admin)
 * Cadastro de colaboradores voluntários com nome, telefone com máscara brasileira, e-mail e observações operacionais.
 * Seleção dinâmica de múltiplos dias da semana (*Segunda* a *Domingo*) e turnos disponíveis (*Manhã*, *Tarde*, *Noite*).
 * Filtros combinados por dias e turnos utilizando operador `@>` (`.contains()`) com aceleração por índices GIN no PostgreSQL.
 * Acionamento direto via WhatsApp para convocação rápida para plantões, resgates e eventos.
+
+### 8. Módulo Financeiro & Balanço Orçamentário (`/financeiro` — Apenas Admin)
+* **Acesso Exclusivo via Barra Lateral:** Painel disponibilizado exclusivamente através da barra lateral administrativa (`userSidenav`) para usuários administradores, não sendo exibido na barra superior para resguardar a visualização e focar a navegação na rotina diária.
+* **Arquitetura de Abas Desacopladas (Smart Tabs):** O painel `FinanceiroDashboardComponent` compõe duas visões isoladas com carregamento sob demanda (`<ng-template matTabContent>`):
+  * **`FinanceiroFluxoTabComponent`:** Inteligência orçamentária alimentada pela view relacional `public.vw_fluxo_caixa`, unificando receitas monetárias, despesas operacionais, custos clínicos, prevenção vacinal e auxílios de lares temporários (`pets_locais`). Contém KPIs em tempo real, gráfico SVG nativo responsivo, distribuição por categoria e ranking dos Top 5 animais mais custosos.
+  * **`FinanceiroDespesasTabComponent`:** Livro-caixa e gestão de despesas gerais (`public.despesas`) com filtros dinâmicos, tabela responsiva e governança estrita de exclusão restrita a administradores.
+* **Prestação de Contas Oficial em PDF e Exportação Excel (CSV):** Emissão client-side com 1 clique de balancetes formais para impressão com cabeçalho institucional e campos para assinatura da diretoria, além de download de planilha eletrônica compatível com Excel brasileiro (CSV com UTF-8 BOM).
+
+### 9. Shell Global e Layout Desacoplado (`MainLayoutComponent`)
+* **`MainNavbarComponent`:** Barra de navegação superior responsiva com logo da ONG, alternância de tema Claro/Escuro, menu de perfil do usuário e acionador da gaveta lateral.
+* **`UserSidenavComponent`:** Barra lateral retrátil com navegação administrativa e operacional filtrada dinamicamente pelo perfil de acesso RBAC (`adminGuard`), identificação do usuário ativo e gatilho de encerramento seguro de sessão.
+* **`MainFooterComponent`:** Rodapé institucional fixo com número de versão da aplicação e vínculo acadêmico com a Universidade Feevale.
 
 ---
 
@@ -258,8 +298,8 @@ O repositório conta com dois fluxos automatizados integrados: [`.github/workflo
 
 | Perfil | Acessos e Permissões |
 | :--- | :--- |
-| **Administrador (`admin`)** | Acesso total a todas as telas, cadastro de pets, prontuários, retificação e edição de dados de entrada/resgate, gestão de clínicas, lares temporários, quadro de voluntários (`/voluntarios`) e administração completa de usuários (`/usuarios`). |
-| **Operador (`user`)** | Acesso operacional para cadastro de pets, lançamentos no prontuário, gestão de lares temporários e veterinários. Bloqueado nas rotas `/usuarios` e `/voluntarios` via `adminGuard` e com dados de entrada de pets em modo somente-leitura na edição. |
+| **Administrador (`admin`)** | Acesso irrestrito a todas as telas e funcionalidades, gestão de pets, prontuários, retificação e edição de dados de entrada/resgate, gestão de clínicas, lares temporários, doações e rateio de insumos (`/doacoes`), quadro de voluntários (`/voluntarios`), administração de usuários (`/usuarios`), painel financeiro e orçamentário (`/financeiro`) e **permissão exclusiva para exclusão física nas 5 tabelas de exceção operacional (`vacinas`, `consultas_exames`, `direcionamento_doacoes`, `doacoes_monetarias` e `despesas`)**. |
+| **Operador (`user`)** | Acesso operacional para cadastro de pets, lançamentos no prontuário, gestão de lares temporários, doações e direcionamentos para locais parceiros (`/doacoes`) e veterinários. Bloqueado nas rotas `/usuarios`, `/voluntarios` e `/financeiro` via `adminGuard`, com dados de entrada de pets em modo somente-leitura na edição, e **sem permissão para exclusão física de registros** (botões de remoção desabilitados ou omitidos na interface). |
 
 ### 2. Credenciais de Desenvolvimento (Mock Local / Seed)
 A conta de administrador inicial da seed de banco de dados (`seed.sql`) está em estrita conformidade com a política de senhas fortes:
@@ -286,3 +326,26 @@ A conta de administrador inicial da seed de banco de dados (`seed.sql`) está em
 
 4. **Proteção na Troca de Senha (`secure_password_change: true`):**
    * O Supabase exige reautenticação recente para alteração de credencial pelo próprio usuário. Caso a sessão tenha sido aberta há muito tempo, o frontend detecta o bloqueio e orienta o usuário a realizar novo login antes de prosseguir.
+
+5. **Governança de Exclusão Física em Tabelas de Exceção (Admin-Only):**
+   * As entidades fundamentais (`pets`, `locais`, `veterinarios`, `entradas`, `voluntarios`, `profiles`) não possuem permissão de exclusão física (`DELETE`), preservando a rastreabilidade e integridade referencial.
+   * A exclusão física é suportada estritamente em **5 tabelas operacionais de exceção**, restrita com exclusividade a usuários com perfil de **Administrador (`role = 'admin'`)**:
+     * `public.vacinas` (Prontuário do pet e modal de vacinação);
+     * `public.consultas_exames` (Prontuário do pet e formulário de procedimentos);
+     * `public.direcionamento_doacoes` (Rateio e estorno de insumos para locais parceiros);
+     * `public.doacoes_monetarias` (Livro-caixa e doações em dinheiro);
+     * `public.despesas` (Despesas institucionais e saídas operacionais).
+   * A restrição opera em dupla camada: políticas RLS ativas no PostgreSQL (`is_admin()`) e validação reativa no Angular (`AuthService.isAdmin()`) desabilitando ou ocultando os botões com tooltips explicativos para operadores comuns.
+
+6. **Rastreamento Automático de Autoria e Trilha de Auditoria (`updated_by`):**
+   * Todas as 13 tabelas de entidades do sistema (`profiles`, `pets`, `entradas`, `veterinarios`, `vacinas`, `consultas_exames`, `locais`, `doacoes`, `direcionamento_doacoes`, `pets_locais`, `voluntarios`, `doacoes_monetarias` e `despesas`) implementam a coluna `updated_by uuid references public.profiles(id) on delete set null default auth.uid()`.
+   * **Automação via Trigger Central (`handle_updated_at`):** No `INSERT`, grava o UUID do usuário logado via `DEFAULT`. No `UPDATE`, atualiza `new.updated_at = timezone('utc', now())` e `new.updated_by = coalesce(auth.uid(), new.updated_by, old.updated_by)` a partir do JWT da sessão autenticada, sem necessidade de payload manual no frontend.
+   * **Componente Reutilizável de Auditoria (`<app-audit-badge>` / `AuditBadgeComponent`):**
+     * Integrado de forma padronizada em todos os formulários e diálogos do sistema (`pet-form`, `procedimento-form`, `vacina-dialog`, `despesa-dialog`, `doacao-dialog`, `doacao-monetaria-dialog`, `pet-info-card` e `pet-detail-header`).
+     * **Segurança e Privacidade (LGPD):** Operadores comuns (`user`) visualizam apenas a data/hora ou pílula estática discreta com ID reduzido, impedindo vazamento de dados de outros colaboradores.
+     * **Popover Interativo para Administradores (`admin`):** O chip de identificação (`ID: a1b2c3...`) atua como gatilho interativo que abre sob demanda um **Popover rico em Angular Material (`mat-menu`)**:
+       * Resolução sob demanda via `AuditResolverService`, que conta com cacheamento em memória (`Map<string, UserProfile>`) com resposta instantânea de $0\text{ ms}$ e deduplicação de requisições simultâneas em voo (zero degradação ou custo de cotas);
+       * Exibe o **E-mail do autor**, botão de cópia de um clique com notificação via toast;
+       * Badges coloridos de **Papel** (`Administrador` / `Operador`) e **Status da Conta** (`Ativa` / `Inativa`);
+       * UUID completo no Supabase com botão de cópia rápida;
+       * Atalho direto de navegação para a gestão de usuários (`/usuarios?search=email`).

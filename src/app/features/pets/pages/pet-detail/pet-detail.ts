@@ -1,54 +1,41 @@
-import { CommonModule, CurrencyPipe, DatePipe } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { Component, computed, effect, inject, OnInit, signal } from '@angular/core';
-import { MatButtonModule } from '@angular/material/button';
-import { MatButtonToggleModule } from '@angular/material/button-toggle';
-import { MatCardModule } from '@angular/material/card';
-import { MatChipsModule } from '@angular/material/chips';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
-import { MatDividerModule } from '@angular/material/divider';
-import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatTabsModule } from '@angular/material/tabs';
-import { MatTooltipModule } from '@angular/material/tooltip';
-import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
+import { AuthService } from '@core/auth/services/auth.service';
 import { NavigationService } from '@core/services/navigation.service';
 import { ToastService } from '@core/services/toast.service';
+import {
+  ConfirmationDialogComponent,
+  ConfirmationDialogData,
+} from '@shared/components/confirmation-dialog/confirmation-dialog';
 import { ImagePreviewDialogComponent } from '@shared/components/image-preview-dialog/image-preview-dialog';
 import { AdotarPetDialogComponent } from '../../components/adotar-pet-dialog/adotar-pet-dialog';
 import { VacinaDialogComponent } from '../../components/vacina-dialog/vacina-dialog';
-import {
-  ConsultaExame,
-  getSexoIcon,
-  getStatusBadgeClass,
-  getTipoBadgeClass,
-  getTipoFaIcon,
-  PetLocal,
-  SortOrderMode,
-  Vacina,
-} from '../../models/pet.model';
+import { ConsultaExame, PetLocal, Vacina } from '../../models/pet.model';
 import { ConsultasExamesService } from '../../services/consultas-exames.service';
 import { PetsLocaisService } from '../../services/pets-locais.service';
 import { PetsService } from '../../services/pets.service';
 import { VacinasService } from '../../services/vacinas.service';
+import { PetDetailHeaderComponent } from './components/pet-detail-header/pet-detail-header';
+import { PetInfoCardComponent } from './components/pet-info-card/pet-info-card';
+import { PetLocaisCardComponent } from './components/pet-locais-card/pet-locais-card';
+import { PetProcedimentosCardComponent } from './components/pet-procedimentos-card/pet-procedimentos-card';
+import { PetVacinasCardComponent } from './components/pet-vacinas-card/pet-vacinas-card';
 
 @Component({
   selector: 'app-pet-detail',
   standalone: true,
   imports: [
     CommonModule,
-    RouterModule,
-    DatePipe,
-    CurrencyPipe,
-    MatCardModule,
-    MatButtonModule,
-    MatIconModule,
-    MatChipsModule,
     MatProgressSpinnerModule,
-    MatTooltipModule,
-    MatTabsModule,
-    MatButtonToggleModule,
-    MatDividerModule,
     MatDialogModule,
+    PetDetailHeaderComponent,
+    PetInfoCardComponent,
+    PetVacinasCardComponent,
+    PetProcedimentosCardComponent,
+    PetLocaisCardComponent,
   ],
   templateUrl: './pet-detail.html',
   styleUrls: ['./pet-detail.scss'],
@@ -62,7 +49,10 @@ export default class PetDetailComponent implements OnInit {
   public vacinasService = inject(VacinasService);
   public consultasExamesService = inject(ConsultasExamesService);
   public petsLocaisService = inject(PetsLocaisService);
+  private authService = inject(AuthService);
   private toast = inject(ToastService);
+
+  public isAdmin = this.authService.isAdmin;
 
   public petId = signal<number | null>(null);
   public pet = this.petsService.cachedPet;
@@ -78,12 +68,7 @@ export default class PetDetailComponent implements OnInit {
   public loadingConsultas = this.consultasExamesService.loading;
   public loadingLocais = this.petsLocaisService.loading;
 
-  // Modos de ordenação (Toggles)
-  public vacinaSortMode = signal<SortOrderMode>('cronologico');
-  public procedimentoSortMode = signal<SortOrderMode>('cronologico');
-
   constructor() {
-    // Reage dinamicamente às mudanças do pet em memória para buscar a URL assinada da foto
     effect(() => {
       const p = this.pet();
       const fotoPath = p?.foto_url;
@@ -98,21 +83,15 @@ export default class PetDetailComponent implements OnInit {
     });
   }
 
-  /**
-   * Obtém uma URL assinada temporária (1 hora) para o bucket privado 'pets' do Supabase Storage.
-   */
   async carregarFotoPet(caminhoFoto: string | null | undefined): Promise<string | null> {
     return this.petsService.getSignedFotoUrl(caminhoFoto, 3600);
   }
 
-  /**
-   * Abre o modal de visualização ampliada (lightbox) com a foto do pet.
-   */
-  openPhotoPreview(url: string, nome: string): void {
+  openPhotoPreview(event: { url: string; nome: string }): void {
     this.dialog.open(ImagePreviewDialogComponent, {
       data: {
-        imageUrl: url,
-        title: nome,
+        imageUrl: event.url,
+        title: event.nome,
         subtitle: 'Foto cadastrada do pet',
       },
       maxWidth: '92vw',
@@ -120,49 +99,7 @@ export default class PetDetailComponent implements OnInit {
     });
   }
 
-  // Computeds de ordenação
-  public sortedVacinas = computed(() => {
-    const list = [...this.vacinas()];
-    const mode = this.vacinaSortMode();
-
-    if (mode === 'valor') {
-      return list.sort((a, b) => (Number(b.custo) || 0) - (Number(a.custo) || 0));
-    }
-
-    // Cronológico (mais recentes primeiro)
-    return list.sort((a, b) => {
-      const dateA = new Date(a.data_aplicacao || a.data_prevista || a.created_at || 0).getTime();
-      const dateB = new Date(b.data_aplicacao || b.data_prevista || b.created_at || 0).getTime();
-      return dateB - dateA;
-    });
-  });
-
-  public sortedConsultas = computed(() => {
-    const list = [...this.consultasExames()];
-    const mode = this.procedimentoSortMode();
-
-    if (mode === 'valor') {
-      return list.sort((a, b) => (Number(b.custo) || 0) - (Number(a.custo) || 0));
-    }
-
-    // Cronológico (mais recentes primeiro)
-    return list.sort((a, b) => {
-      const dateA = new Date(a.data_realizacao || a.created_at || 0).getTime();
-      const dateB = new Date(b.data_realizacao || b.created_at || 0).getTime();
-      return dateB - dateA;
-    });
-  });
-
-  public sortedLocais = computed(() => {
-    const list = [...this.petsLocais()];
-    return list.sort((a, b) => {
-      const dateA = new Date(a.data_saida || a.data_reentrada || a.created_at || 0).getTime();
-      const dateB = new Date(b.data_saida || b.data_reentrada || b.created_at || 0).getTime();
-      return dateB - dateA;
-    });
-  });
-
-  // Métricas financeiras e de saúde
+  // Métricas financeiras e de permanência
   public totalCustoVacinas = computed(() =>
     this.vacinas().reduce((acc, v) => acc + (Number(v.custo) || 0), 0),
   );
@@ -187,8 +124,7 @@ export default class PetDetailComponent implements OnInit {
     const entrada = new Date(dataEntradaStr);
     const hoje = new Date();
     const diffTime = Math.abs(hoje.getTime() - entrada.getTime());
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    return diffDays;
+    return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
   });
 
   ngOnInit() {
@@ -207,10 +143,6 @@ export default class PetDetailComponent implements OnInit {
     }
 
     this.petId.set(id);
-
-    // Otimização: A responsabilidade de cache e estado é das services singleton.
-    // Ao navegar de volta (seja por salvar, cancelar ou voltar), se os dados já existirem em memória para o id,
-    // nenhuma chamada de rede é feita.
     this.loadPetAndSubCollections(id);
   }
 
@@ -220,19 +152,6 @@ export default class PetDetailComponent implements OnInit {
     this.consultasExamesService.getConsultasExamesByPetId(id, forceRefresh);
     this.petsLocaisService.getPetsLocaisByPetId(id, forceRefresh);
   }
-
-  setVacinaSort(mode: SortOrderMode) {
-    this.vacinaSortMode.set(mode);
-  }
-
-  setProcedimentoSort(mode: SortOrderMode) {
-    this.procedimentoSortMode.set(mode);
-  }
-
-  readonly getStatusBadgeClass = getStatusBadgeClass;
-  readonly getTipoBadgeClass = getTipoBadgeClass;
-  readonly getTipoFaIcon = getTipoFaIcon;
-  readonly getSexoIcon = getSexoIcon;
 
   goBack() {
     this.nav.back('/pets');
@@ -288,6 +207,36 @@ export default class PetDetailComponent implements OnInit {
     }
   }
 
+  confirmDeleteVacina(vac: Vacina): void {
+    if (!vac.id) return;
+
+    if (!this.isAdmin()) {
+      this.toast.error(
+        'Apenas administradores possuem permissão para excluir registros de vacinas.',
+      );
+      return;
+    }
+
+    const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
+      data: {
+        title: 'Excluir Vacina',
+        message: `Tem certeza que deseja remover o registro da vacina "${vac.nome_vacina}"? Esta ação é definitiva e removerá o lançamento do histórico do animal.`,
+        confirmText: 'Sim, excluir',
+        cancelText: 'Cancelar',
+        confirmColor: 'warn',
+        icon: 'delete_forever',
+        isDestructive: true,
+      } as ConfirmationDialogData,
+      width: '440px',
+    });
+
+    dialogRef.afterClosed().subscribe(async (confirmed: boolean) => {
+      if (confirmed && vac.id) {
+        await this.vacinasService.deleteVacina(vac.id);
+      }
+    });
+  }
+
   openAddProcedimento() {
     const p = this.pet();
     if (p) {
@@ -302,6 +251,36 @@ export default class PetDetailComponent implements OnInit {
         state: { pet: p, procedimento: proc },
       });
     }
+  }
+
+  confirmDeleteProcedimento(proc: ConsultaExame): void {
+    if (!proc.id) return;
+
+    if (!this.isAdmin()) {
+      this.toast.error(
+        'Apenas administradores possuem permissão para excluir procedimentos clínicos ou exames.',
+      );
+      return;
+    }
+
+    const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
+      data: {
+        title: 'Excluir Procedimento / Exame',
+        message: `Tem certeza que deseja remover o registro de "${proc.operacao_medicamento}"? Esta ação é definitiva e removerá o lançamento do histórico médico do animal.`,
+        confirmText: 'Sim, excluir',
+        cancelText: 'Cancelar',
+        confirmColor: 'warn',
+        icon: 'delete_forever',
+        isDestructive: true,
+      } as ConfirmationDialogData,
+      width: '460px',
+    });
+
+    dialogRef.afterClosed().subscribe(async (confirmed: boolean) => {
+      if (confirmed && proc.id) {
+        await this.consultasExamesService.deleteConsultaExame(proc.id);
+      }
+    });
   }
 
   openAddLocal() {
@@ -320,9 +299,6 @@ export default class PetDetailComponent implements OnInit {
     }
   }
 
-  /**
-   * Abre o modal padronizado de registro de adoção definitiva para o pet atual.
-   */
   openAdotarModal(): void {
     const p = this.pet();
     if (!p) return;
@@ -337,7 +313,6 @@ export default class PetDetailComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe((adotadoComSucesso: boolean) => {
       if (adotadoComSucesso && p.id) {
-        // Atualiza os dados do pet (agora 'Adotado') e recarrega os locais de passagem
         this.loadPetAndSubCollections(p.id, true);
       }
     });

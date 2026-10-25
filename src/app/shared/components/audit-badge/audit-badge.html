@@ -1,0 +1,170 @@
+<div class="audit-badge-container" [class.compact-mode]="compact()">
+  @if (showDate() && updatedAt()) {
+    @if (compact()) {
+      <span
+        class="audit-date"
+        [matTooltip]="'Última alteração: ' + (updatedAt() | date: 'dd/MM/yyyy HH:mm:ss')"
+      >
+        <mat-icon class="audit-icon">schedule</mat-icon>
+        <span>{{ updatedAt() | date: 'dd/MM/yyyy HH:mm' }}</span>
+      </span>
+    } @else {
+      <span class="audit-date-full">
+        <mat-icon class="audit-icon">schedule</mat-icon>
+        <span
+          >Última alteração:
+          <strong
+            >{{ updatedAt() | date: 'dd/MM/yyyy' }} às {{ updatedAt() | date: 'HH:mm' }}</strong
+          ></span
+        >
+      </span>
+    }
+  }
+
+  @if (updatedBy(); as uuid) {
+    @if (isAdmin()) {
+      <!-- Botão Interativo com Popover para Administradores -->
+      <button
+        type="button"
+        class="audit-trigger-btn"
+        [matMenuTriggerFor]="auditPopover"
+        (menuOpened)="onPopoverOpen()"
+        matTooltip="Clique para inspecionar autor da alteração (Administrador)"
+        aria-label="Inspecionar autor da alteração"
+      >
+        <mat-icon class="trigger-icon">verified_user</mat-icon>
+        <span class="trigger-label">ID:</span>
+        <code class="uuid-preview">{{ uuid | slice: 0 : 8 }}...</code>
+        <mat-icon class="arrow-icon">expand_more</mat-icon>
+      </button>
+
+      <!-- Popover com Informações do Autor -->
+      <mat-menu
+        #auditPopover="matMenu"
+        class="audit-popover-menu"
+        xPosition="after"
+        yPosition="above"
+      >
+        <div class="audit-card" (click)="$event.stopPropagation()">
+          <header class="audit-card-header">
+            <div class="header-title">
+              <mat-icon class="shield-icon">verified_user</mat-icon>
+              <span>Trilha de Auditoria</span>
+            </div>
+            <span class="admin-badge">Admin</span>
+          </header>
+
+          <div class="audit-card-body">
+            @if (loading()) {
+              <div class="loading-state">
+                <mat-spinner diameter="24"></mat-spinner>
+                <span>Identificando autor...</span>
+              </div>
+            } @else if (userProfile(); as user) {
+              <!-- E-mail do Autor -->
+              <div class="user-row main-identity">
+                <mat-icon class="row-icon">mail</mat-icon>
+                <div class="user-info">
+                  <span class="info-label">E-mail do Editor</span>
+                  <span class="info-value user-email" [title]="user.email">{{ user.email }}</span>
+                </div>
+                <button
+                  type="button"
+                  class="copy-btn"
+                  matTooltip="Copiar e-mail"
+                  (click)="copyText(user.email || '', 'E-mail')"
+                >
+                  <mat-icon>content_copy</mat-icon>
+                </button>
+              </div>
+
+              <!-- Badges de Função e Status -->
+              <div class="badges-row">
+                <span class="role-chip" [class.is-admin]="user.role === 'admin'">
+                  <mat-icon>{{ user.role === 'admin' ? 'security' : 'person' }}</mat-icon>
+                  {{ user.role === 'admin' ? 'Administrador' : 'Operador' }}
+                </span>
+                <span
+                  class="status-chip"
+                  [class.is-active]="user.ativo"
+                  [class.is-inactive]="!user.ativo"
+                >
+                  <span class="status-dot"></span>
+                  {{ user.ativo ? 'Conta Ativa' : 'Conta Inativa' }}
+                </span>
+              </div>
+
+              <!-- UUID Completo no Supabase -->
+              <div class="uuid-row">
+                <div class="uuid-content">
+                  <span class="info-label">UUID do Usuário</span>
+                  <code class="full-uuid">{{ user.id }}</code>
+                </div>
+                <button
+                  type="button"
+                  class="copy-btn"
+                  matTooltip="Copiar UUID"
+                  (click)="copyText(user.id, 'UUID')"
+                >
+                  <mat-icon>content_copy</mat-icon>
+                </button>
+              </div>
+
+              <!-- Atalho de navegação para a tela de Usuários -->
+              <div class="audit-card-actions">
+                <a
+                  class="manage-user-link"
+                  [routerLink]="['/usuarios']"
+                  [queryParams]="{ search: user.email }"
+                >
+                  <mat-icon>manage_accounts</mat-icon>
+                  Localizar em Usuários
+                </a>
+              </div>
+            } @else {
+              <!-- Estado não encontrado -->
+              <div class="not-found-state">
+                <mat-icon class="warn-icon">person_off</mat-icon>
+                <div class="not-found-text">
+                  <strong>Perfil não encontrado</strong>
+                  <p>
+                    O perfil pode ter sido excluído ou o registro foi gerado por migração do banco.
+                  </p>
+                </div>
+              </div>
+              <div class="uuid-row">
+                <div class="uuid-content">
+                  <span class="info-label">UUID Registrado</span>
+                  <code class="full-uuid">{{ uuid }}</code>
+                </div>
+                <button
+                  type="button"
+                  class="copy-btn"
+                  matTooltip="Copiar UUID"
+                  (click)="copyText(uuid, 'UUID')"
+                >
+                  <mat-icon>content_copy</mat-icon>
+                </button>
+              </div>
+            }
+          </div>
+
+          @if (updatedAt()) {
+            <footer class="audit-card-footer">
+              <mat-icon>schedule</mat-icon>
+              <span
+                >Modificado em {{ updatedAt() | date: 'dd/MM/yyyy' }} às
+                {{ updatedAt() | date: 'HH:mm:ss' }}</span
+              >
+            </footer>
+          }
+        </div>
+      </mat-menu>
+    } @else {
+      <!-- Exibição discreta para usuários não-administradores -->
+      <span class="audit-non-admin-pill" [matTooltip]="'Identificador do registro'">
+        ID: <code class="uuid-preview">{{ uuid | slice: 0 : 8 }}...</code>
+      </span>
+    }
+  }
+</div>

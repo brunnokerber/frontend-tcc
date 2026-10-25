@@ -39,9 +39,19 @@ export const routes: Routes = [
         loadChildren: () => import('./features/locais/locais.routes'),
       },
       {
+        path: 'doacoes',
+        loadChildren: () => import('./features/doacoes/doacoes.routes'),
+      },
+      {
         path: 'voluntarios',
         canActivate: [adminGuard],
         loadChildren: () => import('./features/voluntarios/voluntarios.routes'),
+      },
+      {
+        path: 'financeiro',
+        canActivate: [adminGuard],
+        loadChildren: () =>
+          import('./features/financeiro/financeiro.routes').then((m) => m.FINANCEIRO_ROUTES),
       },
       {
         path: 'usuarios',

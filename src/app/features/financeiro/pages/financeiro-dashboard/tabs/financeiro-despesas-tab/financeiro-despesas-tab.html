@@ -1,0 +1,157 @@
+<div class="p-3 p-md-4">
+  <!-- Painel de Filtros da Aba de Despesas -->
+  <app-filter-panel (clear)="limparFiltroDespesas()">
+    <div class="row g-2 w-100">
+      <!-- Campo de Busca -->
+      <div class="col-12 col-md-6">
+        <mat-form-field appearance="outline" class="w-100 density-compact">
+          <mat-label>Buscar por descrição ou favorecido</mat-label>
+          <input
+            matInput
+            [ngModel]="searchTermDespesas()"
+            (ngModelChange)="searchTermDespesas.set($event); pageIndexDesp.set(0)"
+            placeholder="Ex: Ração, Agropecuária, Material de limpeza"
+          />
+          <mat-icon matPrefix class="me-2">search</mat-icon>
+        </mat-form-field>
+      </div>
+
+      <!-- Categoria -->
+      <div class="col-12 col-md-6">
+        <mat-form-field appearance="outline" class="w-100 density-compact">
+          <mat-label>Filtrar por Categoria</mat-label>
+          <mat-select
+            [ngModel]="selectedCategoriaDespesas()"
+            (ngModelChange)="selectedCategoriaDespesas.set($event); pageIndexDesp.set(0)"
+          >
+            <mat-option value="">Todas as Categorias</mat-option>
+            @for (cat of categoriasDespesas; track cat) {
+              <mat-option [value]="cat">{{ cat }}</mat-option>
+            }
+          </mat-select>
+          <mat-icon matPrefix class="me-2">category</mat-icon>
+        </mat-form-field>
+      </div>
+    </div>
+  </app-filter-panel>
+
+  <!-- Tabela de Despesas Gerais -->
+  <div class="card border rounded-3 shadow-xs mt-3">
+    @if (loadingDespesas()) {
+      <div class="py-5 text-center">
+        <mat-spinner diameter="36" class="mx-auto mb-2"></mat-spinner>
+        <span class="text-surface-muted small">Carregando despesas institucionais...</span>
+      </div>
+    } @else if (filteredDespesas().length === 0) {
+      <div class="empty-state py-5 text-center text-surface-muted">
+        <div class="empty-icon-circle mx-auto mb-3">
+          <mat-icon>receipt_long</mat-icon>
+        </div>
+        <p class="mb-0">Nenhuma despesa encontrada com os filtros aplicados.</p>
+      </div>
+    } @else {
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+          <thead>
+            <tr>
+              <th>Descrição</th>
+              <th>Categoria</th>
+              <th style="width: 100px">Data</th>
+              <th>Favorecido / Fornecedor</th>
+              <th>Pet Vinculado</th>
+              <th class="text-end" style="width: 120px">Valor</th>
+              <th class="text-end" style="width: 90px">Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (d of pagedDespesas(); track d.id) {
+              <tr>
+                <td class="fw-semibold">
+                  {{ d.descricao }}
+                  @if (d.observacoes) {
+                    <span
+                      class="d-block small text-surface-muted text-truncate"
+                      style="max-width: 250px"
+                      >{{ d.observacoes }}</span
+                    >
+                  }
+                </td>
+                <td>
+                  <span class="badge bg-surface-subtle text-surface-main border border-surface">
+                    {{ d.categoria }}
+                  </span>
+                </td>
+                <td class="small text-surface-muted">
+                  {{ d.data_despesa | date: 'dd/MM/yyyy' }}
+                </td>
+                <td class="small">
+                  {{ d.favorecido }}
+                  @if (d.telefone) {
+                    <span class="text-surface-muted d-block" style="font-size: 0.75rem">{{
+                      d.telefone
+                    }}</span>
+                  }
+                </td>
+                <td class="small">
+                  @if (d.pet) {
+                    <a
+                      [routerLink]="['/pets/detalhes', d.pet.id]"
+                      class="text-decoration-none fw-medium text-primary d-inline-flex align-items-center gap-1"
+                    >
+                      <mat-icon style="font-size: 14px; width: 14px; height: 14px">pets</mat-icon>
+                      <span>{{ d.pet.nome }}</span>
+                    </a>
+                  } @else {
+                    <span class="text-surface-muted fst-italic">Institucional / Geral</span>
+                  }
+                </td>
+                <td class="text-end fw-bold text-danger">R$ {{ d.valor | number: '1.2-2' }}</td>
+                <td class="text-end">
+                  <div class="d-inline-flex align-items-center gap-1">
+                    <button
+                      type="button"
+                      mat-icon-button
+                      (click)="openEditarDespesa(d)"
+                      matTooltip="Editar despesa"
+                      class="btn-sm"
+                    >
+                      <mat-icon>edit</mat-icon>
+                    </button>
+
+                    <button
+                      type="button"
+                      mat-icon-button
+                      [disabled]="!isAdmin()"
+                      (click)="confirmDeleteDespesa(d, $event)"
+                      [matTooltip]="
+                        isAdmin()
+                          ? 'Excluir despesa'
+                          : 'Apenas administradores podem excluir registros contábeis'
+                      "
+                      class="btn-sm"
+                    >
+                      <mat-icon
+                        [class.text-danger]="isAdmin()"
+                        [class.text-surface-muted]="!isAdmin()"
+                        >delete</mat-icon
+                      >
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Paginação -->
+      <mat-paginator
+        [length]="filteredDespesas().length"
+        [pageSize]="pageSizeDesp()"
+        [pageSizeOptions]="pageSizeOptions"
+        (page)="onPageChangeDesp($event)"
+        aria-label="Paginação das despesas"
+      />
+    }
+  </div>
+</div>

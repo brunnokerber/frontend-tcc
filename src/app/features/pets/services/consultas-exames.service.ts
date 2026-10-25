@@ -140,6 +140,27 @@ export class ConsultasExamesService {
     }
   }
 
+  async deleteConsultaExame(id: number): Promise<boolean> {
+    this.loadingSignal.set(true);
+    try {
+      const { error } = await this.supabase.client.from('consultas_exames').delete().eq('id', id);
+
+      if (error) {
+        throw error;
+      }
+
+      this.toast.success('Registro de procedimento/consulta excluído com sucesso!');
+      this.consultasSignal.update((list) => list.filter((c) => c.id !== id));
+      return true;
+    } catch (err: unknown) {
+      const msg = extractErrorMessage(err, 'Erro ao excluir procedimento/consulta.');
+      this.toast.error(msg);
+      return false;
+    } finally {
+      this.loadingSignal.set(false);
+    }
+  }
+
   clearCache(): void {
     this.cachedPetIdSignal.set(null);
     this.consultasSignal.set([]);

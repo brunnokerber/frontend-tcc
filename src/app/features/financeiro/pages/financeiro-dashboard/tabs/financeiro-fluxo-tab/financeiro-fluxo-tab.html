@@ -1,0 +1,298 @@
+<div class="p-3 p-md-4">
+  <!-- Linha 1: Gráfico Mensal e Distribuição por Categoria -->
+  <div class="row g-4 mb-4">
+    <!-- Coluna 1: Gráfico SVG de Evolução Cronológica Mensal -->
+    <div class="col-12 col-lg-7">
+      <div class="card h-100 border p-3 p-md-4 rounded-3 shadow-xs">
+        <div class="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
+          <div class="d-flex align-items-center gap-2">
+            <mat-icon class="text-primary">bar_chart</mat-icon>
+            <h3 class="h6 mb-0 fw-bold">Evolução Mensal (Entradas vs. Saídas)</h3>
+          </div>
+          <div class="d-flex align-items-center gap-3 small">
+            <span class="d-inline-flex align-items-center gap-1">
+              <span class="legend-box bg-success"></span>
+              <span>Entradas</span>
+            </span>
+            <span class="d-inline-flex align-items-center gap-1">
+              <span class="legend-box bg-danger"></span>
+              <span>Saídas</span>
+            </span>
+          </div>
+        </div>
+
+        <!-- Container Responsivo SVG -->
+        <div class="chart-container w-100 position-relative">
+          @if (evolucaoMensal().length === 0) {
+            <div class="empty-state py-5 text-center text-surface-muted">
+              <div class="empty-icon-circle mx-auto mb-3">
+                <mat-icon>show_chart</mat-icon>
+              </div>
+              <p class="mb-0">Nenhuma movimentação registrada para o período selecionado.</p>
+            </div>
+          } @else {
+            <svg viewBox="0 0 620 260" class="w-100 h-auto" preserveAspectRatio="xMidYMid meet">
+              <!-- Linhas de Grade e Eixo Horizontal -->
+              <line
+                x1="40"
+                y1="220"
+                x2="600"
+                y2="220"
+                stroke="currentColor"
+                stroke-opacity="0.15"
+                stroke-width="1"
+              />
+              <line
+                x1="40"
+                y1="130"
+                x2="600"
+                y2="130"
+                stroke="currentColor"
+                stroke-opacity="0.08"
+                stroke-dasharray="4"
+                stroke-width="1"
+              />
+              <line
+                x1="40"
+                y1="40"
+                x2="600"
+                y2="40"
+                stroke="currentColor"
+                stroke-opacity="0.08"
+                stroke-dasharray="4"
+                stroke-width="1"
+              />
+
+              <!-- Barras Agrupadas por Mês -->
+              @for (m of evolucaoMensal(); track m.chave; let idx = $index) {
+                <g class="month-group">
+                  <!-- Barra de Entradas (Verde) -->
+                  <rect
+                    [attr.x]="getMonthX(idx, evolucaoMensal().length) - 16"
+                    [attr.y]="getBarY(m.entradas)"
+                    width="14"
+                    [attr.height]="getBarHeight(m.entradas)"
+                    rx="3"
+                    fill="#2e7d32"
+                    class="bar-entry"
+                  >
+                    <title>Entradas: R$ {{ m.entradas | number: '1.2-2' }}</title>
+                  </rect>
+
+                  <!-- Barra de Saídas (Vermelho) -->
+                  <rect
+                    [attr.x]="getMonthX(idx, evolucaoMensal().length) + 2"
+                    [attr.y]="getBarY(m.saidas)"
+                    width="14"
+                    [attr.height]="getBarHeight(m.saidas)"
+                    rx="3"
+                    fill="#e53935"
+                    class="bar-expense"
+                  >
+                    <title>Saídas: R$ {{ m.saidas | number: '1.2-2' }}</title>
+                  </rect>
+
+                  <!-- Label do Mês -->
+                  <text
+                    [attr.x]="getMonthX(idx, evolucaoMensal().length)"
+                    y="240"
+                    text-anchor="middle"
+                    fill="currentColor"
+                    opacity="0.75"
+                    font-size="11"
+                    font-weight="500"
+                  >
+                    {{ m.label }}
+                  </text>
+                </g>
+              }
+            </svg>
+          }
+        </div>
+      </div>
+    </div>
+
+    <!-- Coluna 2: Despesas por Categoria (Barras de Distribuição) -->
+    <div class="col-12 col-lg-5">
+      <div class="card h-100 border p-3 p-md-4 rounded-3 shadow-xs">
+        <div class="d-flex align-items-center gap-2 mb-3">
+          <mat-icon class="text-primary">pie_chart</mat-icon>
+          <h3 class="h6 mb-0 fw-bold">Despesas por Categoria</h3>
+        </div>
+
+        @if (despesasPorCategoria().length === 0) {
+          <div class="empty-state py-5 text-center text-surface-muted">
+            <div class="empty-icon-circle mx-auto mb-3">
+              <mat-icon>donut_large</mat-icon>
+            </div>
+            <p class="mb-0">Sem despesas no período selecionado.</p>
+          </div>
+        } @else {
+          <div class="d-flex flex-column gap-3 overflow-y-auto" style="max-height: 250px">
+            @for (cat of despesasPorCategoria(); track cat.categoria) {
+              <div>
+                <div class="d-flex align-items-center justify-content-between small mb-1">
+                  <span class="fw-medium text-truncate" style="max-width: 220px">{{
+                    cat.categoria
+                  }}</span>
+                  <div class="d-flex align-items-center gap-2">
+                    <span class="text-surface-muted">{{ cat.quantidade }}x</span>
+                    <span class="fw-bold">R$ {{ cat.total | number: '1.2-2' }}</span>
+                    <span class="badge bg-surface-subtle text-surface-main border border-surface"
+                      >{{ cat.percentual | number: '1.1-1' }}%</span
+                    >
+                  </div>
+                </div>
+                <div class="progress" style="height: 7px">
+                  <div
+                    class="progress-bar bg-danger"
+                    role="progressbar"
+                    [style.width.%]="cat.percentual"
+                  ></div>
+                </div>
+              </div>
+            }
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+
+  <!-- Linha 2: Top Animais com Maior Custo e Lançamentos Recentes -->
+  <div class="row g-4">
+    <!-- Coluna 1: Top 5 Animais Mais Custosos -->
+    <div class="col-12 col-lg-4">
+      <div class="card h-100 border p-3 p-md-4 rounded-3 shadow-xs">
+        <div class="d-flex align-items-center gap-2 mb-3">
+          <mat-icon class="text-warning">pets</mat-icon>
+          <h3 class="h6 mb-0 fw-bold">Top Animais com Maior Custo</h3>
+        </div>
+        <p class="text-surface-muted small mb-3">
+          Identifica os pets com maior investimento clínico no período para direcionamento de
+          apadrinhamento.
+        </p>
+
+        @if (topPetsCusto().length === 0) {
+          <div class="empty-state py-4 text-center text-surface-muted">
+            <div class="empty-icon-circle mx-auto mb-3">
+              <mat-icon>sentiment_satisfied</mat-icon>
+            </div>
+            <p class="mb-0 small">Nenhum custo clínico vinculado a pets no período.</p>
+          </div>
+        } @else {
+          <div class="d-flex flex-column gap-2">
+            @for (pet of topPetsCusto(); track pet.id_pet; let pos = $index) {
+              <a
+                [routerLink]="['/pets/detalhes', pet.id_pet]"
+                class="d-flex align-items-center justify-content-between p-2 rounded-2 border border-surface bg-surface-subtle text-decoration-none text-body hover-surface"
+              >
+                <div class="d-flex align-items-center gap-2 overflow-hidden">
+                  <span class="badge rounded-circle bg-primary text-white p-2 small"
+                    >#{{ pos + 1 }}</span
+                  >
+                  <div class="d-flex flex-column text-truncate">
+                    <span class="fw-bold text-truncate">{{ pet.nome_pet }}</span>
+                    <span class="text-surface-muted small"
+                      >{{ pet.quantidadeProcedimentos }} intervenções</span
+                    >
+                  </div>
+                </div>
+                <div class="text-end ps-2">
+                  <span class="fw-bold text-danger d-block"
+                    >R$ {{ pet.totalGasto | number: '1.2-2' }}</span
+                  >
+                  <span class="text-primary small">Ver Prontuário &rarr;</span>
+                </div>
+              </a>
+            }
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- Coluna 2: Tabela de Lançamentos Recentes do Fluxo de Caixa -->
+    <div class="col-12 col-lg-8">
+      <div class="card h-100 border p-3 p-md-4 rounded-3 shadow-xs">
+        <div class="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
+          <div class="d-flex align-items-center gap-2">
+            <mat-icon class="text-primary">receipt_long</mat-icon>
+            <h3 class="h6 mb-0 fw-bold">Lançamentos do Período</h3>
+          </div>
+          <span class="badge bg-surface-subtle text-surface-muted border border-surface"
+            >{{ movimentacoes().length }} registros</span
+          >
+        </div>
+
+        @if (loadingFluxo()) {
+          <div class="py-5 text-center">
+            <mat-spinner diameter="36" class="mx-auto mb-2"></mat-spinner>
+            <span class="text-surface-muted small">Carregando lançamentos contábeis...</span>
+          </div>
+        } @else if (movimentacoes().length === 0) {
+          <div class="empty-state py-5 text-center text-surface-muted">
+            <div class="empty-icon-circle mx-auto mb-3">
+              <mat-icon>receipt_long</mat-icon>
+            </div>
+            <p class="mb-0">Nenhuma movimentação registrada no período selecionado.</p>
+          </div>
+        } @else {
+          <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+              <thead>
+                <tr>
+                  <th style="width: 80px">Tipo</th>
+                  <th>Categoria</th>
+                  <th style="width: 100px">Data</th>
+                  <th>Referência / Favorecido / Doador</th>
+                  <th class="text-end" style="width: 130px">Valor</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (m of pagedMovimentacoes(); track m.created_at + m.pessoa_referencia) {
+                  <tr>
+                    <td>
+                      <span
+                        class="badge"
+                        [class.bg-success-subtle]="m.tipo_movimentacao === 'Entrada'"
+                        [class.text-success]="m.tipo_movimentacao === 'Entrada'"
+                        [class.bg-danger-subtle]="m.tipo_movimentacao === 'Saída'"
+                        [class.text-danger]="m.tipo_movimentacao === 'Saída'"
+                      >
+                        {{ m.tipo_movimentacao }}
+                      </span>
+                    </td>
+                    <td class="small fw-medium">{{ m.categoria }}</td>
+                    <td class="small text-surface-muted">
+                      {{ m.data_movimentacao | date: 'dd/MM/yyyy' }}
+                    </td>
+                    <td class="small text-truncate" style="max-width: 220px">
+                      {{ m.pessoa_referencia }}
+                    </td>
+                    <td
+                      class="text-end fw-bold"
+                      [class.text-success]="m.tipo_movimentacao === 'Entrada'"
+                      [class.text-danger]="m.tipo_movimentacao === 'Saída'"
+                    >
+                      {{ m.tipo_movimentacao === 'Entrada' ? '+' : '-' }} R$
+                      {{ m.valor | number: '1.2-2' }}
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Paginação -->
+          <mat-paginator
+            [length]="movimentacoes().length"
+            [pageSize]="pageSizeMov()"
+            [pageSizeOptions]="[10, 25, 50]"
+            (page)="onPageChangeMov($event)"
+            aria-label="Paginação dos lançamentos"
+            class="mt-2"
+          />
+        }
+      </div>
+    </div>
+  </div>
+</div>

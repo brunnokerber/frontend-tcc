@@ -1,0 +1,151 @@
+<form [formGroup]="form" (ngSubmit)="onSave()">
+  <app-dialog-layout
+    [title]="isEditing() ? 'Editar Direcionamento' : 'Direcionar Insumos para Local'"
+    [subtitle]="
+      isEditing()
+        ? 'Ajuste o volume destinado ao local selecionado'
+        : 'Distribua parte ou a totalidade dos insumos desta doação para um lar, abrigo ou clínica'
+    "
+    [icon]="isEditing() ? 'sync_alt' : 'local_shipping'"
+    iconVariant="info"
+    size="md"
+    [closeDisabled]="isSaving()"
+    (close)="onCancel()"
+  >
+    <div class="d-flex flex-column gap-3">
+      <!-- Card Informativo da Doação de Origem -->
+      <div class="origem-card p-3 rounded-3 border">
+        <div class="d-flex align-items-center justify-content-between mb-2">
+          <span
+            class="badge bg-primary-subtle text-primary border border-primary small fw-semibold"
+          >
+            Doação Origem #{{ data.doacao.id }}
+          </span>
+          <span class="small text-surface-muted">
+            Unidade: <strong>{{ data.doacao.unidade_medida }}</strong>
+          </span>
+        </div>
+
+        <div class="row g-2 align-items-center">
+          <div class="col-12 col-sm-6">
+            <div class="text-surface-muted small">Doador</div>
+            <div class="fw-bold text-truncate">{{ data.doacao.doador }}</div>
+          </div>
+          <div class="col-6 col-sm-3">
+            <div class="text-surface-muted small">Volume Total</div>
+            <div class="fw-semibold">{{ data.doacao.volume }} {{ data.doacao.unidade_medida }}</div>
+          </div>
+          <div class="col-6 col-sm-3">
+            <div class="text-surface-muted small">Saldo Disponível</div>
+            <div class="fw-bold text-success">
+              {{ maxPermitido() }} {{ data.doacao.unidade_medida }}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Formulário de Direcionamento -->
+      <div class="p-3 rounded-3 border bg-surface">
+        <div class="row g-3">
+          <!-- Local de Destino -->
+          <div class="col-12">
+            <mat-form-field appearance="outline" class="w-100">
+              <mat-label>Local de Destino (Lar / Clínica / Abrigo)</mat-label>
+              <mat-select
+                id="id-local-select"
+                formControlName="id_local"
+                placeholder="Selecione o local de acolhimento"
+              >
+                @for (loc of locaisList(); track loc.id) {
+                  <mat-option [value]="loc.id">
+                    <div class="d-flex align-items-center justify-content-between w-100 gap-2">
+                      <span class="fw-medium text-truncate">{{ loc.local }}</span>
+                      <span
+                        class="badge bg-surface-subtle text-surface-muted border border-surface small"
+                      >
+                        {{ loc.tipo_local }}
+                      </span>
+                    </div>
+                  </mat-option>
+                }
+              </mat-select>
+              <mat-icon matPrefix class="me-2">location_on</mat-icon>
+              @if (loadingLocais()) {
+                <mat-spinner matSuffix diameter="18" class="me-2"></mat-spinner>
+              }
+              @if (form.controls.id_local.touched && form.controls.id_local.errors) {
+                <mat-error>{{ form.controls.id_local | formError }}</mat-error>
+              }
+            </mat-form-field>
+          </div>
+
+          <!-- Volume a ser Destinado -->
+          <div class="col-12">
+            <mat-form-field appearance="outline" class="w-100">
+              <mat-label>Volume a Direcionar (em {{ data.doacao.unidade_medida }})</mat-label>
+              <input
+                matInput
+                id="volume-direcionar-input"
+                type="number"
+                step="0.01"
+                min="0.01"
+                [max]="maxPermitido()"
+                formControlName="volume"
+                placeholder="Ex: 10.00"
+              />
+              <span matSuffix class="text-surface-muted me-2">{{
+                data.doacao.unidade_medida
+              }}</span>
+              <mat-icon matPrefix class="me-2">scale</mat-icon>
+              @if (form.controls.volume.touched && form.controls.volume.errors) {
+                <mat-error>{{ form.controls.volume | formError }}</mat-error>
+              }
+            </mat-form-field>
+
+            <!-- Botão de Atalho para Alocar Saldo Máximo -->
+            <div class="d-flex justify-content-end mt-1">
+              <button
+                type="button"
+                class="btn btn-sm btn-outline-primary d-inline-flex align-items-center gap-1 rounded-pill"
+                (click)="alocarSaldoTotal()"
+                matTooltip="Preenche automaticamente com todo o saldo restante da doação"
+              >
+                <mat-icon style="font-size: 16px; width: 16px; height: 16px"
+                  >all_inclusive</mat-icon
+                >
+                <span
+                  >Alocar saldo total restante ({{ maxPermitido() }}
+                  {{ data.doacao.unidade_medida }})</span
+                >
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Ações -->
+    <div dialog-actions class="d-flex align-items-center justify-content-end gap-2 w-100">
+      <button type="button" mat-stroked-button (click)="onCancel()" [disabled]="isSaving()">
+        Cancelar
+      </button>
+
+      <button
+        type="submit"
+        mat-flat-button
+        color="primary"
+        [disabled]="isSaving() || form.invalid || maxPermitido() <= 0"
+      >
+        @if (isSaving()) {
+          <mat-spinner diameter="18" class="me-2"></mat-spinner>
+          <span>Salvando...</span>
+        } @else {
+          <span class="d-inline-flex align-items-center gap-1">
+            <mat-icon>{{ isEditing() ? 'check' : 'local_shipping' }}</mat-icon>
+            <span>{{ isEditing() ? 'Atualizar Direcionamento' : 'Confirmar Envio' }}</span>
+          </span>
+        }
+      </button>
+    </div>
+  </app-dialog-layout>
+</form>

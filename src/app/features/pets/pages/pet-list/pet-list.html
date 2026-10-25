@@ -389,7 +389,10 @@
                     }
                     @if (pet.moura) {
                       <div>
-                        <span class="badge bg-light-primary border">Moura: {{ pet.moura }}</span>
+                        <span
+                          class="badge bg-surface-subtle text-surface-muted border border-surface"
+                          >Moura: {{ pet.moura }}</span
+                        >
                       </div>
                     }
                     @if (!pet.chip && !pet.rga && !pet.moura) {

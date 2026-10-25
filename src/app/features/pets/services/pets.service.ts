@@ -84,16 +84,30 @@ export class PetsService {
 
     this.loadingSignal.set(true);
     try {
+      // Tenta carregar o pet acompanhado dos dados do último editor (updated_by)
+      let pet: Pet | null = null;
       const { data, error } = await this.supabase.client
         .from('pets')
-        .select('*, entradas(*)')
+        .select('*, editor:updated_by(id, email, role), entradas(*)')
         .eq('id', id)
         .single();
 
-      if (error) {
-        throw error;
+      if (!error && data) {
+        pet = data as Pet;
+      } else {
+        // Fallback resiliente caso o relacionamento não esteja mapeado no cache PostgREST
+        const fallback = await this.supabase.client
+          .from('pets')
+          .select('*, entradas(*)')
+          .eq('id', id)
+          .single();
+
+        if (fallback.error) {
+          throw fallback.error;
+        }
+        pet = fallback.data as Pet;
       }
-      const pet = data as Pet;
+
       this.cachedPetSignal.set(pet);
       return pet;
     } catch (err: unknown) {

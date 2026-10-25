@@ -1,0 +1,26 @@
+.empty-state {
+  .empty-icon-circle {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background-color: var(--mat-sys-surface-container);
+    color: var(--mat-sys-on-surface-variant);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    mat-icon {
+      font-size: 28px;
+      width: 28px;
+      height: 28px;
+      opacity: 0.75;
+    }
+  }
+
+  > mat-icon {
+    font-size: 36px;
+    width: 36px;
+    height: 36px;
+    opacity: 0.7;
+  }
+}

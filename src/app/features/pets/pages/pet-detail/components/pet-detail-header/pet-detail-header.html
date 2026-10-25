@@ -1,0 +1,204 @@
+@if (pet(); as p) {
+  <!-- Barra de Navegação e Ações Rápidas -->
+  <div class="row align-items-center mb-4 g-3">
+    <div class="col-12 col-md-6 d-flex align-items-center gap-2">
+      <button
+        mat-icon-button
+        (click)="onBack()"
+        matTooltip="Voltar para a listagem de pets"
+        class="btn-back"
+      >
+        <mat-icon>arrow_back</mat-icon>
+      </button>
+      <div>
+        <div class="d-flex align-items-center gap-2 flex-wrap">
+          <h1 class="h3 fw-bold mb-0">{{ p.nome }}</h1>
+          <span class="badge-status {{ getStatusBadgeClass(p.status) }}">
+            {{ p.status }}
+          </span>
+        </div>
+        <p class="text-surface-muted small mb-0 mt-1 d-flex align-items-center gap-1 flex-wrap">
+          <span>Registro #{{ p.id }}</span>
+          <span>&bull;</span>
+          <span>Cadastrado em {{ p.created_at | date: 'dd/MM/yyyy' }}</span>
+          @if (p.updated_at) {
+            <span>&bull;</span>
+            <app-audit-badge
+              [updatedAt]="p.updated_at"
+              [updatedBy]="p.updated_by"
+              [editor]="p.editor"
+              [compact]="true"
+            ></app-audit-badge>
+          }
+        </p>
+      </div>
+    </div>
+
+    <div class="col-12 col-md-6 d-flex justify-content-md-end gap-2 flex-wrap">
+      @if (p.link_documentos) {
+        <a
+          [href]="p.link_documentos"
+          target="_blank"
+          rel="noopener noreferrer"
+          mat-stroked-button
+          color="primary"
+          class="d-flex align-items-center gap-1 rounded-3"
+        >
+          <mat-icon>open_in_new</mat-icon>
+          <span>Prontuário / Docs</span>
+        </a>
+      }
+      @if (p.status === 'Disponível') {
+        <button
+          type="button"
+          mat-flat-button
+          (click)="onAdotar()"
+          class="btn-adotar-destaque d-flex align-items-center gap-2 py-2 px-3 rounded-3 shadow-sm"
+          matTooltip="Registrar a adoção definitiva deste animal"
+        >
+          <mat-icon>volunteer_activism</mat-icon>
+          <span class="fw-semibold">Registrar Adoção</span>
+        </button>
+      }
+    </div>
+  </div>
+
+  <!-- Hero Card: Perfil Rápido + Resumo de Saúde / Finanças -->
+  <div class="hero-card p-3 p-md-4 rounded-3 shadow-xs mb-4">
+    <div class="row g-4 align-items-center">
+      <!-- Identificação Principal -->
+      <div class="col-12 col-lg-5">
+        <div class="d-flex align-items-center gap-3">
+          @if (fotoUrl(); as url) {
+            <button
+              type="button"
+              class="pet-hero-avatar-btn p-0 border-0 bg-transparent rounded-circle position-relative"
+              (click)="onPhotoClick(url, p.nome)"
+              matTooltip="Clique para expandir a foto"
+              aria-label="Expandir foto do animal"
+            >
+              <img
+                [src]="url"
+                [alt]="'Foto de ' + p.nome"
+                class="pet-hero-avatar pet-hero-photo rounded-circle"
+                loading="lazy"
+              />
+              <span
+                class="avatar-zoom-overlay rounded-circle d-flex align-items-center justify-content-center"
+              >
+                <mat-icon>zoom_in</mat-icon>
+              </span>
+            </button>
+          } @else {
+            <div
+              class="pet-hero-avatar rounded-circle"
+              [ngClass]="getTipoBadgeClass(p.tipo_pet)"
+              title="Sem foto cadastrada"
+            >
+              <i [class]="getTipoFaIcon(p.tipo_pet)"></i>
+            </div>
+          }
+          <div>
+            <div class="d-flex align-items-center gap-2">
+              <span class="fs-5 fw-bold">{{ p.nome }}</span>
+              <mat-icon
+                [matTooltip]="p.sexo"
+                class="text-surface-muted"
+                style="font-size: 20px; width: 20px; height: 20px"
+              >
+                {{ getSexoIcon(p.sexo) }}
+              </mat-icon>
+            </div>
+            <div class="text-surface-muted small">
+              {{ p.tipo_pet }} &bull; {{ p.raca || 'Sem raça definida' }} &bull;
+              {{ p.porte || 'Porte N/I' }}
+            </div>
+            <!-- Identificadores (Apenas existentes) -->
+            <div class="d-flex align-items-center gap-1 flex-wrap mt-2">
+              @if (p.chip) {
+                <span class="badge bg-surface-subtle text-surface-main border border-surface">
+                  <mat-icon class="badge-mini-icon">memory</mat-icon> Chip: {{ p.chip }}
+                </span>
+              }
+              @if (p.rga) {
+                <span class="badge bg-surface-subtle text-surface-muted border border-surface">
+                  <mat-icon class="badge-mini-icon">tag</mat-icon> RGA: {{ p.rga }}
+                </span>
+              }
+              @if (p.moura) {
+                <span class="badge bg-surface-subtle text-surface-muted border border-surface">
+                  <mat-icon class="badge-mini-icon">qr_code_2</mat-icon> Moura: {{ p.moura }}
+                </span>
+              }
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Métricas Rápidas de Saúde e Investimento -->
+      <div class="col-12 col-lg-7">
+        <div class="row g-2 text-center">
+          <div class="col-6 col-md-3">
+            <div class="metric-box p-2 rounded-2">
+              <span
+                class="text-surface-muted small d-block text-uppercase fw-semibold tracking-wide"
+                >Total Investido</span
+              >
+              <span class="fs-6 fw-bold text-primary">
+                {{ totalInvestidoGeral() | currency: 'BRL' : 'symbol' : '1.2-2' }}
+              </span>
+            </div>
+          </div>
+          <div class="col-6 col-md-3">
+            <div class="metric-box p-2 rounded-2">
+              <span
+                class="text-surface-muted small d-block text-uppercase fw-semibold tracking-wide"
+                >Vacinas</span
+              >
+              <span class="fs-6 fw-bold text-success">
+                {{ totalCustoVacinas() | currency: 'BRL' : 'symbol' : '1.2-2' }}
+              </span>
+            </div>
+          </div>
+          <div class="col-6 col-md-3">
+            <div class="metric-box p-2 rounded-2">
+              <span
+                class="text-surface-muted small d-block text-uppercase fw-semibold tracking-wide"
+                >Procedimentos</span
+              >
+              <span class="fs-6 fw-bold text-warning">
+                {{ totalCustoConsultas() | currency: 'BRL' : 'symbol' : '1.2-2' }}
+              </span>
+            </div>
+          </div>
+          <div class="col-6 col-md-3">
+            <div class="metric-box p-2 rounded-2">
+              <span
+                class="text-surface-muted small d-block text-uppercase fw-semibold tracking-wide"
+                >Aux. Moradia</span
+              >
+              <span class="fs-6 fw-bold text-info">
+                {{ totalCustoAuxilio() | currency: 'BRL' : 'symbol' : '1.2-2' }}
+              </span>
+            </div>
+          </div>
+          <div class="col-12 mt-2">
+            <div
+              class="d-flex align-items-center justify-content-center gap-2 text-surface-muted small"
+            >
+              <mat-icon style="font-size: 16px; width: 16px; height: 16px">calendar_today</mat-icon>
+              <span>
+                Tempo sob tutela:
+                @if (diasNoAbrigo(); as dias) {
+                  <strong>{{ dias }} dias</strong>
+                } @else {
+                  Não informado
+                }
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+}

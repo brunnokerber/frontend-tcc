@@ -1,0 +1,77 @@
+.hero-card {
+  background-color: var(--mat-sys-surface-container-lowest);
+  border: 1px solid var(--mat-sys-outline-variant);
+  transition: box-shadow 0.2s ease-in-out;
+}
+
+.metric-box {
+  background-color: var(--mat-sys-surface-container-low);
+  border: 1px solid var(--mat-sys-outline-variant);
+}
+
+.badge-mini-icon {
+  font-size: 14px;
+  width: 14px;
+  height: 14px;
+  vertical-align: text-bottom;
+  margin-right: 2px;
+}
+
+.tracking-wide {
+  letter-spacing: 0.05em;
+}
+
+.pet-hero-avatar-btn {
+  cursor: pointer;
+  outline: none;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+
+  &:hover {
+    transform: scale(1.04);
+
+    .pet-hero-photo {
+      border-color: var(--mat-sys-primary);
+    }
+
+    .avatar-zoom-overlay {
+      opacity: 1;
+    }
+  }
+
+  &:focus-visible {
+    box-shadow: 0 0 0 3px var(--mat-sys-primary);
+  }
+}
+
+.avatar-zoom-overlay {
+  position: absolute;
+  inset: 0;
+  background-color: rgba(15, 23, 42, 0.45);
+  backdrop-filter: blur(1px);
+  -webkit-backdrop-filter: blur(1px);
+  color: #ffffff;
+  opacity: 0;
+  transition: opacity 0.2s ease-in-out;
+  pointer-events: none;
+
+  mat-icon {
+    font-size: 22px;
+    width: 22px;
+    height: 22px;
+  }
+}
+
+.btn-adotar-destaque {
+  background-color: var(--mat-sys-primary, #198754);
+  color: var(--mat-sys-on-primary, #ffffff);
+  transition:
+    transform 0.2s ease,
+    filter 0.2s ease;
+
+  &:hover {
+    transform: translateY(-1px);
+    filter: brightness(1.08);
+  }
+}

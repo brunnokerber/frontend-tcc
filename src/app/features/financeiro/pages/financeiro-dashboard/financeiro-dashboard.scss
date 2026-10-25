@@ -1,0 +1,111 @@
+.financeiro-container {
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.btn-export {
+  background-color: var(--mat-sys-surface-container-lowest);
+  border-color: var(--mat-sys-outline-variant);
+  color: var(--mat-sys-on-surface);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+
+  @media (min-width: 576px) {
+    min-width: 195px;
+  }
+
+  &:hover:not(:disabled) {
+    background-color: var(--mat-sys-surface-container-high);
+    border-color: var(--mat-sys-outline);
+  }
+}
+
+.btn-create {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+}
+
+.legend-box {
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
+  display: inline-block;
+}
+
+.chart-container {
+  min-height: 220px;
+
+  .bar-entry {
+    transition:
+      opacity 0.2s ease,
+      transform 0.2s ease;
+    cursor: pointer;
+
+    &:hover {
+      opacity: 0.85;
+      transform: scaleY(1.02);
+      transform-origin: bottom;
+    }
+  }
+
+  .bar-expense {
+    transition:
+      opacity 0.2s ease,
+      transform 0.2s ease;
+    cursor: pointer;
+
+    &:hover {
+      opacity: 0.85;
+      transform: scaleY(1.02);
+      transform-origin: bottom;
+    }
+  }
+}
+
+.hover-surface {
+  transition:
+    background-color 0.15s ease,
+    transform 0.15s ease;
+
+  &:hover {
+    background-color: var(--mat-sys-surface-container, rgba(0, 0, 0, 0.04));
+    transform: translateY(-1px);
+  }
+}
+
+.empty-state {
+  .empty-icon-circle {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background-color: var(--mat-sys-surface-container);
+    color: var(--mat-sys-on-surface-variant);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    mat-icon {
+      font-size: 28px;
+      width: 28px;
+      height: 28px;
+      opacity: 0.75;
+    }
+  }
+
+  > mat-icon {
+    font-size: 36px;
+    width: 36px;
+    height: 36px;
+    opacity: 0.4;
+  }
+}
+
+.density-compact {
+  ::ng-deep .mat-mdc-form-field-subscript-wrapper {
+    display: none;
+  }
+}

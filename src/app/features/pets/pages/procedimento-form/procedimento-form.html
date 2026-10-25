@@ -21,6 +21,16 @@
               : 'Adicione uma nova consulta, exame ou tratamento para o animal'
           }}
         </span>
+        @if (isEditing() && existingProcedimento(); as procData) {
+          @if (procData.updated_at) {
+            <div class="mt-1">
+              <app-audit-badge
+                [updatedAt]="procData.updated_at"
+                [updatedBy]="procData.updated_by"
+              ></app-audit-badge>
+            </div>
+          }
+        }
       </div>
     </div>
   </div>
@@ -160,6 +170,7 @@
           <div class="col-12 col-md-5">
             <mat-form-field appearance="outline" class="w-100">
               <mat-label>Custo do Procedimento (R$)</mat-label>
+              <mat-icon matPrefix class="me-2">payments</mat-icon>
               <input
                 id="custo_procedimento"
                 matInput
@@ -169,8 +180,6 @@
                 formControlName="custo"
                 placeholder="0,00"
               />
-              <span matTextPrefix class="me-1 text-muted">R$&nbsp;</span>
-              <mat-icon matSuffix class="text-muted">payments</mat-icon>
               @if (
                 procedimentoForm.controls.custo.touched && procedimentoForm.controls.custo.errors
               ) {
@@ -230,21 +239,48 @@
       </div>
 
       <!-- Barra de Ações Inferior -->
-      <div class="d-flex align-items-center justify-content-end gap-2 pt-2 mb-5">
-        <button type="button" mat-stroked-button (click)="goBack()" [disabled]="isSaving()">
-          Cancelar
-        </button>
-        <button type="submit" mat-flat-button color="primary" [disabled]="isSaving()" class="px-4">
-          @if (isSaving()) {
-            <span class="spinner-border spinner-border-sm me-2" role="status"></span>
-            <span>Salvando...</span>
-          } @else {
-            <span class="d-inline-flex align-items-center justify-content-center gap-2">
-              <mat-icon>save</mat-icon>
-              <span>{{ isEditing() ? 'Atualizar Registro' : 'Salvar Registro Clínico' }}</span>
-            </span>
+      <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 pt-2 mb-5">
+        <div>
+          @if (isEditing() && isAdmin()) {
+            <button
+              type="button"
+              mat-stroked-button
+              color="warn"
+              (click)="confirmDelete()"
+              [disabled]="isSaving() || isDeleting()"
+            >
+              <mat-icon>delete</mat-icon>
+              <span>Excluir Procedimento</span>
+            </button>
           }
-        </button>
+        </div>
+        <div class="d-flex align-items-center gap-2 ms-auto">
+          <button
+            type="button"
+            mat-stroked-button
+            (click)="goBack()"
+            [disabled]="isSaving() || isDeleting()"
+          >
+            Cancelar
+          </button>
+          <button
+            type="submit"
+            mat-flat-button
+            color="primary"
+            [disabled]="isSaving() || isDeleting()"
+            class="px-4"
+          >
+            @if (isSaving()) {
+              <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+              <span>Salvando...</span>
+            } @else {
+              <span class="d-inline-flex align-items-center justify-content-center gap-2">
+                <mat-icon>save</mat-icon>
+                <span>{{ isEditing() ? 'Atualizar Registro' : 'Salvar Registro Clínico' }}</span>
+              </span>
+            }
+          </button>
+        </div>
       </div>
     </form>
   }

@@ -1,0 +1,244 @@
+<div class="financeiro-container container-fluid px-3 px-md-4 py-3">
+  <!-- Cabeçalho Principal -->
+  <app-page-header
+    title="Painel Financeiro & Balanço"
+    description="Controle orçamentário, demonstrativo de receitas vs. despesas e direcionamento de recursos"
+    icon="account_balance_wallet"
+  >
+    <!-- Menu de Exportação / Relatórios -->
+    <button
+      type="button"
+      mat-stroked-button
+      [matMenuTriggerFor]="exportMenu"
+      [disabled]="loadingFluxo() || movimentacoes().length === 0"
+      class="btn-export flex-fill flex-sm-grow-0 py-2 px-2 px-sm-3 rounded-3 shadow-xs"
+      matTooltip="Exportar prestação de contas em PDF ou planilha de lançamentos em CSV"
+    >
+      <mat-icon>file_download</mat-icon>
+      <span class="fw-semibold"> <span class="d-none d-sm-inline">Exportar </span>Relatório </span>
+      <mat-icon iconPositionEnd>expand_more</mat-icon>
+    </button>
+
+    <mat-menu #exportMenu="matMenu" class="custom-export-menu shadow-sm">
+      <button mat-menu-item (click)="exportarPdf()">
+        <mat-icon class="text-danger">picture_as_pdf</mat-icon>
+        <span>Prestação de Contas (PDF)</span>
+      </button>
+      <button mat-menu-item (click)="exportarCsv()">
+        <mat-icon class="text-success">table_view</mat-icon>
+        <span>Planilha Financeira (CSV)</span>
+      </button>
+    </mat-menu>
+
+    <!-- Botão de Ação Primária -->
+    <button
+      type="button"
+      mat-flat-button
+      color="primary"
+      (click)="openNovaDespesaDialog()"
+      class="btn-create flex-fill flex-sm-grow-0 py-2 px-2 px-sm-3 rounded-3 shadow-sm"
+      matTooltip="Registrar nova saída financeira ou despesa institucional"
+    >
+      <mat-icon>add_circle</mat-icon>
+      <span class="fw-semibold">
+        <span class="d-none d-sm-inline">Registrar </span>Nova Despesa
+      </span>
+    </button>
+  </app-page-header>
+
+  <!-- Barra de Filtro de Período Temporal -->
+  <div class="periodo-bar card border p-3 mb-4 rounded-3 shadow-xs">
+    <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+      <div class="d-flex align-items-center gap-2 flex-wrap">
+        <span class="text-surface-muted small fw-semibold me-1 d-flex align-items-center gap-1">
+          <mat-icon style="font-size: 18px; width: 18px; height: 18px">date_range</mat-icon>
+          <span>Período:</span>
+        </span>
+
+        <button
+          type="button"
+          class="btn btn-sm rounded-pill px-3"
+          [class.btn-primary]="filtro().tipo === 'mes_atual'"
+          [class.btn-outline-secondary]="filtro().tipo !== 'mes_atual'"
+          (click)="selecionarPeriodo('mes_atual')"
+        >
+          Mês Atual
+        </button>
+
+        <button
+          type="button"
+          class="btn btn-sm rounded-pill px-3"
+          [class.btn-primary]="filtro().tipo === 'ultimo_mes'"
+          [class.btn-outline-secondary]="filtro().tipo !== 'ultimo_mes'"
+          (click)="selecionarPeriodo('ultimo_mes')"
+        >
+          Mês Anterior
+        </button>
+
+        <button
+          type="button"
+          class="btn btn-sm rounded-pill px-3"
+          [class.btn-primary]="filtro().tipo === 'trimestre'"
+          [class.btn-outline-secondary]="filtro().tipo !== 'trimestre'"
+          (click)="selecionarPeriodo('trimestre')"
+        >
+          Últimos 90 Dias
+        </button>
+
+        <button
+          type="button"
+          class="btn btn-sm rounded-pill px-3"
+          [class.btn-primary]="filtro().tipo === 'ano'"
+          [class.btn-outline-secondary]="filtro().tipo !== 'ano'"
+          (click)="selecionarPeriodo('ano')"
+        >
+          Ano Vigente
+        </button>
+
+        <button
+          type="button"
+          class="btn btn-sm rounded-pill px-3"
+          [class.btn-primary]="filtro().tipo === 'customizado'"
+          [class.btn-outline-secondary]="filtro().tipo !== 'customizado'"
+          (click)="
+            filtro.set({
+              tipo: 'customizado',
+              dataInicio: filtro().dataInicio,
+              dataFim: filtro().dataFim,
+            })
+          "
+        >
+          Personalizado
+        </button>
+      </div>
+
+      <div class="text-surface-muted small fw-medium">
+        <span
+          >Exibindo: <strong>{{ periodoLabel() }}</strong></span
+        >
+      </div>
+    </div>
+
+    <!-- Seção de Intervalo Personalizado (Data Início / Fim) -->
+    @if (filtro().tipo === 'customizado') {
+      <div class="row g-2 align-items-center mt-3 pt-3 border-top border-surface">
+        <div class="col-12 col-sm-4 col-md-3">
+          <mat-form-field appearance="outline" class="w-100 density-compact">
+            <mat-label>Data Inicial</mat-label>
+            <input
+              matInput
+              [matDatepicker]="pickerIni"
+              [(ngModel)]="customInicio"
+              placeholder="DD/MM/AAAA"
+              appDateMask
+            />
+            <mat-datepicker-toggle matIconSuffix [for]="pickerIni"></mat-datepicker-toggle>
+            <mat-datepicker #pickerIni></mat-datepicker>
+          </mat-form-field>
+        </div>
+
+        <div class="col-12 col-sm-4 col-md-3">
+          <mat-form-field appearance="outline" class="w-100 density-compact">
+            <mat-label>Data Final</mat-label>
+            <input
+              matInput
+              [matDatepicker]="pickerFim"
+              [(ngModel)]="customFim"
+              placeholder="DD/MM/AAAA"
+              appDateMask
+            />
+            <mat-datepicker-toggle matIconSuffix [for]="pickerFim"></mat-datepicker-toggle>
+            <mat-datepicker #pickerFim></mat-datepicker>
+          </mat-form-field>
+        </div>
+
+        <div class="col-12 col-sm-4 col-md-2 mb-3 mb-sm-0">
+          <button
+            type="button"
+            mat-flat-button
+            color="primary"
+            (click)="aplicarFiltroCustomizado()"
+            class="w-100"
+          >
+            <mat-icon>filter_alt</mat-icon>
+            <span>Filtrar</span>
+          </button>
+        </div>
+      </div>
+    }
+  </div>
+
+  <!-- Indicadores Principais (KPIs / Stat Cards) -->
+  <div class="row g-3 mb-4">
+    <!-- Card 1: Total Entradas (Doações) -->
+    <div class="col-12 col-sm-6 col-xl-3">
+      <app-stat-card
+        label="Total Arrecadado"
+        [value]="'R$ ' + (balanco().totalEntradas | number: '1.2-2')"
+        icon="savings"
+        variant="success"
+      />
+    </div>
+
+    <!-- Card 2: Total Saídas (Despesas Gerais + Clínicas) -->
+    <div class="col-12 col-sm-6 col-xl-3">
+      <app-stat-card
+        label="Total de Despesas"
+        [value]="'R$ ' + (balanco().totalSaidas | number: '1.2-2')"
+        icon="payments"
+        variant="danger"
+      />
+    </div>
+
+    <!-- Card 3: Balanço Líquido (Superávit / Déficit) -->
+    <div class="col-12 col-sm-6 col-xl-3">
+      <app-stat-card
+        label="Balanço Líquido"
+        [value]="'R$ ' + (balanco().saldoLiquido | number: '1.2-2')"
+        [icon]="balanco().saldoLiquido >= 0 ? 'trending_up' : 'trending_down'"
+        [variant]="balanco().saldoLiquido >= 0 ? 'success' : 'danger'"
+      />
+    </div>
+
+    <!-- Card 4: Taxa de Cobertura Orçamentária -->
+    <div class="col-12 col-sm-6 col-xl-3">
+      <app-stat-card
+        label="Taxa de Cobertura"
+        [value]="(balanco().taxaCobertura | number: '1.1-1') + '%'"
+        icon="pie_chart"
+        [variant]="balanco().taxaCobertura >= 100 ? 'primary' : 'warning'"
+      />
+    </div>
+  </div>
+
+  <!-- Abas do Módulo Financeiro (Composição) -->
+  <mat-tab-group class="modern-tabs shadow-xs rounded-3 bg-surface" animationDuration="200ms">
+    <!-- ABA 1: Painel Geral, Gráficos & Insights -->
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <div class="d-flex align-items-center gap-2">
+          <mat-icon>insights</mat-icon>
+          <span>Visão Geral & Indicadores</span>
+        </div>
+      </ng-template>
+
+      <ng-template matTabContent>
+        <app-financeiro-fluxo-tab #fluxoTab />
+      </ng-template>
+    </mat-tab>
+
+    <!-- ABA 2: Gestão de Despesas Gerais da Instituição -->
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <div class="d-flex align-items-center gap-2">
+          <mat-icon>request_quote</mat-icon>
+          <span>Despesas Gerais da ONG</span>
+        </div>
+      </ng-template>
+
+      <ng-template matTabContent>
+        <app-financeiro-despesas-tab #despesasTab (dataChanged)="carregarDados()" />
+      </ng-template>
+    </mat-tab>
+  </mat-tab-group>
+</div>

@@ -34,8 +34,8 @@ O processo metodológico de Engenharia de Requisitos adotado no presente TCC bas
 
 | Ator / Papel | Descrição | Escopo de Permissões |
 | :--- | :--- | :--- |
-| **Administrador (`admin`)** | Gestor responsável pela governança da ONG e administração do sistema. | Acesso irrestrito a todos os módulos, convite de novos usuários, alteração de níveis de acesso (`role`), ativação/desativação de contas, gestão do quadro de voluntários e escalas, retificação de dados de entrada/resgate do pet e auditoria global. |
-| **Operador (`user`)** | Voluntário, médico veterinário parceiro ou colaborador operacional da ONG. | Cadastro e edição cadastral de pets (com dados de entrada em modo somente-leitura), registro de entradas iniciais no cadastro, prontuários clínicos (vacinas/consultas), gestão de lares temporários e parceiros veterinários. Bloqueado nas rotas `/usuarios` e `/voluntarios` via `adminGuard` e políticas RLS. |
+| **Administrador (`admin`)** | Gestor responsável pela governança da ONG e administração do sistema. | Acesso irrestrito a todos os módulos, gestão do painel financeiro e orçamentário (`/financeiro`), convite de novos usuários, alteração de níveis de acesso (`role`), ativação/desativação de contas, gestão do quadro de voluntários e escalas, retificação de dados de entrada/resgate do pet, auditoria global e **permissão exclusiva para operações de exclusão física em tabelas operacionais de exceção (`vacinas`, `consultas_exames`, `direcionamento_doacoes`, `doacoes_monetarias` e `despesas`)**. |
+| **Operador (`user`)** | Voluntário, médico veterinário parceiro ou colaborador operacional da ONG. | Cadastro e edição cadastral de pets (com dados de entrada em modo somente-leitura), registro de entradas iniciais no cadastro, prontuários clínicos (vacinas/consultas), gestão de lares temporários e parceiros veterinários. Bloqueado nas rotas `/usuarios`, `/voluntarios` e `/financeiro` via `adminGuard` e políticas RLS. **Não possui permissão de exclusão física de registros** (ações de exclusão em `vacinas`, `consultas_exames`, `direcionamento_doacoes`, `doacoes_monetarias` e `despesas` são restritas a administradores tanto na interface com botões desabilitados/ocultos quanto nas políticas RLS do banco de dados). |
 | **Sistema / Backend (Supabase + Edge Functions)** | Processamento assíncrono de segurança e integridade referencial. | Aplicação síncrona de banimentos no `auth.users`, disparo de e-mails transacionais (convite/redefinição de senha) e auditoria de timestamps (`created_at`, `updated_at`). |
 
 ---
@@ -132,10 +132,10 @@ O processo metodológico de Engenharia de Requisitos adotado no presente TCC bas
   * **Prioridade:** Should Have (Importante)
   * **Regras Associadas:** RN11
 
-* **[RF16] Edição e Exclusão de Registros Clínicos**
-  * **Descrição:** Permitir atualizar dados de vacinas e consultas ou removê-los com diálogo de confirmação.
+* **[RF16] Edição e Exclusão de Registros Clínicos (Vacinas, Consultas e Procedimentos)**
+  * **Descrição:** Permitir atualizar dados de vacinas e consultas/exames. A exclusão de registros clínicos (vacinas e procedimentos/consultas/exames) é prerrogativa estrita de usuários com perfil de Administrador (`admin`), exibindo diálogo de confirmação destrutiva (`ConfirmationDialogComponent`) e feedback visual de sucesso/erro. Para usuários com perfil Operador (`user`), as opções de exclusão são desabilitadas na tabela do prontuário ou omitidas nos formulários de edição.
   * **Prioridade:** Must Have (Essencial)
-  * **Regras Associadas:** RN17
+  * **Regras Associadas:** RN17, RN27
 
 ---
 
@@ -220,6 +220,60 @@ O processo metodológico de Engenharia de Requisitos adotado no presente TCC bas
 
 ---
 
+### Módulo 8: Gestão de Doações e Rateio de Insumos (`public.doacoes` e `public.direcionamento_doacoes`)
+
+* **[RF31] Registro e Controle de Doações de Insumos Recebidos**
+  * **Descrição:** O sistema deve permitir o cadastro e gerenciamento de doações físicas/materiais recebidas pela ONG (rações, cobertores, medicamentos, insumos de limpeza), armazenando: Tipo de Doação (obrigatório, máx. 50 caracteres, com autocomplete e botões de seleção rápida para: Ração, Medicamento, Material de Limpeza, Cobertores/Camas, Acessórios, Outro), Nome do Doador (pessoa física ou jurídica, obrigatório, máx. 50 caracteres), Telefone de Contato (opcional, com máscara e link direto para WhatsApp), Volume Total Arrecadado (decimal 10,2 positivo) e Unidade de Medida (obrigatório, máx. 10 caracteres, com botões de seleção rápida para: kg, litros, un, sacos, pacotes, caixas, latas, fardos).
+  * **Prioridade:** Must Have (Essencial)
+  * **Regras Associadas:** RN17, RN24
+
+* **[RF32] Rateio e Direcionamento de Doações para Locais Parceiros (`direcionamento_doacoes`)**
+  * **Descrição:** Permitir a distribuição fracionada ou integral dos insumos de uma doação para os locais de acolhimento cadastrados (`public.locais`), associando o Local de Destino e o Volume Destinado. A interface deve prover validação instantânea para que o volume a direcionar não ultrapasse o saldo livre da doação de origem, oferecendo atalho para alocação do saldo total restante em um clique. A exclusão física ou estorno de direcionamentos de doações é restrita a usuários com perfil de Administrador (`admin`), com botões desabilitados e salvaguarda imperativa para operadores comuns.
+  * **Prioridade:** Must Have (Essencial)
+  * **Regras Associadas:** RN16, RN24, RN25, RN27
+
+* **[RF33] Painel Master-Detail e Visão Consolidada de Insumos por Local**
+  * **Descrição:** O sistema deve disponibilizar aba própria na navegação principal (`/doacoes`) composta por visões operacionais isoladas através do padrão de composição de abas (*Smart Tabs Composition* com renderização preguiçosa `matTabContent`): (1) Aba "Doações e Rateio" (`DoacoesInsumosTabComponent`) com listagem mestre de doações, filtros de busca por Doador/Telefone/Unidade, filtro de status de saldo (100% Livre, Parcial, Esgotada), KPIs em tempo real, barra de progresso visual de distribuição e expansão inline (Master-Detail) revelando os locais atendidos com opções de edição de volume e estorno; e (2) Aba "Direcionamentos por Local" (`DoacoesDirecionamentosTabComponent`), apresentando a tabela intermediária consolidada com filtro por local parceiro para auditoria do total de insumos que cada abrigo ou clínica já recebeu da ONG.
+  * **Prioridade:** Must Have (Essencial)
+  * **Regras Associadas:** RN24, RN25
+
+* **[RF34] Registro e Controle Financeiro de Doações Monetárias (`public.doacoes_monetarias`)**
+  * **Descrição:** O sistema deve disponibilizar aba dedicada "Doações em Dinheiro" (`DoacoesMonetariasTabComponent`) no módulo de doações (`/doacoes`) para gerenciamento de contribuições financeiras recebidas pela instituição (via PIX, dinheiro ou transferência bancária), armazenando: Valor Doado (decimal 10,2 estritamente positivo, obrigatório), Nome do Doador (obrigatório, máx. 50 caracteres), Telefone de Contato (opcional, com máscara, cópia rápida e link direto para WhatsApp), Data da Doação (date, padrão data corrente) e Observações/Finalidade (opcional, máx. 255 caracteres).
+  * **Funcionalidades e Painel:** A interface apresenta KPIs financeiros computados em tempo real (Total Arrecadado, Total de Doações, Média por Doação e Maior Doação recebida), painel de filtros combinados por Doador/Telefone e Período (A partir de / Até), atalhos de valores sugeridos no modal de cadastro (R$ 20, R$ 50, R$ 100, R$ 200, R$ 500) e paginação ergonômica.
+  * **Governança e Permissões:** Em conformidade com as políticas de segurança RLS (`is_admin()`), a exclusão de registros de doações monetárias é uma prerrogativa exclusiva de usuários com papel de Administrador (`admin`), prevenindo exclusões indevidas por operadores comuns.
+  * **Prioridade:** Must Have (Essencial)
+  * **Regras Associadas:** RN01, RN17, RN26
+
+---
+
+### Módulo 9: Painel Financeiro, Balanço Orçamentário e Despesas Gerais (`/financeiro`)
+
+* **[RF35] Painel Financeiro, Balanço Orçamentário e Indicadores de Sustentabilidade (`public.vw_fluxo_caixa`)**
+  * **Descrição:** O sistema deve disponibilizar painel administrativo estratégico exclusivo para administradores (`/financeiro`), composto por orquestrador desacoplado (`FinanceiroDashboardComponent`) com abas modulares preguiçosas (`matTabContent`): a aba "Fluxo de Caixa & Indicadores" (`FinanceiroFluxoTabComponent`), consolidando em tempo real todas as entradas financeiras (`public.doacoes_monetarias`), despesas operacionais da instituição (`public.despesas`), custos clínicos assistenciais dos animais resgatados (`public.consultas_exames` e `public.vacinas` com custos positivos) e auxílios de custos pagos para estadias em lares temporários (`public.pets_locais` com `valor_auxilio > 0`) através da view relacional `public.vw_fluxo_caixa`; e a aba "Despesas Institucionais" (`FinanceiroDespesasTabComponent`).
+  * **Funcionalidades e Análise:**
+    * **Barra Temporal Rápida:** Filtros com 1 clique para Mês Atual, Mês Anterior, Últimos 90 Dias, Ano Vigente e Intervalo Personalizado (Data Inicial / Final).
+    * **KPIs Executivos:** Total Arrecadado (Entradas), Total de Despesas (Saídas), Balanço Líquido (Superávit/Déficit com sinalização visual dinâmica) e Taxa de Cobertura Orçamentária (% de despesas cobertas por doações).
+    * **Gráfico SVG de Evolução Mensal:** Gráfico cronológico nativo em SVG/CSS comparando barras lado a lado de Entradas (verde) e Saídas (vermelho) mês a mês com tooltips interativos.
+    * **Distribuição de Despesas por Categoria:** Barras horizontais dinâmicas com percentuais e valores consolidados por tipo de despesa.
+    * **Inteligência de Direcionamento (Top 5 Animais Mais Custosos):** Ranking dos animais que mais demandaram investimento clínico no período com link direto para o prontuário, apoiando campanhas de apadrinhamento.
+    * **Lançamentos Detalhados:** Tabela discriminada de todos os registros contábeis do período com paginação.
+  * **Prioridade:** Must Have (Essencial)
+  * **Regras Associadas:** RN01, RN17, RN28
+
+* **[RF36] Registro e Gestão de Despesas Gerais da Instituição (`public.despesas`)**
+  * **Descrição:** Permitir o cadastro, consulta, edição e exclusão de despesas gerais e saídas financeiras institucionais da ONG que não são procedimentos clínicos individuais (ex: sacos de ração em atacado, insumos de limpeza, transporte de resgates, manutenção da sede, despesas operacionais avulsas).
+  * **Atributos:** Descrição (obrigatório, 3-100 caracteres), Categoria padronizada (enum com 8 opções: Alimentação / Ração, Medicamentos & Insumos Gerais, Higiene & Limpeza, Transporte & Resgate, Infraestrutura & Sede, Serviços Veterinários Avulsos, Administrativo & Operacional, Outro), Valor (decimal 10,2 positivo), Data do Pagamento/Despesa (date, padrão data corrente), Favorecido/Fornecedor (obrigatório, 2-100 caracteres), Telefone (opcional, com máscara), Vínculo opcional a um animal resgatado (`id_pet`) e Observações (opcional, máx. 255 caracteres).
+  * **Governança de Exclusão:** Exclusão física restrita a administradores (`is_admin()`).
+  * **Prioridade:** Must Have (Essencial)
+  * **Regras Associadas:** RN17, RN27, RN28
+
+* **[RF37] Prestação de Contas Oficial em PDF e Exportação de Planilha (Excel/CSV)**
+  * **Descrição:** O sistema deve permitir a emissão client-side em um clique do Balancete Oficial de Prestação de Contas formatado para impressão ou PDF (contendo cabeçalho institucional da ONG, período auditado, sumário executivo de KPIs, detalhamento de despesas por categoria, extrato discriminado dos lançamentos contábeis e campos para assinaturas da tesouraria e diretoria executiva), bem como a exportação completa dos lançamentos do período para planilha eletrônica (.CSV com UTF-8 BOM e separador compatível com o Microsoft Excel).
+  * **Prioridade:** Should Have (Importante)
+  * **Regras Associadas:** RN28
+
+---
+
 ## 4. Regras de Negócio (RN)
 
 * **[RN01] Restrição de Gestão de Usuários por Papel (RBAC):**  
@@ -293,8 +347,26 @@ O processo metodológico de Engenharia de Requisitos adotado no presente TCC bas
 * **[RN16] Padronização de Endereçamento de Locais:**  
   Todo local parceiro deve possuir endereço estruturado (logradouro, número, bairro, cidade, estado e CEP) para facilitar a logística de transporte e visitas de inspeção do bem-estar animal.
 
-* **[RN17] Auditoria Automática de Criação e Modificação (`Audit Trail`):**  
-  Todas as entidades do banco de dados relacional implementam os atributos de auditoria `created_at` e `updated_at`, gerados e atualizados pelo banco de dados para garantir integridade temporal em conformidade com boas práticas de governança de dados.
+* **[RN17] Auditoria Automática de Criação, Modificação e Autoria (`Audit Trail` e `updated_by`):**  
+  Todas as entidades do banco de dados relacional (`profiles`, `pets`, `entradas`, `veterinarios`, `vacinas`, `consultas_exames`, `locais`, `doacoes`, `direcionamento_doacoes`, `pets_locais`, `voluntarios` e `doacoes_monetarias`) implementam os atributos de auditoria `created_at`, `updated_at` e `updated_by` (`uuid references public.profiles(id) on delete set null default auth.uid()`), garantindo integridade temporal e autoria em conformidade com governança de dados.
+  - **Automação via Trigger Central (`handle_updated_at`):**
+    - **No `INSERT`:** O campo `updated_by` é preenchido nativamente com o UUID do usuário logado via `default auth.uid()`.
+    - **No `UPDATE`:** O trigger central atualiza de forma autônoma:
+      ```sql
+      new.updated_at = timezone('utc', now());
+      new.updated_by = coalesce(auth.uid(), new.updated_by, old.updated_by);
+      ```
+      Dessa forma, o identificador do usuário que realizou a última alteração é capturado diretamente do JWT da sessão autenticada, sem necessidade de payload ou intervenção manual no frontend.
+  - **Exibição na Interface sem Degradação de Desempenho ou Consumo de Cotas:**
+    - **Estratégia Zero Quota Overhead:** As consultas de listagem e diálogo utilizam `select('*')`, obtendo o atributo `updated_by` sem qualquer requisição adicional ($N+1$) ou joins desnecessários.
+    - **Serviço Singleton de Resolução com Cache em Memória (`AuditResolverService`):** Orquestra a busca do perfil (`UserProfile`) do autor via PostgREST, aplicando barreira de segurança no cliente (`authService.isAdmin()`), cacheamento local com resposta instantânea de $0\text{ ms}$ em buscas subsequentes e deduplicação de requisições simultâneas em voo.
+    - **Componente Reutilizável de Trilha de Auditoria (`AuditBadgeComponent`):** Padroniza a apresentação da data de atualização e identificador de autoria em todos os formulários e diálogos do sistema (`pet-form`, `procedimento-form`, `vacina-dialog`, `despesa-dialog`, `doacao-dialog`, `doacao-monetaria-dialog`, `pet-info-card` e `pet-detail-header`):
+      - **Para Operadores Comuns (`user`):** Apresenta data/hora ou pílula estática discreta com ID reduzido, resguardando a privacidade de dados (LGPD).
+      - **Para Administradores (`admin`):** O chip de identificação (`ID: a1b2c3...`) atua como gatilho interativo que abre sob demanda um **Popover rico em Angular Material (`mat-menu`)**:
+        - E-mail completo do autor com botão de cópia rápida em 1 clique e notificação via toast;
+        - Chips temáticos de **Papel** (`Administrador` / `Operador`) e **Status da Conta** (`Ativa` / `Inativa`);
+        - UUID completo de auditoria com botão de cópia;
+        - Atalho direto de navegação para a gestão de usuários (`/usuarios?search=email`).
 
 * **[RN18] Feedback e Não-Bloqueio de Experiência:**  
   Toda operação assíncrona com o banco de dados deve fornecer feedback visual imediato ao usuário (spinners de carregamento e notificações do tipo *Toast* com estados de sucesso, alerta ou erro claro em língua portuguesa).
@@ -322,6 +394,28 @@ O processo metodológico de Engenharia de Requisitos adotado no presente TCC bas
   - **Ação Rápida de Aplicação:** A interface do calendário e do prontuário deve disponibilizar mecanismo de aplicação rápida ("Aplicar Hoje"), atribuindo automaticamente a data corrente à `data_aplicacao` e persistindo a alteração no banco de dados.
   - **Atualização Reativa de Calendário:** A confirmação ou desmarcação de aplicação de uma vacina via `VacinaDialogComponent` ou ação rápida deve refletir instantaneamente nas métricas (KPIs de previstas, aplicadas e atrasadas) e nos chips visuais do calendário sem recarga de página.
 
+* **[RN24] Validação de Limites de Rateio de Doações e Consistência de Volume:**  
+  - **Saldo Não-Negativo:** O volume direcionado a um local parceiro não pode ser superior ao saldo livre restante da doação ($\text{Volume a Direcionar} \le \text{Volume Total} - \sum \text{Volumes já Direcionados}$). A tentativa de direcionar volume superior é bloqueada com notificação visual explicativa.
+  - **Trava de Diminuição de Volume Total:** Ao editar uma doação já registrada, o novo volume total informado não pode ser inferior à soma dos volumes que já foram direcionados para locais parceiros. Para reduzir o volume total abaixo dessa quantia, o operador deve previamente remover ou ajustar os direcionamentos vinculados.
+
+* **[RN25] Restituição Automática de Saldo por Estorno de Direcionamento:**  
+  Ao excluir um direcionamento existente na tabela intermediária `direcionamento_doacoes`, o volume correspondente é imediatamente estornado e restituído ao saldo disponível da doação de origem, recalculando reativamente o percentual rateado e atualizando o status operacional (ex: de 'Esgotada' para 'Parcial' ou '100% Livre').
+
+* **[RN26] Governança de Exclusão de Doações Monetárias (Admin Only via RLS):**  
+  Em conformidade com as diretrizes contábeis e de prestação de contas da instituição, registros de doações financeiras (`public.doacoes_monetarias`) possuem proteção reforçada. Qualquer usuário ativo (`is_active_user()`) pode registrar ou consultar doações e editar dados cadastrais/observações. Todavia, a exclusão física (`DELETE`) é estritamente restrita a usuários com perfil de Administrador (`admin`), tanto pela política de segurança RLS (`Admins can delete doacoes_monetarias`) no PostgreSQL quanto por validação no frontend (`AuthService.isAdmin()`), mantendo a integridade do livro-caixa e do histórico financeiro da ONG.
+
+* **[RN27] Governança de Exclusão Física em Tabelas de Exceção Operacional (Admin-Only via RBAC e RLS):**  
+  Por diretriz estrita de integridade de dados e auditoria, tabelas operacionais onde a remoção física de registros é permitida (`public.vacinas`, `public.consultas_exames`, `public.direcionamento_doacoes`, `public.doacoes_monetarias` e `public.despesas`) possuem a exclusão física (`DELETE`) estritamente restrita a usuários com papel de **Administrador (`role = 'admin'`)**. Usuários com perfil de Operador (`role = 'user'`) podem visualizar, cadastrar e atualizar dados autorizados, porém são impedidos de realizar exclusões:
+  - **Camada de Banco (RLS):** As políticas de `DELETE` aplicam a regra `public.is_admin()`, rejeitando no PostgreSQL qualquer tentativa de exclusão executada por usuários comuns.
+  - **Camada de Interface (Angular):** O frontend valida reativamente a permissão através do signal `AuthService.isAdmin()`, desabilitando com tooltip explicativo ou omitindo os botões de exclusão nas tabelas do prontuário do pet (`pet-detail`), nos diálogos (`vacina-dialog`, `despesa-dialog`), no formulário de procedimentos (`procedimento-form`), nas abas de rateio de doações (`doacao-list`) e no painel financeiro (`financeiro-dashboard`), além de aplicar salvaguarda imperativa nos métodos TypeScript com notificação (*toast*) de advertência caso a operação seja invocada indevidamente.
+
+* **[RN28] Governança Orçamentária e Restrição de Acesso ao Módulo Financeiro (Admin-Only):**  
+  Por motivos de sigilo financeiro, planejamento institucional e conformidade tributária/contábil:
+  - **Restrição de Rota e Acesso Exclusivo via Barra Lateral:** O acesso ao módulo `/financeiro` é restrito estritamente a usuários autenticados com o papel `admin` através do `adminGuard`. O link de navegação é disponibilizado exclusivamente através da barra lateral administrativa (`userSidenav`), não sendo exibido na barra superior de navegação para preservar o foco operacional e resguardar a visualização de recursos gerenciais. Operadores comuns (`user`) que tentarem acessar a URL direta são bloqueados e redirecionados para a tela inicial (`/pets`) com toast informativo de permissão insuficiente.
+  - **Visibilidade Contábil Segregada:** A consolidação orçamentária via `public.vw_fluxo_caixa` (cálculo de balanço, cobertura percentual e comparativos de arrecadação vs. saídas) e o balancete oficial de prestação de contas são de visualização exclusiva da administração.
+  - **Lançamento de Despesas Institucionais:** O cadastro e edição de despesas gerais (`public.despesas`) e sua auditoria são gerenciados a partir da aba dedicada no painel financeiro com validação de duplicidade e histórico de autoria (`updated_by`).
+
+
 ---
 
 ## 5. Requisitos Não-Funcionais (RNF)
@@ -333,7 +427,7 @@ O processo metodológico de Engenharia de Requisitos adotado no presente TCC bas
 | **[RNF03]** | **Desempenho de Carga e Banco** | O carregamento inicial e transições devem utilizar Lazy Loading no Angular, e as consultas no PostgreSQL devem ser aceleradas por índices GIN trigram, GIN para arrays e B-Tree compostos para eliminar table scans. | FCP < 1.5s, LCP < 2.5s; tempo de execução de queries de prontuário < 1ms via Index Scan (aferido em 0.109ms via EXPLAIN ANALYZE). |
 | **[RNF04]** | **Reatividade de Estado** | O gerenciamento de estado do frontend deve utilizar o novo paradigma de **Signals** e **Computed Signals** do Angular 20, evitando renderizações desnecessárias. | Zero subscrições manuais não gerenciadas em componentes principais; reatividade fina de signals. |
 | **[RNF05]** | **Segurança & Autenticação** | Todas as requisições autenticadas devem trafegar via HTTPS com Bearer Tokens JWT emitidos pelo Supabase Auth, política estrita de senhas fortes (8+ caracteres, maiúsculas, minúsculas, números e símbolos com rejeição nativa HTTP 422), proteção contra alteração desautorizada (`secure_password_change: true`), gestão de timeouts de sessão (timebox de 24h e inatividade de 8h) e refresh automático. | Criptografia em trânsito (TLS 1.3), validação estrita de credenciais e proteção em tempo real contra máquinas compartilhadas. |
-| **[RNF06]** | **Segurança em Nível de Banco (RLS) e Integridade Referencial** | O banco de dados PostgreSQL deve implementar Row Level Security (RLS) protegendo mutações não autorizadas. Tabelas primárias (`pets`, `locais`, `veterinarios`, `entradas`, `profiles`) possuem exclusão física (`DELETE`) bloqueada para prevenção de órfãos e perda de histórico; exclusões são restritas a itens de prontuário/estadias (`vacinas`, `consultas_exames`, `pets_locais`) exclusivas para administradores (`is_admin()`). | Políticas RLS ativas para todas as tabelas do schema público com matriz de DELETE auditada. |
+| **[RNF06]** | **Segurança em Nível de Banco (RLS) e Integridade Referencial** | O banco de dados PostgreSQL deve implementar Row Level Security (RLS) protegendo mutações não autorizadas. Tabelas primárias (`pets`, `locais`, `veterinarios`, `entradas`, `profiles`) possuem exclusão física (`DELETE`) bloqueada para prevenção de órfãos e perda de histórico; exclusões físicas são restritas estritamente às 5 tabelas operacionais de exceção (`vacinas`, `consultas_exames`, `direcionamento_doacoes`, `doacoes_monetarias` e `despesas`), cuja permissão de DELETE é exclusiva para administradores (`is_admin()`). | Políticas RLS ativas para todas as tabelas do schema público com matriz de DELETE auditada e restrita a administradores. |
 | **[RNF07]** | **Persistência de Preferências** | As preferências visuais do usuário (Tema Claro / Escuro) devem ser persistidas localmente no navegador (`LocalStorage`). | Retenção da preferência visual em novas sessões sem flicker de tela. |
 | **[RNF08]** | **Confiabilidade & Tratamento de Erros** | Erros de rede, validação de formulário ou falhas de Edge Function devem ser interceptados por utilitários centralizados e convertidos em mensagens amigáveis em português. | Ausência de stacktraces expostos ao usuário final; toasts informativos. |
 | **[RNF09]** | **Arquitetura de Software, Padronização e Testes Automatizados** | O frontend deve adotar arquitetura modular organizada em camadas: `Core` (serviços globais, auth, guards, interceptors), `Features` (módulos de negócio autocontidos), `Layout` e `Shared` (componentes, diretivas, pipes e layouts genéricos reutilizáveis como `PageHeaderComponent`, `StatCardComponent`, `FilterPanelComponent` e `DialogLayoutComponent`). Todo o código-fonte deve aderir à formatação estrita e padronizada via Prettier (`.prettierrc`), validada por script de verificação em esteira (`npm run format:check`), e dispor de suíte de testes unitários automatizados operando sobre o motor Vitest com ambiente simulado JSDOM e geração de relatórios de cobertura (*V8 Code Coverage*) integráveis a esteiras de CI/CD no GitHub Actions. | Separação estrita de responsabilidades, DRY, alto desacoplamento, 100% de conformidade com Prettier e testes automatizados com cobertura reportada em CI/CD. |
@@ -349,32 +443,39 @@ O processo metodológico de Engenharia de Requisitos adotado no presente TCC bas
 | **RF02** | Redefinição, primeiro acesso e alteração de senha | RN03, RN04 | RNF05, RNF08 | `auth.users` | `DefinirSenhaComponent`, `AlterarSenhaDialogComponent`, `PasswordRequirementsComponent`, `AuthService` |
 | **RF03** | Convite de usuários por admin | RN01, RN05 | RNF05, RNF08 | `profiles`, `auth.users` | `UsuarioDialogComponent`, `AuthService` |
 | **RF04** | Desativação/Reativação de contas | RN05, RN06 | RNF05, RNF08 | `profiles`, `Edge Function` | `UsuariosService`, `UsuarioListComponent` |
-| **RF05** | Auto-desativação de conta | RN06 | RNF05, RNF08 | `profiles`, `Edge Function` | `MainLayoutComponent`, `UsuariosService` |
+| **RF05** | Auto-desativação de conta | RN06 | RNF05, RNF08 | `profiles`, `Edge Function` | `MainLayoutComponent`, `UserSidenavComponent`, `UsuariosService` |
 | **RF06** | Alteração de Role (RBAC) | RN01, RN05 | RNF05, RNF08 | `profiles` | `UsuariosService`, `UsuarioListComponent` |
 | **RF07** | Cadastro completo de pet, foto e enquadramento | RN07, RN08, RN09, RN20 | RNF01, RNF04, RNF08 | `pets`, `Storage ('pets')` | `PetFormComponent`, `ImageCropperDialogComponent`, `PetsService` |
 | **RF08** | Registro obrigatório de entrada | RN10, RN17 | RNF08, RNF09 | `entradas` | `PetFormComponent`, `PetsService` |
 | **RF09** | Cálculo de senioridade | RN09 | RNF04 | `pets` | `pet.model.ts (calculateSenioridade)` |
-| **RF10** | Edição de pet, reajuste de enquadramento e foto | RN07, RN17, RN20 | RNF01, RNF08 | `pets`, `Storage ('pets')` | `PetFormComponent`, `ImageCropperDialogComponent`, `PetsService` |
+| **RF10** | Edição de pet, reajuste de enquadramento e foto | RN07, RN17, RN20 | RNF01, RNF08 | `pets`, `Storage ('pets')` | `PetFormComponent`, `ImageCropperDialogComponent`, `AuditBadgeComponent`, `PetsService`, `AuditResolverService` |
 | **RF11** | Listagem e filtros de pets | RN07, RN08 | RNF01, RNF03, RNF04 | `pets`, `entradas` | `PetListComponent`, `PetsService` |
-| **RF12** | Prontuário consolidado e visualização/expansão de foto | RN11, RN15, RN20 | RNF01, RNF04 | `pets`, `vacinas`, `consultas_exames`, `pets_locais`, `Storage ('pets')` | `PetDetailComponent`, `ImagePreviewDialogComponent`, `PetsService` |
-| **RF13** | Cadastro/Gestão de vacinas | RN11, RN12, RN14 | RNF01, RNF04 | `vacinas` | `VacinaDialogComponent`, `VacinasService` |
-| **RF14** | Procedimentos clínicos e exames | RN11, RN13, RN14 | RNF01, RNF04 | `consultas_exames` | `ProcedimentoFormComponent`, `ConsultasExamesService` |
-| **RF15** | Ordenação de prontuário | RN11 | RNF04 | `vacinas`, `consultas_exames` | `PetDetailComponent (Signals)` |
-| **RF16** | Edição/Exclusão clínica | RN17 | RNF08 | `vacinas`, `consultas_exames` | `PetDetailComponent`, `ConfirmationDialog` |
+| **RF12** | Prontuário consolidado e visualização/expansão de foto | RN11, RN15, RN20 | RNF01, RNF04 | `pets`, `vacinas`, `consultas_exames`, `pets_locais`, `Storage ('pets')` | `PetDetailComponent` (composto por `PetDetailHeaderComponent` e `PetInfoCardComponent`), `AuditBadgeComponent`, `AuditResolverService`, `ImagePreviewDialogComponent`, `PetsService` |
+| **RF13** | Cadastro/Gestão de vacinas | RN11, RN12, RN14 | RNF01, RNF04 | `vacinas` | `PetVacinasCardComponent`, `VacinaDialogComponent`, `AuditBadgeComponent`, `VacinasService` |
+| **RF14** | Procedimentos clínicos e exames | RN11, RN13, RN14 | RNF01, RNF04 | `consultas_exames` | `PetProcedimentosCardComponent`, `ProcedimentoFormComponent`, `AuditBadgeComponent`, `ConsultasExamesService` |
+| **RF15** | Ordenação de prontuário | RN11 | RNF04 | `vacinas`, `consultas_exames` | `PetDetailComponent`, `PetProcedimentosCardComponent (Signals)` |
+| **RF16** | Edição/Exclusão clínica (Admin-only delete) | RN17, RN27 | RNF06, RNF08 | `vacinas`, `consultas_exames` | `PetVacinasCardComponent`, `PetProcedimentosCardComponent`, `ProcedimentoFormComponent`, `VacinaDialogComponent`, `ConfirmationDialog` |
 | **RF17** | Cadastro de locais parceiros | RN16, RN17 | RNF01, RNF08 | `locais` | `LocalFormComponent`, `LocaisService` |
 | **RF18** | Listagem/Busca de locais | RN16 | RNF01, RNF04 | `locais` | `LocalListComponent`, `LocaisService` |
-| **RF19** | Histórico de estadias (`pets_locais`)| RN15, RN16 | RNF01, RNF04 | `pets_locais`, `locais` | `PetLocalFormComponent`, `PetsLocaisService` |
+| **RF19** | Histórico de estadias (`pets_locais`)| RN15, RN16 | RNF01, RNF04 | `pets_locais`, `locais` | `PetLocaisCardComponent`, `PetLocalFormComponent`, `PetsLocaisService` |
 | **RF20** | Cadastro de veterinários | RN14, RN17 | RNF01, RNF08 | `veterinarios` | `VeterinarioFormComponent`, `VeterinariosService` |
 | **RF21** | Listagem de veterinários | RN14 | RNF01, RNF04 | `veterinarios` | `VeterinarioListComponent`, `VeterinariosService` |
-| **RF22** | Totalizador financeiro reativo | RN11, RN15 | RNF04 | `vacinas`, `consultas_exames`, `pets_locais` | `PetDetailComponent (Computed Signals)` |
-| **RF23** | Alternância de tema Light/Dark | RNF01, RNF07 | RNF07 | `LocalStorage` | `ThemeService`, `MainLayoutComponent` |
+| **RF22** | Totalizador financeiro reativo | RN11, RN15 | RNF04 | `vacinas`, `consultas_exames`, `pets_locais` | `PetDetailComponent`, `PetDetailHeaderComponent (Computed Signals)` |
+| **RF23** | Alternância de tema Light/Dark | RNF01, RNF07 | RNF07 | `LocalStorage` | `ThemeService`, `MainLayoutComponent`, `MainNavbarComponent`, `UserSidenavComponent` |
 | **RF24** | Navegação inteligente com retorno | RNF01 | RNF01 | Memória de Roteamento | `NavigationService` |
 | **RF25** | Cadastro de voluntários e disponibilidades | RN17, RN19 | RNF01, RNF04, RNF08 | `voluntarios` | `VoluntarioDialogComponent`, `VoluntariosService` |
 | **RF26** | Listagem e filtros de voluntários | RN19 | RNF01, RNF03, RNF04 | `voluntarios` | `VoluntarioListComponent`, `VoluntariosService` |
 | **RF27** | Edição e exclusão de voluntários | RN17, RN19 | RNF01, RNF08 | `voluntarios` | `VoluntarioDialogComponent`, `VoluntarioListComponent` |
 | **RF28** | Relatórios gerenciais de pets (Excel/PDF) | RN07, RN08 | RNF01, RNF04, RNF10 | `pets`, `entradas` | `PetReportService`, `PetListComponent` |
-| **RF29** | Fluxo de Adoção Definitiva e Transferência Atômica | RN08, RN15, RN16, RN21 | RNF01, RNF04, RNF06, RNF08 | `pets`, `pets_locais`, `RPC ('adotar_pet')` | `AdotarPetDialogComponent`, `PetDetailComponent`, `PetListComponent`, `PetsService` |
-| **RF30** | Calendário Vacinal e Gestão de Imunizações | RN11, RN12, RN14, RN22 | RNF01, RNF03, RNF04, RNF08 | `vacinas`, `pets`, `veterinarios` | `CalendarioVacinalComponent`, `VacinaDialogComponent`, `PetDetailComponent`, `VacinasService` |
+| **RF29** | Fluxo de Adoção Definitiva e Transferência Atômica | RN08, RN15, RN16, RN21 | RNF01, RNF04, RNF06, RNF08 | `pets`, `pets_locais`, `RPC ('adotar_pet')` | `AdotarPetDialogComponent`, `PetDetailHeaderComponent`, `PetListComponent`, `PetsService` |
+| **RF30** | Calendário Vacinal e Gestão de Imunizações | RN11, RN12, RN14, RN22 | RNF01, RNF03, RNF04, RNF08 | `vacinas`, `pets`, `veterinarios` | `CalendarioVacinalComponent`, `VacinaDialogComponent`, `PetVacinasCardComponent`, `VacinasService` |
+| **RF31** | Registro e controle de doações de insumos | RN17, RN24 | RNF01, RNF04, RNF08 | `doacoes` | `DoacaoDialogComponent`, `AuditBadgeComponent`, `DoacoesService` |
+| **RF32** | Rateio e direcionamento de doações para locais (Admin-only delete) | RN16, RN24, RN25, RN27 | RNF01, RNF04, RNF06, RNF08 | `direcionamento_doacoes`, `locais`, `doacoes` | `DirecionamentoDialogComponent`, `DoacoesService`, `DoacaoListComponent` |
+| **RF33** | Painel Master-Detail e consolidado por local | RN24, RN25 | RNF01, RNF03, RNF04 | `doacoes`, `direcionamento_doacoes`, `locais` | `DoacaoListComponent`, `DoacoesService` |
+| **RF34** | Registro e controle de doações monetárias (Admin-only delete) | RN01, RN17, RN26, RN27 | RNF01, RNF03, RNF04, RNF06 | `doacoes_monetarias` | `DoacaoMonetariaDialogComponent`, `DoacaoListComponent`, `AuditBadgeComponent`, `DoacoesMonetariasService` |
+| **RF35** | Painel financeiro, balanço orçamentário e sustentabilidade | RN01, RN17, RN28 | RNF01, RNF03, RNF04, RNF06 | `vw_fluxo_caixa`, `doacoes_monetarias`, `despesas`, `consultas_exames`, `vacinas`, `pets_locais` | `FinanceiroDashboardComponent`, `FinanceiroService` |
+| **RF36** | Registro e gestão de despesas gerais da instituição (Admin-only delete) | RN17, RN27, RN28 | RNF01, RNF04, RNF06, RNF08 | `despesas`, `pets` | `DespesaDialogComponent`, `FinanceiroDashboardComponent`, `AuditBadgeComponent`, `DespesasService` |
+| **RF37** | Prestação de contas oficial em PDF e exportação de planilha (Excel/CSV) | RN28 | RNF01, RNF04, RNF09, RNF10 | `vw_fluxo_caixa`, `despesas` | `FinanceiroReportService`, `FinanceiroDashboardComponent` |
 
 ---
 
@@ -388,8 +489,11 @@ erDiagram
     PETS ||--o{ CONSULTAS_EXAMES : "possui"
     PETS ||--o{ PETS_LOCAIS : "hospeda-se em"
     LOCAIS ||--o{ PETS_LOCAIS : "aloca"
+    LOCAIS ||--o{ DIRECIONAMENTO_DOACOES : "recebe"
+    DOACOES ||--o{ DIRECIONAMENTO_DOACOES : "possui"
     VETERINARIOS ||--o{ VACINAS : "aplica"
     VETERINARIOS ||--o{ CONSULTAS_EXAMES : "realiza"
+    PETS ||--o{ DESPESAS : "pode vincular"
 
     PROFILES {
         uuid id PK
@@ -398,6 +502,7 @@ erDiagram
         boolean ativo
         timestamp created_at
         timestamp updated_at
+        uuid updated_by FK
     }
 
     PETS {
@@ -418,6 +523,7 @@ erDiagram
         string link_documentos
         timestamp created_at
         timestamp updated_at
+        uuid updated_by FK
     }
 
     ENTRADAS {
@@ -430,6 +536,7 @@ erDiagram
         string observacoes
         timestamp created_at
         timestamp updated_at
+        uuid updated_by FK
     }
 
     VACINAS {
@@ -442,6 +549,7 @@ erDiagram
         numeric custo
         timestamp created_at
         timestamp updated_at
+        uuid updated_by FK
     }
 
     CONSULTAS_EXAMES {
@@ -454,6 +562,7 @@ erDiagram
         numeric custo
         timestamp created_at
         timestamp updated_at
+        uuid updated_by FK
     }
 
     LOCAIS {
@@ -471,6 +580,7 @@ erDiagram
         string complemento
         timestamp created_at
         timestamp updated_at
+        uuid updated_by FK
     }
 
     PETS_LOCAIS {
@@ -484,6 +594,7 @@ erDiagram
         string obs
         timestamp created_at
         timestamp updated_at
+        uuid updated_by FK
     }
 
     VETERINARIOS {
@@ -493,6 +604,7 @@ erDiagram
         string telefone
         timestamp created_at
         timestamp updated_at
+        uuid updated_by FK
     }
 
     VOLUNTARIOS {
@@ -505,6 +617,55 @@ erDiagram
         string observacoes
         timestamp created_at
         timestamp updated_at
+        uuid updated_by FK
+    }
+
+    DOACOES {
+        bigint id PK
+        decimal volume
+        string doador
+        string telefone
+        string unidade_medida
+        timestamp created_at
+        timestamp updated_at
+        uuid updated_by FK
+    }
+
+    DIRECIONAMENTO_DOACOES {
+        bigint id PK
+        bigint id_local FK
+        bigint id_doacao FK
+        decimal volume
+        timestamp created_at
+        timestamp updated_at
+        uuid updated_by FK
+    }
+
+    DOACOES_MONETARIAS {
+        bigint id PK
+        decimal valor "check > 0"
+        string doador
+        string telefone
+        date data_doacao
+        string observacoes
+        timestamp created_at
+        timestamp updated_at
+        uuid updated_by FK
+    }
+
+    DESPESAS {
+        bigint id PK
+        string descricao
+        string categoria
+        decimal valor "check > 0"
+        date data_despesa
+        string favorecido
+        string telefone
+        string observacoes
+        bigint id_pet FK
+        timestamp created_at
+        timestamp updated_at
+        uuid updated_by FK
     }
 ```
 

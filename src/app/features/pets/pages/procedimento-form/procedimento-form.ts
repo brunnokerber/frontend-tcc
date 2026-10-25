@@ -12,11 +12,17 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSelectModule } from '@angular/material/select';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { ActivatedRoute, Router } from '@angular/router';
+import { AuthService } from '@core/auth/services/auth.service';
 import { NavigationService } from '@core/services/navigation.service';
 import { ToastService } from '@core/services/toast.service';
 import { VeterinarioDialogComponent } from '@features/veterinarios/components/veterinario-dialog/veterinario-dialog';
 import { Veterinario } from '@features/veterinarios/models/veterinario.model';
 import { VeterinariosService } from '@features/veterinarios/services/veterinarios.service';
+import {
+  ConfirmationDialogComponent,
+  ConfirmationDialogData,
+} from '@shared/components/confirmation-dialog/confirmation-dialog';
+import { AuditBadgeComponent } from '@shared/components/audit-badge/audit-badge';
 import { DateMaskDirective } from '@shared/directives/date-mask.directive';
 import { FormErrorPipe } from '@shared/pipes/form-error.pipe';
 import {
@@ -59,6 +65,7 @@ import { PetsService } from '../../services/pets.service';
     MatDialogModule,
     FormErrorPipe,
     DateMaskDirective,
+    AuditBadgeComponent,
   ],
   templateUrl: './procedimento-form.html',
   styleUrls: ['./procedimento-form.scss'],
@@ -72,7 +79,10 @@ export default class ProcedimentoFormComponent implements OnInit {
   private consultasExamesService = inject(ConsultasExamesService);
   private veterinariosService = inject(VeterinariosService);
   private dialog = inject(MatDialog);
+  private authService = inject(AuthService);
   private toast = inject(ToastService);
+
+  public isAdmin = this.authService.isAdmin;
 
   public petId = signal<number | null>(null);
   public procedimentoId = signal<number | null>(null);
@@ -82,6 +92,7 @@ export default class ProcedimentoFormComponent implements OnInit {
   public isEditing = signal<boolean>(false);
   public isLoading = signal<boolean>(false);
   public isSaving = signal<boolean>(false);
+  public isDeleting = signal<boolean>(false);
   public loadingVets = signal<boolean>(false);
 
   public veterinarios = signal<Veterinario[]>([]);
@@ -283,6 +294,45 @@ export default class ProcedimentoFormComponent implements OnInit {
     } finally {
       this.isSaving.set(false);
     }
+  }
+
+  confirmDelete(): void {
+    const id = this.procedimentoId();
+    if (!id || this.isDeleting() || this.isSaving()) return;
+
+    if (!this.isAdmin()) {
+      this.toast.error(
+        'Apenas administradores possuem permissão para excluir procedimentos clínicos ou exames.',
+      );
+      return;
+    }
+
+    const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
+      data: {
+        title: 'Excluir Procedimento / Exame',
+        message: `Tem certeza que deseja remover este procedimento clínico? Esta ação é definitiva e removerá o lançamento do histórico médico do animal.`,
+        confirmText: 'Sim, excluir',
+        cancelText: 'Cancelar',
+        confirmColor: 'warn',
+        icon: 'delete_forever',
+        isDestructive: true,
+      } as ConfirmationDialogData,
+      width: '460px',
+    });
+
+    dialogRef.afterClosed().subscribe(async (confirmed: boolean) => {
+      if (confirmed && id) {
+        this.isDeleting.set(true);
+        try {
+          const ok = await this.consultasExamesService.deleteConsultaExame(id);
+          if (ok) {
+            this.goBack();
+          }
+        } finally {
+          this.isDeleting.set(false);
+        }
+      }
+    });
   }
 
   goBack(): void {

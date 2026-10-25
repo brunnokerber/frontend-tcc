@@ -1,0 +1,585 @@
+<div class="p-3 p-md-4">
+  <!-- CARDS DE INDICADORES / KPIS (INSUMOS) -->
+  <div class="row g-3 mb-4">
+    <div class="col-12 col-sm-6 col-xl-3">
+      <app-stat-card
+        label="Total de Doações"
+        [value]="totalDoacoes()"
+        icon="inventory_2"
+        variant="primary"
+      ></app-stat-card>
+    </div>
+
+    <div class="col-12 col-sm-6 col-xl-3">
+      <app-stat-card
+        label="Com Saldo Disponível"
+        [value]="totalComSaldo()"
+        icon="check_circle"
+        variant="success"
+      ></app-stat-card>
+    </div>
+
+    <div class="col-12 col-sm-6 col-xl-3">
+      <app-stat-card
+        label="100% Direcionadas"
+        [value]="totalEsgotadas()"
+        icon="done_all"
+        variant="info"
+      ></app-stat-card>
+    </div>
+
+    <div class="col-12 col-sm-6 col-xl-3">
+      <app-stat-card
+        label="Total de Direcionamentos"
+        [value]="totalDirecionamentos()"
+        icon="local_shipping"
+        variant="warning"
+      ></app-stat-card>
+    </div>
+  </div>
+
+  <!-- PAINEL DE FILTRO E BUSCA (INSUMOS) -->
+  <app-filter-panel
+    (search)="applyFilters()"
+    (clear)="clearFilters()"
+    [loading]="doacoesService.loading()"
+    [clearDisabled]="!searchValue() && statusFilter() === 'todos'"
+    actionsColClass="col-12 col-md-4 col-xl-3 ms-auto"
+  >
+    <!-- Coluna 1: Campo de Busca -->
+    <div class="col-12 col-sm-6 col-md-3 col-xl-2">
+      <label
+        for="doacao-filter-field"
+        class="form-label small fw-semibold text-surface-muted mb-1 text-truncate d-block"
+      >
+        Buscar por
+      </label>
+      <select
+        id="doacao-filter-field"
+        class="form-select bg-surface-card text-surface-main border-surface"
+        [ngModel]="searchField()"
+        (ngModelChange)="onSearchFieldChange($event)"
+        name="searchField"
+      >
+        @for (field of searchFields; track field.value) {
+          <option [value]="field.value">{{ field.label }}</option>
+        }
+      </select>
+    </div>
+
+    <!-- Coluna 2: Termo de Busca -->
+    <div class="col-12 col-sm-6 col-md-5 col-xl-4">
+      <label
+        for="doacao-filter-value"
+        class="form-label small fw-semibold text-surface-muted mb-1 text-truncate d-block"
+      >
+        Termo de Pesquisa
+      </label>
+      <div class="input-group">
+        <span class="input-group-text bg-surface-subtle border-end-0 border-surface">
+          <i class="bi bi-search"></i>
+        </span>
+        <input
+          id="doacao-filter-value"
+          type="text"
+          class="form-control border-start-0 border-surface bg-surface-card text-surface-main"
+          [placeholder]="getSearchPlaceholder()"
+          [ngModel]="searchValue()"
+          (ngModelChange)="searchValue.set($event)"
+          name="searchValue"
+        />
+        @if (searchValue()) {
+          <button
+            class="btn btn-outline-secondary border-start-0 border-surface"
+            type="button"
+            (click)="searchValue.set('')"
+            matTooltip="Limpar busca"
+          >
+            <i class="bi bi-x-lg"></i>
+          </button>
+        }
+      </div>
+    </div>
+
+    <!-- Coluna 3: Status do Saldo -->
+    <div class="col-12 col-sm-6 col-md-4 col-xl-3">
+      <label
+        for="doacao-filter-status"
+        class="form-label small fw-semibold text-surface-muted mb-1 text-truncate d-block"
+      >
+        Status do Saldo
+      </label>
+      <select
+        id="doacao-filter-status"
+        class="form-select bg-surface-card text-surface-main border-surface"
+        [ngModel]="statusFilter()"
+        (ngModelChange)="statusFilter.set($event); applyFilters()"
+        name="statusFilter"
+      >
+        <option value="todos">Todos os Status</option>
+        <option value="disponivel">100% Disponível (Livre)</option>
+        <option value="parcial">Parcialmente Direcionada</option>
+        <option value="esgotado">Totalmente Direcionada</option>
+      </select>
+    </div>
+  </app-filter-panel>
+
+  <!-- SPINNER DE CARREGAMENTO -->
+  @if (doacoesService.loading()) {
+    <div class="d-flex flex-column align-items-center justify-content-center py-5">
+      <mat-spinner diameter="42"></mat-spinner>
+      <p class="mt-3 text-surface-muted small">Carregando doações e direcionamentos...</p>
+    </div>
+  } @else if (pagedDoacoes().length === 0) {
+    <!-- ESTADO VAZIO -->
+    <div class="empty-state text-center py-5 px-3 rounded-3 border">
+      <div class="empty-icon-circle mx-auto mb-3 d-flex align-items-center justify-content-center">
+        <mat-icon class="text-surface-muted" style="font-size: 36px; width: 36px; height: 36px">
+          inventory_2
+        </mat-icon>
+      </div>
+      <h5 class="fw-bold text-surface-main mb-1">Nenhuma doação encontrada</h5>
+      <p class="text-surface-muted small mb-3">
+        {{
+          searchValue() || statusFilter() !== 'todos'
+            ? 'Nenhum registro corresponde aos filtros aplicados. Tente ajustar os parâmetros de busca.'
+            : 'Nenhuma doação foi registrada no sistema até o momento.'
+        }}
+      </p>
+      @if (searchValue() || statusFilter() !== 'todos') {
+        <button mat-stroked-button (click)="clearFilters()">Limpar Filtros</button>
+      } @else {
+        <button mat-flat-button color="primary" (click)="openDoacaoDialog()">
+          <mat-icon class="me-1">add</mat-icon>
+          <span>Cadastrar Primeira Doação</span>
+        </button>
+      }
+    </div>
+  } @else {
+    <!-- TABELA MASTER-DETAIL DE DOAÇÕES -->
+    <div class="table-responsive rounded-3 border mb-3">
+      <table class="table align-middle table-hover mb-0 doacoes-table">
+        <thead class="small fw-semibold">
+          <tr>
+            <th scope="col" style="width: 48px" class="text-center">#</th>
+            <th scope="col">Doador & Contato</th>
+            <th scope="col" class="text-center" style="width: 140px">Volume Total</th>
+            <th scope="col" style="min-width: 220px">Distribuição & Saldo</th>
+            <th scope="col" class="text-center" style="width: 150px">Status</th>
+            <th scope="col" class="text-end" style="width: 140px">Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (doacao of pagedDoacoes(); track doacao.id) {
+            <!-- LINHA PRINCIPAL DA DOAÇÃO -->
+            <tr
+              class="doacao-row cursor-pointer"
+              [class.table-active]="isRowExpanded(doacao.id)"
+              (click)="toggleExpandRow(doacao.id, $event)"
+            >
+              <!-- Botão de Expansão e ID -->
+              <td class="text-center">
+                <button
+                  type="button"
+                  mat-icon-button
+                  class="btn-expand"
+                  [matTooltip]="
+                    isRowExpanded(doacao.id)
+                      ? 'Recolher direcionamentos'
+                      : 'Ver direcionamentos para locais'
+                  "
+                >
+                  <mat-icon class="expand-icon" [class.rotated]="isRowExpanded(doacao.id)">
+                    expand_more
+                  </mat-icon>
+                </button>
+              </td>
+
+              <!-- Doador e Contato -->
+              <td>
+                <div class="d-flex flex-column">
+                  <div class="d-flex align-items-center gap-2">
+                    <span class="fw-bold text-surface-main fs-6">{{ doacao.doador }}</span>
+                    <span
+                      class="badge bg-surface-subtle text-surface-muted border border-surface small"
+                    >
+                      #{{ doacao.id }}
+                    </span>
+                    @if (doacao.tipo_doacao) {
+                      <span
+                        class="badge bg-primary-subtle text-primary border border-primary-subtle small"
+                      >
+                        {{ doacao.tipo_doacao }}
+                      </span>
+                    }
+                  </div>
+
+                  <!-- Telefone & Ações Rápidas -->
+                  @if (doacao.telefone) {
+                    <div class="d-flex align-items-center gap-2 mt-1">
+                      <span class="text-surface-muted small d-inline-flex align-items-center gap-1">
+                        <mat-icon style="font-size: 14px; width: 14px; height: 14px"
+                          >phone</mat-icon
+                        >
+                        <span>{{ formatPhone(doacao.telefone) }}</span>
+                      </span>
+
+                      <!-- Botão WhatsApp -->
+                      <a
+                        [href]="getWhatsAppLink(doacao.telefone)"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="btn-icon-link text-success"
+                        matTooltip="Conversar no WhatsApp"
+                        (click)="$event.stopPropagation()"
+                      >
+                        <i class="bi bi-whatsapp"></i>
+                      </a>
+
+                      <!-- Botão Copiar -->
+                      <button
+                        type="button"
+                        class="btn-icon-link text-surface-muted"
+                        matTooltip="Copiar telefone"
+                        (click)="copyPhone(doacao.telefone, $event)"
+                      >
+                        <mat-icon style="font-size: 14px; width: 14px; height: 14px"
+                          >content_copy</mat-icon
+                        >
+                      </button>
+                    </div>
+                  } @else {
+                    <span class="text-surface-muted small fst-italic">Sem telefone cadastrado</span>
+                  }
+                </div>
+              </td>
+
+              <!-- Volume Total -->
+              <td class="text-center">
+                <div class="d-flex flex-column align-items-center">
+                  <span class="fw-bold fs-6 text-surface-main">
+                    {{ doacao.volume }}
+                  </span>
+                  <span class="badge bg-secondary-subtle text-secondary small">
+                    {{ doacao.unidade_medida }}
+                  </span>
+                </div>
+              </td>
+
+              <!-- Barra de Progresso e Saldo -->
+              <td>
+                <div class="d-flex flex-column gap-1">
+                  <div class="d-flex align-items-center justify-content-between small">
+                    <span class="text-surface-muted">
+                      Direcionado:
+                      <strong>{{ doacao.volume_direcionado }} {{ doacao.unidade_medida }}</strong>
+                    </span>
+                    <span
+                      class="fw-bold"
+                      [class.text-success]="(doacao.volume_disponivel ?? 0) > 0"
+                      [class.text-surface-muted]="(doacao.volume_disponivel ?? 0) <= 0"
+                    >
+                      Saldo: {{ doacao.volume_disponivel }} {{ doacao.unidade_medida }}
+                    </span>
+                  </div>
+
+                  <!-- Barra de Progresso Visual -->
+                  <div class="progress" style="height: 7px">
+                    <div
+                      class="progress-bar"
+                      role="progressbar"
+                      [style.width.%]="doacao.percentual_direcionado"
+                      [class.bg-success]="doacao.status === 'esgotado'"
+                      [class.bg-primary]="doacao.status === 'parcial'"
+                      [class.bg-secondary]="doacao.status === 'disponivel'"
+                      [attr.aria-valuenow]="doacao.percentual_direcionado"
+                      aria-valuemin="0"
+                      aria-valuemax="100"
+                    ></div>
+                  </div>
+
+                  <div
+                    class="d-flex align-items-center justify-content-between small text-surface-muted"
+                    style="font-size: 0.72rem"
+                  >
+                    <span>{{ doacao.percentual_direcionado }}% rateado</span>
+                    <span>{{ doacao.direcionamentos?.length || 0 }} local(is) atendido(s)</span>
+                  </div>
+                </div>
+              </td>
+
+              <!-- Status -->
+              <td class="text-center">
+                @switch (doacao.status) {
+                  @case ('disponivel') {
+                    <span
+                      class="badge bg-success-subtle text-success border border-success-subtle d-inline-flex align-items-center gap-1 px-2 py-1"
+                    >
+                      <mat-icon style="font-size: 14px; width: 14px; height: 14px"
+                        >check_circle</mat-icon
+                      >
+                      <span>100% Livre</span>
+                    </span>
+                  }
+                  @case ('parcial') {
+                    <span
+                      class="badge bg-primary-subtle text-primary border border-primary-subtle d-inline-flex align-items-center gap-1 px-2 py-1"
+                    >
+                      <mat-icon style="font-size: 14px; width: 14px; height: 14px"
+                        >pie_chart</mat-icon
+                      >
+                      <span>Parcial</span>
+                    </span>
+                  }
+                  @case ('esgotado') {
+                    <span
+                      class="badge bg-secondary-subtle text-secondary border border-secondary-subtle d-inline-flex align-items-center gap-1 px-2 py-1"
+                    >
+                      <mat-icon style="font-size: 14px; width: 14px; height: 14px"
+                        >done_all</mat-icon
+                      >
+                      <span>Esgotada</span>
+                    </span>
+                  }
+                }
+              </td>
+
+              <!-- Ações -->
+              <td class="text-end" (click)="$event.stopPropagation()">
+                <div class="d-inline-flex align-items-center gap-1">
+                  <!-- Botão de Direcionamento Rápido -->
+                  <button
+                    type="button"
+                    mat-icon-button
+                    [disabled]="(doacao.volume_disponivel ?? 0) <= 0"
+                    (click)="openDirecionarDialog(doacao, undefined, $event)"
+                    [matTooltip]="
+                      (doacao.volume_disponivel ?? 0) > 0
+                        ? 'Direcionar insumos para um local parceiro'
+                        : 'Saldo da doação esgotado'
+                    "
+                    aria-label="Direcionar insumos para local parceiro"
+                  >
+                    <mat-icon class="text-primary">local_shipping</mat-icon>
+                  </button>
+
+                  <!-- Editar Doação -->
+                  <button
+                    type="button"
+                    mat-icon-button
+                    (click)="openDoacaoDialog(doacao)"
+                    matTooltip="Editar dados da doação"
+                  >
+                    <mat-icon class="text-primary">edit</mat-icon>
+                  </button>
+
+                  <!-- Excluir Doação -->
+                  <button
+                    type="button"
+                    mat-icon-button
+                    (click)="confirmDeleteDoacao(doacao, $event)"
+                    matTooltip="Excluir doação"
+                  >
+                    <mat-icon class="text-danger">delete</mat-icon>
+                  </button>
+                </div>
+              </td>
+            </tr>
+
+            <!-- LINHA EXPANSÍVEL: TABELA INTERMEDIÁRIA DE DIRECIONAMENTOS -->
+            @if (isRowExpanded(doacao.id)) {
+              <tr class="expanded-detail-row">
+                <td colspan="6" class="p-0">
+                  <div class="expanded-panel p-3 p-md-4 border-bottom">
+                    <div
+                      class="d-flex flex-column flex-sm-row align-items-sm-center justify-content-between gap-2 mb-3"
+                    >
+                      <div class="d-flex align-items-center gap-2">
+                        <div
+                          class="panel-icon-circle d-flex align-items-center justify-content-center"
+                        >
+                          <mat-icon
+                            class="text-primary"
+                            style="font-size: 18px; width: 18px; height: 18px"
+                          >
+                            share_location
+                          </mat-icon>
+                        </div>
+                        <div>
+                          <h6 class="fw-bold mb-0 text-surface-main">
+                            Locais Atendidos com esta Doação (#{{ doacao.id }})
+                          </h6>
+                          <span class="text-surface-muted small">
+                            Total de {{ doacao.volume_direcionado }}
+                            {{ doacao.unidade_medida }} distribuídos entre
+                            {{ doacao.direcionamentos?.length || 0 }} local(is)
+                          </span>
+                        </div>
+                      </div>
+
+                      <!-- Botão Adicionar Direcionamento dentro do painel -->
+                      <button
+                        type="button"
+                        mat-stroked-button
+                        color="primary"
+                        class="btn-sm d-inline-flex align-items-center gap-1"
+                        [disabled]="(doacao.volume_disponivel ?? 0) <= 0"
+                        (click)="openDirecionarDialog(doacao, undefined, $event)"
+                      >
+                        <mat-icon style="font-size: 16px; width: 16px; height: 16px">add</mat-icon>
+                        <span>Direcionar para Local</span>
+                      </button>
+                    </div>
+
+                    <!-- Se houver direcionamentos cadastrados -->
+                    @if (doacao.direcionamentos && doacao.direcionamentos.length > 0) {
+                      <div class="table-responsive bg-surface rounded-3 border">
+                        <table class="table align-middle table-sm mb-0">
+                          <thead class="small fw-semibold">
+                            <tr>
+                              <th scope="col">Local Parceiro (Destino)</th>
+                              <th scope="col" class="text-center">Tipo de Estabelecimento</th>
+                              <th scope="col" class="text-center">Volume Destinado</th>
+                              <th scope="col" class="text-center">% da Doação</th>
+                              <th scope="col" class="text-center">Data do Envio</th>
+                              <th scope="col" class="text-end" style="width: 110px">Ações</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            @for (direc of doacao.direcionamentos; track direc.id) {
+                              <tr>
+                                <!-- Local de Destino -->
+                                <td>
+                                  <div class="d-flex align-items-center gap-2">
+                                    <mat-icon class="text-primary fs-5">home_work</mat-icon>
+                                    <div class="d-flex flex-column">
+                                      <span class="fw-semibold text-surface-main">
+                                        {{ direc.local?.local || 'Local #' + direc.id_local }}
+                                      </span>
+                                      @if (direc.local?.cidade) {
+                                        <span
+                                          class="text-surface-muted small"
+                                          style="font-size: 0.75rem"
+                                        >
+                                          {{ direc.local?.cidade }}
+                                        </span>
+                                      }
+                                    </div>
+                                  </div>
+                                </td>
+
+                                <!-- Tipo de Estabelecimento -->
+                                <td class="text-center">
+                                  <span
+                                    class="badge bg-surface-subtle text-surface-muted border border-surface small"
+                                  >
+                                    {{ direc.local?.tipo_local || 'Não informado' }}
+                                  </span>
+                                </td>
+
+                                <!-- Volume Destinado -->
+                                <td class="text-center">
+                                  <span class="fw-bold text-primary">
+                                    {{ direc.volume }} {{ doacao.unidade_medida }}
+                                  </span>
+                                </td>
+
+                                <!-- Percentual da Doação -->
+                                <td class="text-center">
+                                  <span class="badge bg-primary-subtle text-primary small">
+                                    {{ ((direc.volume / doacao.volume) * 100).toFixed(1) }}%
+                                  </span>
+                                </td>
+
+                                <!-- Data do Envio -->
+                                <td class="text-center small text-surface-muted">
+                                  {{ direc.created_at | date: 'dd/MM/yyyy HH:mm' }}
+                                </td>
+
+                                <!-- Ações no Direcionamento -->
+                                <td class="text-end">
+                                  <div class="d-inline-flex align-items-center gap-1">
+                                    <button
+                                      type="button"
+                                      mat-icon-button
+                                      class="btn-icon-sm"
+                                      (click)="openDirecionarDialog(doacao, direc, $event)"
+                                      matTooltip="Editar volume direcionado"
+                                    >
+                                      <mat-icon style="font-size: 16px; width: 16px; height: 16px"
+                                        >edit</mat-icon
+                                      >
+                                    </button>
+
+                                    <button
+                                      type="button"
+                                      mat-icon-button
+                                      class="btn-icon-sm"
+                                      [disabled]="!isAdmin()"
+                                      (click)="
+                                        confirmDeleteDirecionamento(
+                                          direc,
+                                          doacao.unidade_medida,
+                                          $event
+                                        )
+                                      "
+                                      [matTooltip]="
+                                        isAdmin()
+                                          ? 'Remover direcionamento (estorna saldo para a doação)'
+                                          : 'Apenas administradores podem remover direcionamentos'
+                                      "
+                                    >
+                                      <mat-icon
+                                        style="font-size: 16px; width: 16px; height: 16px"
+                                        [class.text-danger]="isAdmin()"
+                                        [class.text-surface-muted]="!isAdmin()"
+                                        >delete</mat-icon
+                                      >
+                                    </button>
+                                  </div>
+                                </td>
+                              </tr>
+                            }
+                          </tbody>
+                        </table>
+                      </div>
+                    } @else {
+                      <!-- Estado vazio de direcionamentos para esta doação -->
+                      <div class="p-3 text-center bg-surface rounded-3 border border-dashed">
+                        <p class="text-surface-muted small mb-2">
+                          Nenhum volume desta doação foi direcionado para locais parceiros ainda.
+                        </p>
+                        <button
+                          type="button"
+                          mat-stroked-button
+                          color="primary"
+                          class="btn-sm"
+                          (click)="openDirecionarDialog(doacao, undefined, $event)"
+                        >
+                          <mat-icon class="me-1">local_shipping</mat-icon>
+                          <span>Direcionar Primeiro Volume</span>
+                        </button>
+                      </div>
+                    }
+                  </div>
+                </td>
+              </tr>
+            }
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <!-- PAGINADOR DA ABA 1 -->
+    <mat-paginator
+      [length]="totalDoacoes()"
+      [pageIndex]="pageIndex()"
+      [pageSize]="pageSize()"
+      [pageSizeOptions]="pageSizeOptions"
+      (page)="onPageChange($event)"
+      showFirstLastButtons
+      aria-label="Página de doações"
+      class="rounded-3 border"
+    ></mat-paginator>
+  }
+</div>
