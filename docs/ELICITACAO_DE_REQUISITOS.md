@@ -184,6 +184,9 @@ O processo metodológico de Engenharia de Requisitos adotado no presente TCC bas
   - **Regras Associadas:** RN11, RN15, RN26, RN27
 
 - **[RF23] Alternância de Tema Visual (Light / Dark / Auto)**
+  - **Descrição:** O sistema deve suportar modo claro, modo escuro e s  - **Regras Associadas:** RN11, RN15, RN17, RN27, RN28
+
+- **[RF23] Alternância de Tema Visual (Light / Dark / Auto)**
   - **Descrição:** O sistema deve suportar modo claro, modo escuro e sincronização com preferência do sistema operacional, persistindo a escolha localmente.
   - **Prioridade:** Could Have (Desejável)
   - **Regras Associadas:** RNF01, RNF07
@@ -239,18 +242,18 @@ O processo metodológico de Engenharia de Requisitos adotado no presente TCC bas
 - **[RF31] Registro e Controle de Doações de Insumos Recebidos**
   - **Descrição:** O sistema deve permitir o cadastro e gerenciamento de doações físicas/materiais recebidas pela ONG (rações, cobertores, medicamentos, insumos de limpeza), armazenando: Tipo de Doação (obrigatório, máx. 50 caracteres, com autocomplete e botões de seleção rápida para: Ração, Medicamento, Material de Limpeza, Cobertores/Camas, Acessórios, Outro), Nome do Doador (pessoa física ou jurídica, obrigatório, máx. 50 caracteres), Telefone de Contato (opcional, com máscara e link direto para WhatsApp), Volume Total Arrecadado (decimal 10,2 positivo) e Unidade de Medida (obrigatório, máx. 10 caracteres, com botões de seleção rápida para: kg, litros, un, sacos, pacotes, caixas, latas, fardos).
   - **Prioridade:** Must Have (Essencial)
-  - **Regras Associadas:** RN17, RN24
+  - **Regras Associadas:** RN17, RN23, RN24
 
 - **[RF32] Rateio e Direcionamento de Doações para Locais Parceiros (`direcionamento_doacoes`)**
   - **Descrição:** Permitir a distribuição fracionada ou integral dos insumos de uma doação para os locais de acolhimento cadastrados (`public.locais`), associando o Local de Destino e o Volume Destinado. A interface deve prover validação instantânea para que o volume a direcionar não ultrapasse o saldo livre da doação de origem, oferecendo atalho para alocação do saldo total restante em um clique. A exclusão física ou estorno de direcionamentos de doações é restrita a usuários com perfil de Administrador (`admin`), com botões desabilitados e salvaguarda imperativa para operadores comuns.
   - **Prioridade:** Must Have (Essencial)
-  - **Regras Associadas:** RN16, RN24, RN25, RN27
+  - **Regras Associadas:** RN16, RN23, RN24, RN25, RN27
 
 - **[RF33] Painel Master-Detail e Visão Consolidada de Insumos por Local**
   - **Descrição:** O sistema deve disponibilizar aba própria na navegação principal (`/doacoes`) composta por visões operacionais isoladas através do padrão de composição de abas (_Smart Tabs Composition_ com renderização preguiçosa `matTabContent` e controle reativo de aba ativa): (1) Aba "Doações e Rateio" (`DoacoesInsumosTabComponent`) com listagem mestre de doações, filtros de busca por Doador/Telefone/Unidade, filtro de status de saldo (100% Livre, Parcial, Esgotada), KPIs em tempo real, barra de progresso visual de distribuição e expansão inline (Master-Detail) revelando os locais atendidos com opções de edição de volume e estorno; e (2) Aba "Direcionamentos por Local" (`DoacoesDirecionamentosTabComponent`), apresentando a tabela intermediária consolidada com filtro por local parceiro para auditoria do total de insumos que cada abrigo ou clínica já recebeu da ONG.
   - **Otimização de Requisições HTTP Sob Demanda (Lazy Tab Loading):** As abas do módulo de doações não exibem contadores numéricos estáticos no cabeçalho, eliminando chamadas antecipadas em lote na inicialização da página. Cada subcomponente de aba é responsável exclusivamente por suas próprias consultas HTTP (`fetchDoacoes`, `fetchDoacoesMonetarias` ou `fetchDirecionamentos` e `fetchLocais`), disparando a carga somente quando a respectiva aba for selecionada pelo usuário.
   - **Prioridade:** Must Have (Essencial)
-  - **Regras Associadas:** RN24, RN25
+  - **Regras Associadas:** RN23, RN24, RN25
 
 - **[RF34] Registro e Controle Financeiro de Doações Monetárias (`public.doacoes_monetarias`)**
   - **Descrição:** O sistema deve disponibilizar aba dedicada "Doações em Dinheiro" (`DoacoesMonetariasTabComponent`) no módulo de doações (`/doacoes`) para gerenciamento de contribuições financeiras recebidas pela instituição (via PIX, dinheiro ou transferência bancária), armazenando: Valor Doado (decimal 10,2 estritamente positivo, obrigatório), Nome do Doador (obrigatório, máx. 50 caracteres), Telefone de Contato (opcional, com máscara, cópia rápida e link direto para WhatsApp), Data da Doação (date, padrão data corrente) e Observações/Finalidade (opcional, máx. 255 caracteres).
@@ -365,7 +368,7 @@ O processo metodológico de Engenharia de Requisitos adotado no presente TCC bas
   Todo local parceiro deve possuir endereço estruturado (logradouro, número, bairro, cidade, estado e CEP) para facilitar a logística de transporte e visitas de inspeção do bem-estar animal.
 
 - **[RN17] Auditoria Automática de Criação, Modificação e Autoria (`Audit Trail` e `updated_by`):**  
-  Todas as entidades do banco de dados relacional (`profiles`, `pets`, `entradas`, `veterinarios`, `vacinas`, `consultas_exames`, `locais`, `doacoes`, `direcionamento_doacoes`, `pets_locais`, `voluntarios` e `doacoes_monetarias`) implementam os atributos de auditoria `created_at`, `updated_at` e `updated_by` (`uuid references public.profiles(id) on delete set null default auth.uid()`), garantindo integridade temporal e autoria em conformidade com governança de dados.
+  Todas as 13 entidades do banco de dados relacional (`profiles`, `pets`, `entradas`, `veterinarios`, `vacinas`, `consultas_exames`, `locais`, `doacoes`, `direcionamento_doacoes`, `pets_locais`, `voluntarios`, `doacoes_monetarias` e `despesas`) implementam os atributos de auditoria `created_at`, `updated_at` e `updated_by` (`uuid references public.profiles(id) on delete set null default auth.uid()`), garantindo integridade temporal e autoria em conformidade com governança de dados.
   - **Automação via Trigger Central (`handle_updated_at`):**
     - **No `INSERT`:** O campo `updated_by` é preenchido nativamente com o UUID do usuário logado via `default auth.uid()`.
     - **No `UPDATE`:** O trigger central atualiza de forma autônoma:
@@ -411,6 +414,14 @@ O processo metodológico de Engenharia de Requisitos adotado no presente TCC bas
   - **Diferenciação Visual e Operacional:** Toda vacina cadastrada possui `data_prevista` mandatória. Vacinas cuja `data_aplicacao` seja nula constam como **Previstas / Pendentes** (se `data_prevista < data_atual`, são computadas e sinalizadas como **Atrasadas** em destaque de alerta). Quando o campo `data_aplicacao` é preenchido, a vacina adquire o status **Aplicada**, sendo visualmente identificada por uma badge verde e ícone de verificação.
   - **Ação Rápida de Aplicação:** A interface do calendário e do prontuário deve disponibilizar mecanismo de aplicação rápida ("Aplicar Hoje"), atribuindo automaticamente a data corrente à `data_aplicacao` e persistindo a alteração no banco de dados.
   - **Atualização Reativa de Calendário:** A confirmação ou desmarcação de aplicação de uma vacina via `VacinaDialogComponent` ou ação rápida deve refletir instantaneamente nas métricas (KPIs de previstas, aplicadas e atrasadas) e nos chips visuais do calendário sem recarga de página.
+
+- **[RN23] Padronização de Insumos, Unidades de Medida e Classificação Dinâmica de Saldo de Doações:**
+  - **Tipos de Doação Homologados:** O cadastro e a filtragem de doações físicas de insumos (`public.doacoes`) adota categorização semântica padronizada através da coluna `tipo_doacao` (máx. 50 caracteres), oferecendo botões de seleção rápida e autocomplete para: `'Ração'`, `'Medicamento'`, `'Material de Limpeza'`, `'Cobertores/Camas'`, `'Acessórios'` e `'Outro'`.
+  - **Volume Não-Negativo e Unidades de Medida Padronizadas:** O volume total arrecadado (`volume`) deve ser estritamente superior a zero ($> 0$, com restrição `CHECK` no PostgreSQL e validadores reativos no formulário), atrelado obrigatoriamente a uma unidade de medida (`unidade_medida`: `'kg'`, `'litros'`, `'un'`, `'sacos'`, `'pacotes'`, `'caixas'`, `'latas'`, `'fardos'`).
+  - **Computação Reativa e Classificação de Saldo:** O sistema calcula em tempo real o saldo disponível para rateio (Saldo Livre = 	Volume Total - Volumes já Direcionados) e o percentual de distribuição (%Distribuído = Volumes Direcionados*100/Volume Total), classificando e sinalizando visualmente cada doação em três estados operacionais:
+    - **100% Livre:** Nenhum direcionamento realizado (Volume Direcionado = 0). Identificada por badge verde de disponibilidade total.
+    - **Parcial:** Fração do insumo distribuída, restando saldo disponível para outros locais parceiros (Volume Direcionado< Volume Total). Identificada por badge amarela/laranja e barra de progresso proporcional de rateio.
+    - **Esgotada:** Volume arrecadado integralmente distribuído para os locais parceiros (Volume Direcionado=Volume Total). Identificada por badge cinza discreta, bloqueando novos direcionamentos.
 
 - **[RN24] Validação de Limites de Rateio de Doações e Consistência de Volume:**
   - **Saldo Não-Negativo:** O volume direcionado a um local parceiro não pode ser superior ao saldo livre restante da doação ($\text{Volume a Direcionar} \le \text{Volume Total} - \sum \text{Volumes já Direcionados}$). A tentativa de direcionar volume superior é bloqueada com notificação visual explicativa.
@@ -477,18 +488,18 @@ O processo metodológico de Engenharia de Requisitos adotado no presente TCC bas
 |   **RF19**   | Histórico de estadias (`pets_locais`)                                   |       RN15, RN16       |          RNF01, RNF04           | `pets_locais`, `locais`                                                                          | `PetLocaisCardComponent`, `PetLocalFormComponent`, `PetsLocaisService`                                                                                                               |
 |   **RF20**   | Cadastro de veterinários                                                |       RN14, RN17       |          RNF01, RNF08           | `veterinarios`                                                                                   | `VeterinarioFormComponent`, `VeterinariosService`                                                                                                                                    |
 |   **RF21**   | Listagem de veterinários                                                |          RN14          |          RNF01, RNF04           | `veterinarios`                                                                                   | `VeterinarioListComponent`, `VeterinariosService`                                                                                                                                    |
-|   **RF22**   | Totalizador financeiro reativo                                          |       RN11, RN15       |              RNF04              | `vacinas`, `consultas_exames`, `pets_locais`                                                     | `PetDetailComponent`, `PetDetailHeaderComponent (Computed Signals)`                                                                                                                  |
+|   **RF22**   | Totalizador financeiro reativo e despesas vinculadas                    | RN11, RN15, RN17, RN27, RN28 |              RNF04              | `vacinas`, `consultas_exames`, `pets_locais`, `despesas`                                         | `PetDetailComponent`, `PetDetailHeaderComponent`, `PetDespesasCardComponent`, `DespesasService`                                                                                     |
 |   **RF23**   | Alternância de tema Light/Dark                                          |      RNF01, RNF07      |              RNF07              | `LocalStorage`                                                                                   | `ThemeService`, `MainLayoutComponent`, `MainNavbarComponent`, `UserSidenavComponent`                                                                                                 |
 |   **RF24**   | Navegação inteligente com retorno                                       |         RNF01          |              RNF01              | Memória de Roteamento                                                                            | `NavigationService`                                                                                                                                                                  |
 |   **RF25**   | Cadastro de voluntários e disponibilidades                              |       RN17, RN19       |       RNF01, RNF04, RNF08       | `voluntarios`                                                                                    | `VoluntarioDialogComponent`, `VoluntariosService`                                                                                                                                    |
 |   **RF26**   | Listagem e filtros de voluntários                                       |          RN19          |       RNF01, RNF03, RNF04       | `voluntarios`                                                                                    | `VoluntarioListComponent`, `VoluntariosService`                                                                                                                                      |
 |   **RF27**   | Edição e exclusão de voluntários                                        |       RN17, RN19       |          RNF01, RNF08           | `voluntarios`                                                                                    | `VoluntarioDialogComponent`, `VoluntarioListComponent`                                                                                                                               |
-|   **RF28**   | Relatórios gerenciais de pets e ficha individual (Excel/PDF)            |       RN07, RN08, RN11, RN12       |       RNF01, RNF04, RNF10       | `pets`, `entradas`, `vacinas`, `consultas_exames`, `despesas`                                    | `PetReportService`, `PetListComponent`, `PetDetailComponent`, `PetDetailHeaderComponent`                                                                                            |
+|   **RF28**   | Relatórios gerenciais de pets e ficha individual (Excel/PDF)            | RN07, RN08, RN11, RN12, RN13, RN15 |       RNF01, RNF04, RNF10       | `pets`, `entradas`, `vacinas`, `consultas_exames`, `despesas`                                    | `PetReportService`, `PetListComponent`, `PetDetailComponent`, `PetDetailHeaderComponent`                                                                                            |
 |   **RF29**   | Fluxo de Adoção Definitiva e Transferência Atômica                      | RN08, RN15, RN16, RN21 |   RNF01, RNF04, RNF06, RNF08    | `pets`, `pets_locais`, `RPC ('adotar_pet')`                                                      | `AdotarPetDialogComponent`, `PetDetailHeaderComponent`, `PetListComponent`, `PetsService`                                                                                            |
 |   **RF30**   | Calendário Vacinal e Gestão de Imunizações                              | RN11, RN12, RN14, RN22 |   RNF01, RNF03, RNF04, RNF08    | `vacinas`, `pets`, `veterinarios`                                                                | `CalendarioVacinalComponent`, `VacinaDialogComponent`, `PetVacinasCardComponent`, `VacinasService`                                                                                   |
-|   **RF31**   | Registro e controle de doações de insumos                               |       RN17, RN24       |       RNF01, RNF04, RNF08       | `doacoes`                                                                                        | `DoacaoDialogComponent`, `AuditBadgeComponent`, `DoacoesService`                                                                                                                     |
-|   **RF32**   | Rateio e direcionamento de doações para locais (Admin-only delete)      | RN16, RN24, RN25, RN27 |   RNF01, RNF04, RNF06, RNF08    | `direcionamento_doacoes`, `locais`, `doacoes`                                                    | `DirecionamentoDialogComponent`, `DoacoesService`, `DoacaoListComponent`                                                                                                             |
-|   **RF33**   | Painel Master-Detail e consolidado por local                            |       RN24, RN25       |       RNF01, RNF03, RNF04       | `doacoes`, `direcionamento_doacoes`, `locais`                                                    | `DoacaoListComponent`, `DoacoesService`                                                                                                                                              |
+|   **RF31**   | Registro e controle de doações de insumos                               |       RN17, RN23, RN24 |       RNF01, RNF04, RNF08       | `doacoes`                                                                                        | `DoacaoDialogComponent`, `AuditBadgeComponent`, `DoacoesService`                                                                                                                     |
+|   **RF32**   | Rateio e direcionamento de doações para locais (Admin-only delete)      | RN16, RN23, RN24, RN25, RN27 |   RNF01, RNF04, RNF06, RNF08    | `direcionamento_doacoes`, `locais`, `doacoes`                                                    | `DirecionamentoDialogComponent`, `DoacoesService`, `DoacaoListComponent`                                                                                                             |
+|   **RF33**   | Painel Master-Detail e consolidado por local                            |       RN23, RN24, RN25 |       RNF01, RNF03, RNF04       | `doacoes`, `direcionamento_doacoes`, `locais`                                                    | `DoacaoListComponent`, `DoacoesService`                                                                                                                                              |
 |   **RF34**   | Registro e controle de doações monetárias (Admin-only delete)           | RN01, RN17, RN26, RN27 |   RNF01, RNF03, RNF04, RNF06    | `doacoes_monetarias`                                                                             | `DoacaoMonetariaDialogComponent`, `DoacaoListComponent`, `AuditBadgeComponent`, `DoacoesMonetariasService`                                                                           |
 |   **RF35**   | Painel financeiro, balanço orçamentário e sustentabilidade              |    RN01, RN17, RN28    |   RNF01, RNF03, RNF04, RNF06    | `vw_fluxo_caixa`, `doacoes_monetarias`, `despesas`, `consultas_exames`, `vacinas`, `pets_locais` | `FinanceiroDashboardComponent`, `FinanceiroService`                                                                                                                                  |
 |   **RF36**   | Registro e gestão de despesas gerais da instituição (Admin-only delete) |    RN17, RN27, RN28    |   RNF01, RNF04, RNF06, RNF08    | `despesas`, `pets`                                                                               | `DespesaDialogComponent`, `DespesaDetalhesDialogComponent`, `FinanceiroDashboardComponent`, `AuditBadgeComponent`, `DespesasService`                                                 |
@@ -508,6 +519,7 @@ erDiagram
     LOCAIS ||--o{ PETS_LOCAIS : "aloca"
     LOCAIS ||--o{ DIRECIONAMENTO_DOACOES : "recebe"
     DOACOES ||--o{ DIRECIONAMENTO_DOACOES : "possui"
+    PETS ||--o{ DESPESAS : "vincula-se opcionalmente"
     VETERINARIOS ||--o{ VACINAS : "aplica"
     VETERINARIOS ||--o{ CONSULTAS_EXAMES : "realiza"
     PETS ||--o{ DESPESAS : "pode vincular"
@@ -639,41 +651,12 @@ erDiagram
 
     DOACOES {
         bigint id PK
-        decimal volume
-        string doador
-        string telefone
+        string tipo_doacao
+        decimal volume "check > 0"
         string unidade_medida
-        timestamp created_at
-        timestamp updated_at
-        uuid updated_by FK
-    }
-
-    DIRECIONAMENTO_DOACOES {
-        bigint id PK
-        bigint id_local FK
-        bigint id_doacao FK
-        decimal volume
-        timestamp created_at
-        timestamp updated_at
-        uuid updated_by FK
-    }
-
-    DOACOES_MONETARIAS {
-        bigint id PK
-        decimal valor "check > 0"
         string doador
         string telefone
-        date data_doacao
-        string observacoes
-        timestamp created_at
-        timestamp updated_at
-        uuid updated_by FK
-    }
-
-    DESPESAS {
-        bigint id PK
-        string descricao
-        string categoria
+      string categoria
         decimal valor "check > 0"
         date data_despesa
         string favorecido

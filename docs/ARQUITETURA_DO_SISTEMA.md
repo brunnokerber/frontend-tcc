@@ -8,7 +8,7 @@
 **Curso:** Engenharia da Computação  
 **Trabalho de Conclusão de Curso (TCC)**  
 **Projeto:** DESENVOLVIMENTO E VALIDAÇÃO DE SOFTWARE DE GERENCIAMENTO DE DADOS CADASTRAIS DE ANIMAIS DE ONGS DE ACOLHIMENTO E TRATAMENTO DE ANIMAIS DE RUA  
-**Versão:** 1.1.0 — Outubro de 2026
+**Versão:** 1.0.0 — Outubro de 2026
 
 ---
 
@@ -31,6 +31,121 @@ Para atender aos critérios de usabilidade móvel, baixo tempo de resposta, segu
 ![Arquitetura Geral da Solução](./assets/Arquitetura%20do%20sistema.png)
 
 > 📁 **Arquivo Fonte Editável:** O arquivo de modelagem vetorial está disponível em [`docs/Arquitetura do sistema.drawio`](./Arquitetura%20do%20sistema.drawio) e pode ser aberto diretamente no [draw.io](https://app.diagrams.net/).
+
+### 2.1. Visão Sistêmica e Relacionamentos entre Componentes
+
+```mermaid
+flowchart TB
+    %% ========================================================
+    %% 1. CAMADA DE APRESENTAÇÃO (FRONTEND SPA)
+    %% ========================================================
+    subgraph FRONTEND ["1. Camada de Apresentação (Frontend SPA - Angular 20 Zoneless)"]
+        direction TB
+        DISP["📱💻 Dispositivos dos Usuários<br>Smartphones, Tablets e Desktops (Voluntários e Gestores da ONG)"]
+        
+        SHELL["Layout & Shell Responsivo (MainLayout)<br>• MainNavbarComponent (Atalhos, tema, menu de usuário)<br>• UserSidenavComponent (Navegação lateral com controle RBAC)<br>• MainFooterComponent e alternância de temas (Light / Dark / Auto)"]
+        
+        subgraph FEATS ["Módulos de Negócio (Feature-Based & Lazy Loading)"]
+            direction TB
+            F_PETS["🐾 Pets & Prontuário<br>Triagem, vacinas, procedimentos, despesas e adoção atômica"]
+            F_DOA["🎁 Doações & Suprimentos<br>Insumos físicos, rateio master-detail e doações monetárias"]
+            F_FIN["💰 Painel Financeiro<br>Fluxo de caixa consolidado, gráfico SVG, Top 5 pets e despesas"]
+            F_CAL["📅 Calendário Vacinal<br>Grade mensal, agenda cronológica e status de vacinação"]
+            F_LOC["🏠 Locais & Lares<br>Lares temporários, clínicas parceiras e estadias"]
+            F_VET["🩺 Veterinários<br>Registro profissional (CRMV) e corpo clínico"]
+            F_VOL["🤝 Voluntários (Admin)<br>Disponibilidade, escalas, dias da semana e turnos"]
+            F_USR["👥 Usuários (Admin)<br>Controle RBAC (admin/user), convites e desativação lógica"]
+            F_AUTH["🔐 Autenticação & Segurança<br>Login, primeiro acesso e timebox (8h inatividade / 24h total)"]
+        end
+
+        CORE_SRV["Módulo Core (Singletons de Infraestrutura & Domínio)<br>• AuthService & SupabaseService (Cliente PostgREST / GoTrue)<br>• AuditResolverService (Cache em memória Map 0ms para updated_by)<br>• NavigationService, ToastService e ThemeService"]
+
+        SHARED_COMP["Módulo Shared (Componentes Reutilizáveis & Utilitários)<br>• AuditBadgeComponent (Popover de autoria com perfil)<br>• PageHeader, StatCard, FilterPanel e DialogLayout<br>• ImagePreviewDialogComponent (Lightbox de fotos), Pipes e Máscaras"]
+
+        SIGNALS["⚡ Reatividade Granular: Angular Signals & Computed Signals (Arquitetura Zoneless)"]
+
+        DISP --> SHELL --> FEATS --> CORE_SRV --> SHARED_COMP --> SIGNALS
+    end
+
+    %% ========================================================
+    %% CONECTOR HTTPS / TLS
+    %% ========================================================
+    FRONTEND <-->|"HTTPS / TLS 1.3<br>Bearer Token JWT (RFC 7519)<br>PostgREST Client SDK & RPCs"| BACKEND
+
+    %% ========================================================
+    %% 2. CAMADA DE SERVIÇOS E PERSISTÊNCIA (BaaS)
+    %% ========================================================
+    subgraph BACKEND ["2. Camada de Serviços e Persistência (BaaS - Supabase)"]
+        direction TB
+        AUTH_S["Supabase Auth (GoTrue Engine)<br>Emissão/validação JWT, timebox de sessão, senhas fortes e convites"]
+        STORAGE_S["Supabase Storage (Bucket Privado 'pets')<br>Upload de fotos de animais (≤256 KB, MIME jpeg/png/webp) e URLs assinadas"]
+        POSTGREST_S["PostgREST API Engine<br>Endpoints RESTful gerados dinamicamente com filtros, paginação e embedding"]
+        
+        subgraph RPCS_BOX ["Stored Procedures Atômicas (RPCs Transacionais ACID)"]
+            RPC1["create_pet_com_entrada (Pet + Entrada atômicos)"]
+            RPC2["update_pet_com_entrada (Edição cadastral e entrada)"]
+            RPC3["adotar_pet (Lock FOR UPDATE, validação 'Disponível' e inserção em pets_locais)"]
+        end
+
+        EDGE_S["Edge Functions (Deno / Serverless Isolado)<br>toggle-user-status: Banimento síncrono no Auth com Service Role e soft delete"]
+
+        subgraph PG_BOX ["SGBDR PostgreSQL 15 Relacional"]
+            direction TB
+            RLS_POL["Row Level Security (RLS) & Governança de Exclusão<br>• RLS ativo em 100% das tabelas públicas (is_active_user / is_admin)<br>• DELETE bloqueado em entidades primárias; DELETE restrito a Admin nas intermediárias"]
+            
+            subgraph TABS_NUCLEO ["Tabelas de Núcleo e Prontuário"]
+                T_PETS["public.pets & public.entradas"]
+                T_CLIN["public.vacinas & public.consultas_exames"]
+                T_LOC["public.locais & public.pets_locais"]
+                T_VET["public.veterinarios"]
+                T_VOL["public.voluntarios"]
+                T_PRF["public.profiles"]
+            end
+
+            subgraph TABS_FIN ["Módulo Financeiro & Suprimentos"]
+                T_DOA["public.doacoes (Insumos Físicos)"]
+                T_DIR["public.direcionamento_doacoes (Rateio para Lares)"]
+                T_MON["public.doacoes_monetarias (Entradas PIX/Dinheiro)"]
+                T_DESP["public.despesas (Saídas Operacionais Gerais)"]
+                T_VIEW["public.vw_fluxo_caixa (View Consolidada security_invoker)"]
+            end
+
+            AUDIT_T["Trilha de Auditoria (updated_by + updated_at)<br>Trigger handle_updated_at automático capturando auth.uid() em 100% das 13 tabelas"]
+            INDEX_T["Otimizações & Índices: GIN Trigram (pg_trgm para buscas ILIKE), GIN Arrays e B-Tree"]
+        end
+
+        subgraph ETL_BOX ["Módulo ETL em Python (etl/)"]
+            ETL_PROC["Pipeline de Ingestão Legada: Parser XML/XLSX, Dicionário Semântico,<br>Normalização Canônica, Gerador SQL Idempotente e Carga Docker"]
+        end
+
+        AUTH_S --- POSTGREST_S --- RPCS_BOX --- EDGE_S
+        STORAGE_S --- TABS_NUCLEO
+        PG_BOX --- ETL_BOX
+    end
+
+    %% ========================================================
+    %% 3. CAMADA DE AUTOMAÇÃO E INFRAESTRUTURA (DevOps)
+    %% ========================================================
+    subgraph DEVOPS ["3. Camada de Automação e Infraestrutura (DevOps)"]
+        direction TB
+        GIT_REPO["Repositório Git (GitHub)<br>Controle de versão distribuído, branch protection e histórico auditável"]
+        
+        subgraph CICD ["Esteira CI/CD (GitHub Actions)"]
+            direction TB
+            CI_1["1. Análise Estática & Lint<br>ESLint Flat Config (Zero 'any' mandatória) + Prettier"]
+            CI_2["2. Testes Unitários & Cobertura<br>Vitest + JSDOM (@vitest/coverage-v8 com relatórios text/lcov/json)"]
+            CI_3["3. Build de Produção & AOT<br>Otimização Angular 20, tree shaking e minificação"]
+            CI_4["4. Deploy Automatizado<br>Publicação contínua pós-aprovação em todos os testes"]
+            CI_1 --> CI_2 --> CI_3 --> CI_4
+        end
+
+        HOSTING["Hospedagem em Nuvem (Vercel CDN)<br>Distribuição global de alta disponibilidade via Edge CDN e SSL automático"]
+
+        GIT_REPO --> CICD --> HOSTING
+    end
+
+    HOSTING -.->|"Distribuição da SPA via CDN"| DISP
+```
 
 ---
 
