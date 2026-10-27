@@ -112,10 +112,6 @@ O processo metodológico de Engenharia de Requisitos adotado no presente TCC bas
   - **Prioridade:** Must Have (Essencial)
   - **Regras Associadas:** RN11, RN15, RN20
 
-- **[RF28] Exportação e Emissão de Relatórios Gerenciais de Pets (Excel e PDF)**
-  - **Descrição:** O sistema deve permitir a exportação dinâmica dos dados dos animais cadastrados para planilha Excel (`.csv` com codificação UTF-8 BOM e delimitador compatível) e a geração de documento para impressão/salvamento em PDF formatado institucionalmente, considerando fielmente todos os filtros aplicados na tela (busca dinâmica, espécie, sexo, status, porte e fase da vida) e incluindo resumo estatístico e indicadores quantitativos.
-  - **Prioridade:** Should Have (Importante)
-  - **Regras Associadas:** RN07, RN08
 
 ---
 
@@ -183,8 +179,6 @@ O processo metodológico de Engenharia de Requisitos adotado no presente TCC bas
   - **Prioridade:** Must Have (Essencial)
   - **Regras Associadas:** RN11, RN15, RN26, RN27
 
-- **[RF23] Alternância de Tema Visual (Light / Dark / Auto)**
-  - **Descrição:** O sistema deve suportar modo claro, modo escuro e s  - **Regras Associadas:** RN11, RN15, RN17, RN27, RN28
 
 - **[RF23] Alternância de Tema Visual (Light / Dark / Auto)**
   - **Descrição:** O sistema deve suportar modo claro, modo escuro e sincronização com preferência do sistema operacional, persistindo a escolha localmente.
@@ -296,153 +290,120 @@ O processo metodológico de Engenharia de Requisitos adotado no presente TCC bas
 
 ## 4. Regras de Negócio (RN)
 
+As regras de negócio definem as políticas operacionais, restrições conceituais de integridade, cálculos determinísticos do domínio e diretrizes de governança de acesso que regem a instituição *Peludinhos do Vale*, independentemente de detalhes tecnológicos ou de implementação de interface. Para assegurar alta coesão e conformidade com o Princípio da Responsabilidade Única (SRP), as regras estão organizadas em pacotes temáticos:
+
+### 4.1 Pacote 1: Governança de Acesso, Autenticação e Sessão
+
 - **[RN01] Restrição de Gestão de Usuários por Papel (RBAC):**  
-  Apenas usuários autenticados com a role `admin` podem visualizar a tela de gestão de usuários, enviar convites de acesso e alterar papéis. Operadores comuns (`user`) que tentarem acessar a rota `/usuarios` devem ser barrados por `adminGuard` e redirecionados.
+  Apenas usuários autenticados com o papel de Administrador (`admin`) possuem permissão para gerenciar contas de usuários, emitir convites de acesso e alterar papéis no sistema. Operadores comuns (`user`) são estritamente impedidos de acessar funcionalidades administrativas de governança de usuários.
 
-- **[RN02] Controle de Sessão, Timeouts de Inatividade e Sessão Expirada:**  
-  Todas as rotas da aplicação (exceto `/login` e `/definir-senha`) são protegidas por `authGuard`. Tentativas de acesso não autenticadas resultam em redirecionamento para `/login`. O Supabase Auth implementa limites rígidos de ciclo de vida de sessão:
-  - **Duração Máxima da Sessão (Timebox):** 24 horas.
-  - **Inatividade Máxima (Inactivity Timeout):** 8 horas.
-  - **Escuta Reativa do Ciclo de Vida:** O `AuthService` escuta os eventos `onAuthStateChange` (`SIGNED_OUT` ou `TOKEN_REFRESHED` com sessão nula). Caso o tempo limite de inatividade expire ou a renovação do token falhe, o usuário é redirecionado automaticamente para `/login` e um toast informativo exibe: _"Sua sessão expirou por inatividade. Por favor, faça login novamente."_.
+- **[RN02] Controle de Ciclo de Vida e Expiração de Sessão por Inatividade:**  
+  O acesso ao sistema exige sessão autenticada ativa. O ciclo de vida da sessão é governado por dois limites temporais de segurança: (1) encerramento obrigatório após **8 horas consecutivas de inatividade** do usuário; e (2) tempo máximo absoluto de **24 horas contínuas de sessão ativa**, momento em que o usuário deve obrigatoriamente realizar nova autenticação para continuar operando.
 
-- **[RN03] Fluxo Fechado de Inscrição, Primeiro Acesso e Proteção na Troca de Senha:**
-  - **Auto-Cadastro Desativado (Signup Fechado):** O endpoint público de auto-registro (`auth.signUp`) é desativado (`signup_disabled`). Não há link nem tela pública de cadastro/inscrição no sistema.
-  - **Inclusão Exclusiva por Administradores:** Novos voluntários são incluídos exclusivamente por administradores (`admin`) através da Edge Function `invite-user`.
-  - **Primeiro Acesso / Redefinição:** O voluntário convidado recebe link temporário por e-mail com token na URL hash e é direcionado para a rota `/definir-senha`, onde cadastra sua senha pela primeira vez cumprindo a política de senha forte.
-  - **Proteção na Troca de Senha (`secure_password_change: true`):** O Supabase Auth exige reautenticação recente para alteração de credencial pelo próprio usuário. Caso a sessão seja antiga, a operação é bloqueada e o frontend orienta o usuário a reautenticar-se antes de definir a nova senha.
+- **[RN03] Onboarding sob Convite e Reautenticação para Alteração de Credenciais:**  
+  O sistema opera em regime de cadastro fechado, sem provisionamento público de auto-registro. Novos usuários são integrados exclusivamente mediante convite administrativo enviado por e-mail com token temporário de primeiro acesso. Para salvaguarda de segurança, qualquer alteração de senha por parte do próprio usuário exige comprovação de autenticação recente antes da persistência da nova credencial.
 
-- **[RN04] Política de Senhas Fortes e Validação de Credenciais:**  
-  O backend do Supabase Auth rejeita nativamente senhas fracas retornando HTTP 422 (`weak_password`), assim como rejeita tentativas de redefinição para a mesma senha atual do usuário (HTTP 422 - `same_password`: _"New password should be different from the old password."_). O frontend Angular trata ambas as situações:
-  - **Tratamento de Senha Idêntica (`same_password`):** Mapeado no `AuthService` e nos formulários reativos via erro `samePassword`, exibindo a mensagem explicativa: _"A nova senha deve ser diferente da senha anterior."_.
-  - **Validação de Complexidade:** Aplica validação síncrona reativa nos formulários (`strongPasswordValidator` e `SENHA_FORTE_REGEX`) acompanhada de checklist visual com indicadores dinâmicos em tempo real nas telas de Definição de Senha de Convite, Redefinição de Senha e Alteração de Senha no Perfil:
-    - **Comprimento Mínimo:** 8 caracteres.
-    - **Letra Maiúscula:** ao menos uma (A-Z).
-    - **Letra Minúscula:** ao menos uma (a-z).
-    - **Número:** ao menos um (0-9).
-    - **Símbolo / Caractere Especial:** ao menos um (`!@#$%^&*()_+-=[]{};':"|,.<>/?~`).
-    - **Expressão Regular Estrita:** `/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~`]).{8,}$/`.
-  - O e-mail deve obedecer à sintaxe RFC 5322 e ter comprimento máximo de 100 caracteres.
+- **[RN04] Política de Complexidade de Senhas e Não-Repetição:**  
+  As senhas de acesso devem possuir comprimento mínimo de 8 caracteres e conter obrigatoriamente: ao menos uma letra maiúscula (A-Z), uma letra minúscula (a-z), um número (0-9) e um caractere especial/símbolo. Por diretriz de integridade e segurança, a definição de uma nova senha não pode ser idêntica à credencial em uso no momento da alteração. O endereço de e-mail deve respeitar formato sintático válido e ter comprimento máximo de 100 caracteres.
 
-- **[RN05] Preservação de Integridade Referencial em Desativações (Soft Delete):**  
-  Nenhum usuário é deletado fisicamente do banco de dados relacional (`hard delete`). Ao desativar um usuário, o campo `ativo` é alterado para `false` no perfil e o Supabase Auth aplica um banimento temporal (`banned_until`), impedindo novos logins sem comprometer o histórico de registros (como quem cadastrou cada pet na tabela `entradas`).
+- **[RN05] Preservação Histórica e Desativação Lógica (Soft Delete):**  
+  Nenhum usuário ou registro estrutural com vínculos operacionais pode ser excluído fisicamente da base de dados. A revogação de acesso de um membro é realizada exclusivamente por inativação lógica (`ativo = false`) com revogação temporal de permissão de login, preservando integralmente o histórico de auditoria e a autoria dos registros legados gerados pelo usuário.
 
-- **[RN06] Regra de Auto-Desativação com Encerramento de Sessão:**  
-  Quando um usuário solicita a auto-desativação de sua própria conta, a operação na Edge Function atualiza o status para inativo e, em caso de sucesso, o cliente executa o logout imediatamente, invalidando a sessão no navegador.
+- **[RN06] Auto-Desativação de Conta e Revogação Imediata de Acesso:**  
+  Ao solicitar a desativação da sua própria conta, o sistema deve registrar a inativação do perfil e revogar imediatamente a sessão ativa do usuário, impedindo qualquer operação subsequente sem intervenção prévia de um administrador.
+
+---
+
+### 4.2 Pacote 2: Gestão Cadastral, Triagem e Adoção de Animais
 
 - **[RN07] Domínio dos Enums de Classificação do Pet:**  
-  Os dados categóricos do pet devem respeitar estritamente as listas controladas:
-  - **Espécie:** `Cachorro`, `Gato`, `Outro`
-  - **Sexo:** `Macho`, `Fêmea`
-  - **Status:** `Disponível`, `Em Tratamento`, `Quarentena`, `Adotado`, `Óbito`
-  - **Porte:** `Mini`, `Pequeno`, `Médio`, `Grande`, `Gigante`
-  - **Senioridade:** `Filhote`, `Adulto`, `Sênior`
+  Os dados categóricos do animal acolhido devem respeitar estritamente listas padronizadas e controladas do domínio:
+  - **Espécie:** `Cachorro`, `Gato`, `Outro`.
+  - **Sexo:** `Macho`, `Fêmea`.
+  - **Status Operacional:** `Disponível`, `Em Tratamento`, `Quarentena`, `Adotado`, `Óbito`.
+  - **Porte:** `Mini`, `Pequeno`, `Médio`, `Grande`, `Gigante`.
+  - **Senioridade:** `Filhote`, `Adulto`, `Sênior`.
 
-- **[RN08] Busca Tolerante e Normalização de Textos:**  
-  A busca de animais deve desconsiderar diferenças entre maiúsculas e minúsculas (`case-insensitive` via operador ILIKE do PostgreSQL/Supabase) e aplicar sanitização (remoção de espaços excedentes nas extremidades).
+- **[RN08] Busca Tolerante e Sanitização Textual:**  
+  A busca de animais e entidades cadastrais deve ser tolerante a variações de caixa alta e baixa (*case-insensitive*) e aplicar sanitização prévia com eliminação de espaços ociosos nas extremidades do termo pesquisado.
 
 - **[RN09] Algoritmo Determinístico de Cálculo de Senioridade:**  
-  A senioridade do animal é calculada pela diferença em meses e anos entre a data atual e a data de nascimento:
+  A classificação etária do animal é computada de forma determinística a partir da diferença em meses e anos entre a data corrente e a data de nascimento informada:
   $$\text{Idade} < 12 \text{ meses} \implies \text{Filhote}$$
   $$1 \text{ ano} \le \text{Idade} < 7 \text{ anos} \implies \text{Adulto}$$
   $$\text{Idade} \ge 7 \text{ anos} \implies \text{Sênior}$$
 
-- **[RN10] Governança, Atomicidade Transacional e Edição de Dados de Entrada / Histórico de Resgate (RBAC):**  
-  Ao criar um novo pet, é mandatório registrar a primeira entrada (`local_origem`, `data_entrada`, `resgatante` e `id_usuario` logado). Essa operação é executada de forma estritamente atômica (transação ACID no PostgreSQL) por meio da _Stored Procedure_ `create_pet_com_entrada`, garantindo rollback automático caso ocorra qualquer inconsistência e associando automaticamente o `id_usuario` a partir da sessão ativa (`auth.uid()`). Em caso de edição cadastral posterior do animal, a alteração conjunta é processada pela procedure `update_pet_com_entrada`, sendo a retificação dos dados de entrada (`local_origem`, `data_entrada`, `resgatante`, `observacoes`) restrita exclusivamente a usuários autenticados com papel de **Administrador (`admin`)**. Usuários operadores (`user`) visualizam esses campos em modo somente-leitura (`readonly`), prevenindo adulterações acidentais ou não autorizadas no registro histórico inicial do resgate.
+- **[RN10] Obrigatoriedade e Governança Histórica do Registro de Entrada:**  
+  Todo pet cadastrado deve possuir compulsoriamente um registro inicial de entrada vinculado (data de entrada, local de origem/resgate, resgatante e observações da triagem). Por razões de integridade do histórico do animal, a retificação posterior dos dados da entrada original é prerrogativa exclusiva de usuários com papel de Administrador (`admin`), permanecendo em modo de somente-leitura para operadores comuns.
+
+- **[RN20] Padronização, Restrições e Privacidade de Fotos de Animais:**  
+  O upload de foto de perfil do animal é opcional, devendo atender a restrições estritas de conformidade: formato de imagem padronizado (JPEG, PNG ou WebP), enquadramento centrado no rosto do animal e tamanho máximo de arquivo de 256 KB para sustentabilidade de armazenamento. Por salvaguarda de privacidade e integridade, as imagens não possuem links públicos diretos, sendo acessadas sob demanda mediante tokens temporários e mantidas apenas enquanto o registro existir (removendo arquivos anteriores em caso de substituição).
+
+- **[RN21] Elegibilidade e Atomicidade na Adoção Definitiva:**  
+  Apenas animais que estejam no status operacional `'Disponível'` são elegíveis para o fluxo de adoção definitiva. Animais em tratamento, quarentena, já adotados ou em óbito não podem receber registro de adoção. O ato de adoção altera obrigatoriamente o status do pet para `'Adotado'` e registra o vínculo de saída com o tutor/adotante de destino de forma simultânea e indissociável.
+
+---
+
+### 4.3 Pacote 3: Prontuário Clínico e Acomodação
 
 - **[RN11] Totalização Financeira e Não-Negatividade de Custos:**  
-  Valores de custo de vacinas, procedimentos clínicos e auxílios de hospedagem não podem ser negativos. O cálculo do total investido deve tratar valores nulos como zero ($0.00$) e refletir reativamente a soma no prontuário.
+  Valores monetários de despesas clínicas, vacinas, procedimentos e auxílios de hospedagem não podem ser negativos ($\ge 0$). O cômputo do investimento financeiro acumulado no prontuário do pet considera o somatório de todos os custos diretos e despesas alocadas, tratando valores nulos como zero ($0.00$).
 
-- **[RN12] Gestão de Status de Aplicação Vacinal:**  
-  Uma vacina cadastrada possui data prevista obrigatória. Caso a `data_aplicacao` seja preenchida, considera-se a dose efetivada; caso contrário, consta como pendência vacinal no prontuário.
+- **[RN12] Controle de Prazos e Efetivação de Vacinas:**  
+  Todo registro de vacina exige data prevista mandatória. A vacina é considerada pendente enquanto a data de aplicação não for preenchida, sendo classificada como atrasada caso a data prevista seja anterior à data corrente. Uma vez informada a data de realização, o registro adquire o status de aplicada.
 
-- **[RN13] Categorização Padronizada de Procedimentos:**  
-  Todo procedimento médico deve ser classificado em uma das categorias permitidas: `Consulta de Rotina`, `Consulta Emergencial`, `Exame de Sangue`, `Exame de Imagem`, `Procedimento Cirúrgico`, `Medicamento` ou `Outro`.
+- **[RN13] Categorização Padronizada de Procedimentos Clínicos:**  
+  Todo atendimento ou intervenção veterinária deve ser classificado em uma das categorias controladas: `Consulta de Rotina`, `Consulta Emergencial`, `Exame de Sangue`, `Exame de Imagem`, `Procedimento Cirúrgico`, `Medicamento` ou `Outro`.
 
-- **[RN14] Desacoplamento Opcional do Profissional Veterinário:**  
-  O vínculo de um médico veterinário a uma vacina ou procedimento clínico é opcional (campo anulável `id_veterinario`), permitindo registros de procedimentos realizados em mutirões ou quando o profissional não está previamente cadastrado na base.
+- **[RN14] Opcionalidade de Vínculo de Profissional Veterinário:**  
+  O registro de vacinas e procedimentos clínicos não exige vínculo obrigatório a um médico veterinário previamente cadastrado na base, permitindo o lançamento de atendimentos realizados em mutirões comunitários ou campanhas públicas de castração.
 
-- **[RN15] Rastreabilidade de Estadias e Transparência de Custos:**  
-  O histórico de acomodação de um pet em lares temporários armazena o histórico sequencial das datas de entrada e eventual saída/reentrada, permitindo auditar onde o animal esteve alojado ao longo de todo o período sob a tutela da ONG.
+- **[RN15] Rastreabilidade Sequencial de Acomodação e Estadias:**  
+  O histórico de hospedagem do animal em lares temporários, clínicas ou canis parceiros armazena a cronologia sequencial das estadias com datas de saída, eventual retorno e motivo da movimentação, permitindo a reconstituição completa da trajetória física do pet sob tutela da ONG.
 
-- **[RN16] Padronização de Endereçamento de Locais:**  
-  Todo local parceiro deve possuir endereço estruturado (logradouro, número, bairro, cidade, estado e CEP) para facilitar a logística de transporte e visitas de inspeção do bem-estar animal.
+- **[RN16] Padronização Estrutural de Endereçamento de Locais:**  
+  Todo ponto de acolhimento parceiro deve possuir endereço estruturado completo (logradouro, número, bairro, cidade, estado e CEP) para viabilizar o planejamento logístico de resgates, transporte e inspeções periódicas de bem-estar animal.
 
-- **[RN17] Auditoria Automática de Criação, Modificação e Autoria (`Audit Trail` e `updated_by`):**  
-  Todas as 13 entidades do banco de dados relacional (`profiles`, `pets`, `entradas`, `veterinarios`, `vacinas`, `consultas_exames`, `locais`, `doacoes`, `direcionamento_doacoes`, `pets_locais`, `voluntarios`, `doacoes_monetarias` e `despesas`) implementam os atributos de auditoria `created_at`, `updated_at` e `updated_by` (`uuid references public.profiles(id) on delete set null default auth.uid()`), garantindo integridade temporal e autoria em conformidade com governança de dados.
-  - **Automação via Trigger Central (`handle_updated_at`):**
-    - **No `INSERT`:** O campo `updated_by` é preenchido nativamente com o UUID do usuário logado via `default auth.uid()`.
-    - **No `UPDATE`:** O trigger central atualiza de forma autônoma:
-      ```sql
-      new.updated_at = timezone('utc', now());
-      new.updated_by = coalesce(auth.uid(), new.updated_by, old.updated_by);
-      ```
-      Dessa forma, o identificador do usuário que realizou a última alteração é capturado diretamente do JWT da sessão autenticada, sem necessidade de payload ou intervenção manual no frontend.
-  - **Exibição na Interface sem Degradação de Desempenho ou Consumo de Cotas:**
-    - **Estratégia Zero Quota Overhead:** As consultas de listagem e diálogo utilizam `select('*')`, obtendo o atributo `updated_by` sem qualquer requisição adicional ($N+1$) ou joins desnecessários.
-    - **Serviço Singleton de Resolução com Cache em Memória (`AuditResolverService`):** Orquestra a busca do perfil (`UserProfile`) do autor via PostgREST, aplicando barreira de segurança no cliente (`authService.isAdmin()`), cacheamento local com resposta instantânea de $0\text{ ms}$ em buscas subsequentes e deduplicação de requisições simultâneas em voo.
-    - **Componente Reutilizável de Trilha de Auditoria (`AuditBadgeComponent`):** Padroniza a apresentação da data de atualização e identificador de autoria em todos os formulários e diálogos do sistema (`pet-form`, `procedimento-form`, `vacina-dialog`, `despesa-dialog`, `doacao-dialog`, `doacao-monetaria-dialog`, `pet-info-card` e `pet-detail-header`):
-      - **Para Operadores Comuns (`user`):** Apresenta data/hora ou pílula estática discreta com ID reduzido, resguardando a privacidade de dados (LGPD).
-      - **Para Administradores (`admin`):** O chip de identificação (`ID: a1b2c3...`) atua como gatilho interativo que abre sob demanda um **Popover rico em Angular Material (`mat-menu`)**:
-        - E-mail completo do autor com botão de cópia rápida em 1 clique e notificação via toast;
-        - Chips temáticos de **Papel** (`Administrador` / `Operador`) e **Status da Conta** (`Ativa` / `Inativa`);
-        - UUID completo de auditoria com botão de cópia;
-        - Atalho direto de navegação para a gestão de usuários (`/usuarios?search=email`).
+- **[RN22] Ciclo de Status e Aplicação Efetiva de Vacinas:**  
+  O gerenciamento de imunizações no calendário e no prontuário do pet opera com transição clara entre os estados Prevista, Atrasada e Aplicada. O sistema deve possibilitar a confirmação imediata da aplicação com data corrente e a atualização dinâmica dos indicadores vacinais da instituição.
 
-- **[RN18] Feedback e Não-Bloqueio de Experiência:**  
-  Toda operação assíncrona com o banco de dados deve fornecer feedback visual imediato ao usuário (spinners de carregamento e notificações do tipo _Toast_ com estados de sucesso, alerta ou erro claro em língua portuguesa).
+---
 
-- **[RN19] Acesso Exclusivo, Governança do Quadro de Voluntários (RBAC) e Sincronização Unidirecional de Dados:**  
-  Apenas usuários autenticados com o papel de Administrador (`admin`) possuem permissão para acessar a rota `/voluntarios`, visualizar a lista de contatos, consultar disponibilidades por dia/turno e realizar o cadastro, alteração ou exclusão de voluntários. O acesso direto ao banco de dados PostgreSQL é protegido por políticas de Row Level Security (RLS) baseadas na função `public.is_admin()`, e no frontend o acesso à rota é bloqueado por `adminGuard`.
-  - **Sincronização Orientada ao Evento de Submit (Eliminação de Duplo GET):** As operações de mutação (`createVoluntario`, `updateVoluntario`, `deleteVoluntario`) no `VoluntariosService` operam de forma atômica e desacoplada, retornando a entidade persistida sem invocar automaticamente refetches internos de leitura. A atualização da listagem é orquestrada exclusivamente pelo evento de fechamento com sucesso da modal (`dialogRef.afterClosed()`) ou no callback de confirmação da exclusão em `VoluntarioListComponent`. Essa abordagem elimina o duplo GET após inserções, edições ou exclusões, garantindo uma única requisição HTTP que preserva rigorosamente os filtros ativos (termo de pesquisa, campo, dia e turno) e a paginação da tela.
+### 4.4 Pacote 4: Suprimentos, Doações e Logística
 
-- **[RN20] Armazenamento Seguro, Enquadramento Pré-Upload e Exibição de Fotos (Supabase Storage):**  
-  O armazenamento de fotos dos animais é gerenciado em bucket privado (`pets`) no Supabase Storage:
-  - **Controle de Acesso, Privacidade e Cache em Memória:** O bucket é estritamente privado (`public = false`), não permitindo URLs públicas estáticas. O acesso às imagens no frontend é realizado mediante geração de URLs temporárias assinadas (`createSignedUrl`) com tempo de expiração determinado (1 hora / 3600s). Para mitigar requisições repetitivas ao Storage na navegação de retorno (ex: ao voltar de formulários de consultas, exames ou procedimentos), o `PetsService` mantém um cache em memória `Map<string, { url: string; expiresAt: number }>` que reaproveita a URL enquanto válida, invalidando a entrada apenas na troca ou exclusão da imagem.
-  - **Enquadramento Circular e Compressão Pré-Upload (Canvas):** Ao selecionar uma nova foto no formulário de cadastro/edição, o sistema abre automaticamente modal interativo (`ImageCropperDialogComponent`) com molde exclusivo de avatar circular, provendo controles de zoom (slider, botões +/- e roda do mouse), deslocamento panorâmico (mouse drag ou touch mobile) e rotação em 90°. Ao confirmar o enquadramento, um Canvas desacoplado recorta e converte a área circular selecionada para WebP (600x600 px) com compressão dinâmica progressiva e redução dimensional caso necessário (`image-utils.ts`), garantindo de forma autônoma que qualquer foto de smartphone (mesmo de 10 MB+) seja convertida para um arquivo leve estritamente inferior a 256 KB (262.144 bytes).
-  - **Visualização Ampliada (Lightbox Modal):** Na tela de detalhes do animal (`/pets/detalhes/:id`), o avatar com foto assinada é clicável e exibe overlay indicativo ao passar o cursor, abrindo modal em alta resolução (`ImagePreviewDialogComponent`) com opções de fechamento e abertura em nova aba do navegador.
-  - **Restrição de Carga e Tipos MIME:** Uploads são estritamente limitados ao tamanho máximo de 256 KB (262.144 bytes) — dimensionamento planejado para viabilizar o armazenamento de no mínimo 4.000 fotos dentro da cota gratuita de 1.000 MB do Supabase Storage — e formatos de imagem aceitos: `image/jpeg`, `image/png` e `image/webp`. Validações ocorrem tanto no cliente quanto na política de integridade do bucket no Supabase.
-  - **Limpeza Automática de Fotos Substituídas (Economia de Storage):** Na edição ou remoção de fotos de pets existentes, o sistema remove automaticamente a foto anterior do bucket privado no Supabase Storage, prevenindo o acúmulo de arquivos órfãos e maximizando a retenção útil de armazenamento.
-  - **Atomicidade Transacional:** A persistência do caminho relativo da foto (`foto_url`) ocorre exclusivamente através das _Stored Procedures_ transacionais (`create_pet_com_entrada` e `update_pet_com_entrada`).
-  - **Estratégia de Desempenho e Economia de Banda:** A imagem não é renderizada na listagem geral paginada de animais (tabela/cards gerais), sendo carregada e exibida sob demanda exclusivamente na tela de detalhes do animal (`/pets/detalhes/:id`) e no formulário de edição/cadastro.
+- **[RN23] Padronização de Insumos e Máquina de Estados de Saldo de Doações:**  
+  Doações físicas recebidas são classificadas em categorias padronizadas (`Ração`, `Medicamento`, `Material de Limpeza`, `Cobertores/Camas`, `Acessórios`, `Outro`) com volumes positivos atrelados a unidades de medida padronizadas (`kg`, `litros`, `un`, `sacos`, `pacotes`, `caixas`, `latas`, `fardos`). O saldo livre é calculado dinamicamente ($\text{Saldo} = \text{Volume Total} - \sum \text{Volumes Direcionados}$), classificando a doação em três estados operacionais:
+  - **100% Livre:** Nenhum direcionamento realizado ($\text{Saldo} = \text{Volume Total}$).
+  - **Parcial:** Fração do insumo distribuída, restando saldo disponível para outros locais parceiros.
+  - **Esgotada:** Saldo totalmente direcionado ($\text{Saldo} = 0$), bloqueando novos direcionamentos.
 
-- **[RN21] Regra de Elegibilidade e Transição Atômica de Adoção Definitiva:**
-  - **Elegibilidade Rígida de Status:** Animais só podem ser submetidos ao fluxo de adoção definitiva se seu status operacional atual for estritamente `'Disponível'`. Caso o animal esteja em status `'Em Tratamento'`, `'Quarentena'`, `'Adotado'` ou `'Óbito'`, tanto o frontend (bloqueando/ocultando as ações) quanto a stored procedure PostgreSQL `adotar_pet` (lançando exceção amigável) impedem a operação.
-  - **Atomicidade Transacional:** A transição de status do animal para `'Adotado'` e a inserção do registro de saída na tabela `pets_locais` ocorrem dentro de uma única transação atômica ACID no banco de dados, garantindo que não existam animais adotados sem vínculo com o adotante/local de destino ou passagens de adoção sem a devida atualização do status do pet.
-  - **Cadastro Inline de Novo Adotante:** A interface de adoção permite pesquisar adotantes existentes ou invocar o modal de cadastro de novo local/tutor em tempo de execução sem perda dos dados preenchidos no formulário de adoção.
+- **[RN24] Limites de Rateio e Integridade de Volume de Insumos:**  
+  O volume direcionado a um local parceiro não pode exceder o saldo livre restante da doação de origem. Ao retificar uma doação existente, o novo volume total informado não pode ser inferior ao montante que já foi distribuído para os locais parceiros.
 
-- **[RN22] Regra de Controle de Status e Aplicação Efetiva de Vacinas:**
-  - **Diferenciação Visual e Operacional:** Toda vacina cadastrada possui `data_prevista` mandatória. Vacinas cuja `data_aplicacao` seja nula constam como **Previstas / Pendentes** (se `data_prevista < data_atual`, são computadas e sinalizadas como **Atrasadas** em destaque de alerta). Quando o campo `data_aplicacao` é preenchido, a vacina adquire o status **Aplicada**, sendo visualmente identificada por uma badge verde e ícone de verificação.
-  - **Ação Rápida de Aplicação:** A interface do calendário e do prontuário deve disponibilizar mecanismo de aplicação rápida ("Aplicar Hoje"), atribuindo automaticamente a data corrente à `data_aplicacao` e persistindo a alteração no banco de dados.
-  - **Atualização Reativa de Calendário:** A confirmação ou desmarcação de aplicação de uma vacina via `VacinaDialogComponent` ou ação rápida deve refletir instantaneamente nas métricas (KPIs de previstas, aplicadas e atrasadas) e nos chips visuais do calendário sem recarga de página.
+- **[RN25] Restituição Automática de Saldo em Estornos de Direcionamento:**  
+  A exclusão ou anulação de um direcionamento de insumo restitui compulsoriamente o volume estornado ao saldo livre da doação de origem, recalculando imediatamente a taxa de distribuição e seu estado operacional.
 
-- **[RN23] Padronização de Insumos, Unidades de Medida e Classificação Dinâmica de Saldo de Doações:**
-  - **Tipos de Doação Homologados:** O cadastro e a filtragem de doações físicas de insumos (`public.doacoes`) adota categorização semântica padronizada através da coluna `tipo_doacao` (máx. 50 caracteres), oferecendo botões de seleção rápida e autocomplete para: `'Ração'`, `'Medicamento'`, `'Material de Limpeza'`, `'Cobertores/Camas'`, `'Acessórios'` e `'Outro'`.
-  - **Volume Não-Negativo e Unidades de Medida Padronizadas:** O volume total arrecadado (`volume`) deve ser estritamente superior a zero ($> 0$, com restrição `CHECK` no PostgreSQL e validadores reativos no formulário), atrelado obrigatoriamente a uma unidade de medida (`unidade_medida`: `'kg'`, `'litros'`, `'un'`, `'sacos'`, `'pacotes'`, `'caixas'`, `'latas'`, `'fardos'`).
-  - **Computação Reativa e Classificação de Saldo:** O sistema calcula em tempo real o saldo disponível para rateio (Saldo Livre = 	Volume Total - Volumes já Direcionados) e o percentual de distribuição (%Distribuído = Volumes Direcionados*100/Volume Total), classificando e sinalizando visualmente cada doação em três estados operacionais:
-    - **100% Livre:** Nenhum direcionamento realizado (Volume Direcionado = 0). Identificada por badge verde de disponibilidade total.
-    - **Parcial:** Fração do insumo distribuída, restando saldo disponível para outros locais parceiros (Volume Direcionado< Volume Total). Identificada por badge amarela/laranja e barra de progresso proporcional de rateio.
-    - **Esgotada:** Volume arrecadado integralmente distribuído para os locais parceiros (Volume Direcionado=Volume Total). Identificada por badge cinza discreta, bloqueando novos direcionamentos.
+---
 
-- **[RN24] Validação de Limites de Rateio de Doações e Consistência de Volume:**
-  - **Saldo Não-Negativo:** O volume direcionado a um local parceiro não pode ser superior ao saldo livre restante da doação ($\text{Volume a Direcionar} \le \text{Volume Total} - \sum \text{Volumes já Direcionados}$). A tentativa de direcionar volume superior é bloqueada com notificação visual explicativa.
-  - **Trava de Diminuição de Volume Total:** Ao editar uma doação já registrada, o novo volume total informado não pode ser inferior à soma dos volumes que já foram direcionados para locais parceiros. Para reduzir o volume total abaixo dessa quantia, o operador deve previamente remover ou ajustar os direcionamentos vinculados.
+### 4.5 Pacote 5: Gestão Financeira, Integridade e Auditoria
 
-- **[RN25] Restituição Automática de Saldo por Estorno de Direcionamento:**  
-  Ao excluir um direcionamento existente na tabela intermediária `direcionamento_doacoes`, o volume correspondente é imediatamente estornado e restituído ao saldo disponível da doação de origem, recalculando reativamente o percentual rateado e atualizando o status operacional (ex: de 'Esgotada' para 'Parcial' ou '100% Livre').
+- **[RN17] Trilha Universal de Auditoria e Autoria:**  
+  Todas as entidades transacionais e operacionais do sistema mantêm obrigatoriamente o registro cronológico de criação (`created_at`), última modificação (`updated_at`) e a identificação do usuário autor (`updated_by`). Por diretrizes de privacidade e governança (LGPD), a inspeção detalhada do autor de cada registro (e-mail, papel de acesso e status da conta) é restrita a usuários com perfil de Administrador.
 
-- **[RN26] Governança de Exclusão de Doações Monetárias (Admin Only via RLS):**  
-  Em conformidade com as diretrizes contábeis e de prestação de contas da instituição, registros de doações financeiras (`public.doacoes_monetarias`) possuem proteção reforçada. Qualquer usuário ativo (`is_active_user()`) pode registrar ou consultar doações e editar dados cadastrais/observações. Todavia, a exclusão física (`DELETE`) é estritamente restrita a usuários com perfil de Administrador (`admin`), tanto pela política de segurança RLS (`Admins can delete doacoes_monetarias`) no PostgreSQL quanto por validação no frontend (`AuthService.isAdmin()`), mantendo a integridade do livro-caixa e do histórico financeiro da ONG.
+- **[RN18] Feedback Operacional e Não-Bloqueio de Experiência:**  
+  Toda operação executada no sistema deve fornecer resposta imediata e explícita ao usuário quanto ao seu processamento e resultado (indicação de carregamento e confirmações de sucesso, alerta ou erro compreensível), assegurando fluidez operacional sem bloqueios silenciosos.
 
-- **[RN27] Governança de Exclusão Física em Tabelas de Exceção Operacional (Admin-Only via RBAC e RLS):**  
-  Por diretriz estrita de integridade de dados e auditoria, tabelas operacionais onde a remoção física de registros é permitida (`public.vacinas`, `public.consultas_exames`, `public.direcionamento_doacoes`, `public.doacoes_monetarias` e `public.despesas`) possuem a exclusão física (`DELETE`) estritamente restrita a usuários com papel de **Administrador (`role = 'admin'`)**. Usuários com perfil de Operador (`role = 'user'`) podem visualizar, cadastrar e atualizar dados autorizados, porém são impedidos de realizar exclusões:
-  - **Camada de Banco (RLS):** As políticas de `DELETE` aplicam a regra `public.is_admin()`, rejeitando no PostgreSQL qualquer tentativa de exclusão executada por usuários comuns.
-  - **Camada de Interface (Angular):** O frontend valida reativamente a permissão através do signal `AuthService.isAdmin()`, desabilitando com tooltip explicativo ou omitindo os botões de exclusão nas tabelas do prontuário do pet (`pet-detail`), nos diálogos (`vacina-dialog`, `despesa-dialog`), no formulário de procedimentos (`procedimento-form`), nas abas de rateio de doações (`doacao-list`) e no painel financeiro (`financeiro-dashboard`), além de aplicar salvaguarda imperativa nos métodos TypeScript com notificação (_toast_) de advertência caso a operação seja invocada indevidamente.
+- **[RN19] Governança e Acesso ao Quadro de Voluntários (RBAC):**  
+  O acesso ao módulo de voluntários, consulta de disponibilidades (dias da semana e turnos), cadastro, alteração e exclusão de dados de contato são prerrogativas exclusivas de usuários com perfil de Administrador (`admin`). Operadores comuns são barrados do acesso.
 
-- **[RN28] Governança Orçamentária e Restrição de Acesso ao Módulo Financeiro (Admin-Only):**  
-  Por motivos de sigilo financeiro, planejamento institucional e conformidade tributária/contábil:
-  - **Restrição de Rota e Acesso Exclusivo via Barra Lateral:** O acesso ao módulo `/financeiro` é restrito estritamente a usuários autenticados com o papel `admin` através do `adminGuard`. O link de navegação é disponibilizado exclusivamente através da barra lateral administrativa (`userSidenav`), não sendo exibido na barra superior de navegação para preservar o foco operacional e resguardar a visualização de recursos gerenciais. Operadores comuns (`user`) que tentarem acessar a URL direta são bloqueados e redirecionados para a tela inicial (`/pets`) com toast informativo de permissão insuficiente.
-  - **Visibilidade Contábil Segregada:** A consolidação orçamentária via `public.vw_fluxo_caixa` (cálculo de balanço, cobertura percentual e comparativos de arrecadação vs. saídas) e o balancete oficial de prestação de contas são de visualização exclusiva da administração.
-  - **Lançamento de Despesas Institucionais:** O cadastro e edição de despesas gerais (`public.despesas`) e sua auditoria são gerenciados a partir da aba dedicada no painel financeiro com validação de duplicidade e histórico de autoria (`updated_by`).
+- **[RN26] Integridade e Governança de Exclusão de Doações Monetárias:**  
+  Registros contábeis de doações monetárias (livro-caixa de entradas financeiras) podem ser consultados e registrados por usuários ativos, porém sua exclusão física é terminantemente restrita a Administradores (`admin`), prevenindo supressões indevidas de receita e garantindo a fidedignidade da prestação de contas institucional.
+
+- **[RN27] Governança de Exclusão Física em Tabelas Operacionais de Exceção:**  
+  Para conciliar a necessidade de retificação de lançamentos errôneos com a preservação histórica do sistema, a exclusão física (`DELETE`) é proibida em entidades estruturais e estritamente restrita a usuários com papel de **Administrador (`admin`)** nas 5 tabelas operacionais de exceção: `vacinas`, `consultas_exames`, `direcionamento_doacoes`, `doacoes_monetarias` e `despesas`. Operadores comuns possuem permissão apenas para visualização, inserção e alteração quando autorizados.
+
+- **[RN28] Sigilo Orçamentário e Segregação Contábil do Módulo Financeiro:**  
+  Por motivos de sigilo institucional, conformidade fiscal e governança orçamentária, o acesso ao painel financeiro consolidado, aos relatórios analíticos de fluxo de caixa, ao balanço contábil e à emissão oficial de prestação de contas é restrito exclusivamente a usuários com papel de Administrador (`admin`). Operadores comuns não possuem acesso ao módulo orçamentário.
 
 ---
 
@@ -476,7 +437,7 @@ O processo metodológico de Engenharia de Requisitos adotado no presente TCC bas
 |   **RF07**   | Cadastro completo de pet, foto e enquadramento                          | RN07, RN08, RN09, RN20 |       RNF01, RNF04, RNF08       | `pets`, `Storage ('pets')`                                                                       | `PetFormComponent`, `ImageCropperDialogComponent`, `PetsService`                                                                                                                     |
 |   **RF08**   | Registro obrigatório de entrada                                         |       RN10, RN17       |          RNF08, RNF09           | `entradas`                                                                                       | `PetFormComponent`, `PetsService`                                                                                                                                                    |
 |   **RF09**   | Cálculo de senioridade                                                  |          RN09          |              RNF04              | `pets`                                                                                           | `pet.model.ts (calculateSenioridade)`                                                                                                                                                |
-|   **RF10**   | Edição de pet, reajuste de enquadramento e foto                         |    RN07, RN17, RN20    |          RNF01, RNF08           | `pets`, `Storage ('pets')`                                                                       | `PetFormComponent`, `ImageCropperDialogComponent`, `AuditBadgeComponent`, `PetsService`, `AuditResolverService`                                                                      |
+|   **RF10**   | Edição de pet, reajuste de enquadramento e foto                         | RN07, RN10, RN17, RN20 |          RNF01, RNF08           | `pets`, `Storage ('pets')`                                                                       | `PetFormComponent`, `ImageCropperDialogComponent`, `AuditBadgeComponent`, `PetsService`, `AuditResolverService`                                                                      |
 |   **RF11**   | Listagem e filtros de pets                                              |       RN07, RN08       |       RNF01, RNF03, RNF04       | `pets`, `entradas`                                                                               | `PetListComponent`, `PetsService`                                                                                                                                                    |
 |   **RF12**   | Prontuário consolidado e visualização/expansão de foto                  |    RN11, RN15, RN20    |          RNF01, RNF04           | `pets`, `vacinas`, `consultas_exames`, `pets_locais`, `Storage ('pets')`                         | `PetDetailComponent` (composto por `PetDetailHeaderComponent` e `PetInfoCardComponent`), `AuditBadgeComponent`, `AuditResolverService`, `ImagePreviewDialogComponent`, `PetsService` |
 |   **RF13**   | Cadastro/Gestão de vacinas                                              |    RN11, RN12, RN14    |          RNF01, RNF04           | `vacinas`                                                                                        | `PetVacinasCardComponent`, `VacinaDialogComponent`, `AuditBadgeComponent`, `VacinasService`                                                                                          |
